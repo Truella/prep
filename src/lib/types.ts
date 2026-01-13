@@ -1,3 +1,5 @@
+import type { ParseError } from "papaparse";
+
 export interface Question {
 	text: string;
 	options: string[];
@@ -18,3 +20,20 @@ export interface QuizSubmission {
 	score?: number;
 	totalPoints?: number;
 }
+export interface MCQRow {
+	Question: string;
+	Option_A: string;
+	Option_B: string;
+	Option_C: string;
+	Option_D: string;
+	CorrectOption: string;
+	[key: string]: string;
+}
+export interface ParsedData {
+	data: MCQRow[];
+	meta: {
+		fields?: (keyof MCQRow)[];
+	};
+	errors: ParseError[];
+}
+

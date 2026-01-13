@@ -1,0 +1,51 @@
+Question,Option_A,Option_B,Option_C,Option_D,Correct_Answer,Points
+"What are the five basic operations performed by all computer systems?","Inputting, Storing, Processing, Outputting, Controlling","Reading, Writing, Executing, Debugging, Testing","Compiling, Linking, Loading, Running, Terminating","Analyzing, Designing, Coding, Testing, Maintaining",A,1
+"Which type of storage is volatile in nature?","Secondary Storage","Primary Storage","Auxiliary Storage","Permanent Storage",B,1
+"What is the main function of the Control Unit?","Execute arithmetic operations","Store data permanently","Coordinate and manage all units of the system","Convert data to human readable form",C,1
+"Where do actual arithmetic and logical operations take place in a computer?","Control Unit","Primary Storage","Arithmetic Logic Unit","Input Unit",C,1
+"What is system software primarily responsible for?","Solving specific user problems","Running the computer and managing resources","Creating documents and presentations","Designing graphics and animations",B,1
+"Which language uses binary numbers (0s and 1s) that computers understand directly?","Assembly Language","High Level Language","Machine Language","Pseudocode",C,1
+"What are mnemonics used in?","Machine Language","Assembly Language","High Level Language","Natural Language",B,1
+"What is the main advantage of high-level programming languages?","Machine dependent","Faster execution","Machine independent and easier to understand","Uses binary code directly",C,1
+"What does a compiler do?","Translates assembly language to machine language","Translates one statement at a time","Translates entire high-level program to machine language","Combines object files into executable",C,1
+"How does an interpreter differ from a compiler?","It translates the entire program at once","It translates and executes one statement at a time","It only works with assembly language","It creates object files",B,1
+"What is the purpose of a linker?","Translate high-level code","Combine object files into a single executable","Debug programs","Interpret code line by line",B,1
+"Which characteristic ensures a program can work on any computer machine?","Reliability","Transferability","Simplicity","Efficiency",B,1
+"What is the first phase in program development?","Coding","Problem Definition/Analysis","Testing","Documentation",B,1
+"What is an algorithm?","A programming language","A set of steps to solve a problem in English","A type of flowchart","A debugging tool",B,1
+"What tool provides pictorial representation of an algorithm?","Pseudocode","Compiler","Flowchart","Interpreter",C,1
+"What does debugging refer to?","Writing code","Finding and fixing errors","Designing algorithms","Creating documentation",B,1
+"Which is NOT one of the three fundamental control structures in structured programming?","Sequence","Selection","Iteration","Compilation",D,1
+"What was the main problem with 'spaghetti code' in early programming?","Too simple","Hard to follow and maintain","Too fast","Used too much memory",B,1
+"Who proposed the concept of 'goto-less' programming in the 1960s?","Von Neumann","Edsger Dijkstra","Alan Turing","Dennis Ritchie",B,1
+"What does 'sequence' mean in structured programming?","Execute instructions in order","Make decisions","Repeat code multiple times","Jump to different parts",A,1
+"What does 'selection' refer to in control structures?","Executing code in order","Choosing between different paths based on conditions","Repeating code","Declaring variables",B,1
+"What is another term for 'iteration' in programming?","Branching","Selection","Looping or Repetition","Sequencing",C,1
+"Which programming paradigm is based on Von Neumann architecture?","Functional","Logical","Imperative","Object-oriented",C,1
+"In functional programming, what are functions considered?","Second class citizens","First class citizens","Not important","Only for mathematics",B,1
+"Which paradigm encapsulates data and operations in objects?","Imperative","Functional","Logical","Object-oriented",D,1
+"What language is an example of the logical programming paradigm?","C++","Java","Prolog","Python",C,1
+"What must an algorithm have according to its characteristics?","Infinite steps","Ambiguous instructions","Well-defined inputs and outputs","Machine-dependent code",C,1
+"Which characteristic means an algorithm must terminate?","Feasibility","Finiteness","Independence","Unambiguous",B,1
+"What are the basic elements of an algorithm?","Sequence, Selection, Iteration","Input, Output, Storage","Variables, Functions, Arrays","Compile, Link, Execute",A,1
+"What does time efficiency of an algorithm refer to?","Memory required","Time required to execute","Code length","Number of variables",B,1
+"What does space efficiency measure?","Execution time","Memory required","Code readability","User interface quality",B,1
+"Which algorithm design technique involves trying all possible solutions?","Divide and Conquer","Brute-force","Dynamic Programming","Greedy Algorithm",B,1
+"What is the top-down method in problem solving?","Start with details and work up","Start at general level and work toward details","Start in the middle","Random approach",B,1
+"What should be the first step in writing an algorithm?","Write code","Obtain problem description","Test the solution","Create documentation",B,1
+"What are the five basic elements of programming?","Variables, Loops, Conditionals, Input/Output, Functions","Classes, Objects, Methods, Attributes, Inheritance","Files, Folders, Directories, Paths, Links","Bits, Bytes, Words, Pages, Blocks",A,1
+"What do variables in programming represent?","Fixed values only","Data that can change","Only numbers","Only text",B,1
+"What is the purpose of loops in programming?","Store data","Repeat instructions until a condition is met","Make decisions","Display output",B,1
+"What do conditionals specify?","Variable types","Execution based on whether a condition is satisfied","Loop iterations","Function names",B,1
+"What is a subroutine?","A type of variable","Code snippet that can be reused","A data type","An input device",B,1
+"Which data type is used for whole numbers?","String","Float","Integer","Boolean",C,1
+"Which data type uses a decimal point?","Integer","String","Float","Character",C,1
+"What does a Boolean data type represent?","Numbers","Text","Logical values (TRUE/FALSE)","Decimal numbers",C,1
+"What is a strongly typed language?","Variables can be used as any type","Variables must respect their data type","Has no data types","Only uses integers",B,1
+"What does IPO stand for in program design?","Integer, Process, Output","Input, Processing, Output","Initialize, Process, Organize","Integrate, Plan, Operate",B,1
+"What is pseudocode?","Real programming code","Algorithm written in programming-like language","Machine code","Assembly language",B,1
+"What is an array?","A single variable","Collection of elements of the same type","A function","A loop structure",B,1
+"What is the index of the first element in a zero-based array?","1","0","-1","Depends on language",B,1
+"How do you access an element in an array?","By using its name only","By using its index in square brackets","By calling a function","By using a loop only",B,1
+"What is a major disadvantage of arrays?","Cannot store multiple values","Fixed size after declaration","Too fast","Too easy to use",B,1
+"What is cache locality in arrays?","Array location in code","Physical memory arrangement improving performance","Array name","Index range",B,1

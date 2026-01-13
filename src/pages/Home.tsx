@@ -1,20 +1,32 @@
-import React from "react";
 import { Link } from "react-router-dom";
 
-const Home: React.FC = () => {
+const Home = () => {
 	return (
-		<div className="container mx-auto px-4 py-16">
-			<div className="max-w-2xl mx-auto text-center">
-				<h1 className="text-4xl font-bold text-gray-900 mb-4">Quiz App</h1>
-				<p className="text-xl text-gray-600 mb-8">
-					Create and share quizzes for studying
+		<div className="min-h-screen flex items-center justify-center px-4">
+			<div className="max-w-xl text-center space-y-6">
+				<h1 className="text-4xl font-semibold tracking-tight">
+					Simple Quiz Builder
+				</h1>
+
+				<p className="text-gray-600 text-lg">
+					Create, upload, and share quizzes effortlessly.
 				</p>
-				<Link
-					to="/create"
-					className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-				>
-					Create New Quiz
-				</Link>
+
+				<div className="flex items-center justify-center gap-4">
+					<Link
+						to="/auth"
+						className="px-6 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
+					>
+						Get Started
+					</Link>
+
+					<Link
+						to="/quizzes"
+						className="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+					>
+						View Quizzes
+					</Link>
+				</div>
 			</div>
 		</div>
 	);
