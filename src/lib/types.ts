@@ -1,17 +1,16 @@
 import type { ParseError } from "papaparse";
 
+export interface QuizDraft {
+	id?: string;
+	title: string;
+	description: string;
+}
+
 export interface Question {
 	text: string;
 	options: string[];
-	correctIndex: number;
-	points: number;
-}
-
-export interface Quiz {
-	id?: string;
-	created_at?: string;
-	title: string;
-	questions: Question[];
+	answer: string;
+	points?: number;
 }
 
 export interface QuizSubmission {
@@ -26,8 +25,8 @@ export interface MCQRow {
 	Option_B: string;
 	Option_C: string;
 	Option_D: string;
-	CorrectOption: string;
-	[key: string]: string;
+	Correct_Answer: string;
+	Points: string;
 }
 export interface ParsedData {
 	data: MCQRow[];
