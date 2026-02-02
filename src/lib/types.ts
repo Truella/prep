@@ -1,5 +1,5 @@
 import type { ParseError } from "papaparse";
-
+import { PostgrestError } from "@supabase/supabase-js";
 export interface QuizDraft {
 	id?: string;
 	title: string;
@@ -35,4 +35,4 @@ export interface ParsedData {
 	};
 	errors: ParseError[];
 }
-
+export type SupabaseError = PostgrestError | null;

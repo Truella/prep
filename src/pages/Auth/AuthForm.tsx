@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import { SupabaseError } from "../../lib/types";
 
 export default function AuthForm() {
 	const { signUp, signIn } = useAuth();
@@ -21,8 +22,8 @@ export default function AuthForm() {
 				await signIn(email, password);
 				toast.success("Logged in successfully!");
 			}
-		} catch (err: any) {
-			toast.error(err.message || "Something went wrong");
+		} catch (err: unknown) {
+			toast.error((err as SupabaseError)?.message || "Something went wrong");
 		} finally {
 			setLoading(false);
 		}

@@ -8,11 +8,7 @@ interface RequireAuthProps {
 }
 
 export function RequireAuth({ children }: RequireAuthProps) {
-	const { user, loading } = useAuth();
-
-	if (loading) {
-		return <p className="text-center mt-10">Loading...</p>; 
-	}
+	const { user} = useAuth();
 
 	if (!user) {
 		return <Navigate to="/auth" replace />;

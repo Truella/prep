@@ -33,8 +33,6 @@ export default function Dashboard() {
 						</div>
 					</div>
 				</div>
-
-				{/* You can add more cards here */}
 			</div>
 		</div>
 	);
