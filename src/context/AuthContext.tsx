@@ -50,7 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			if (error) throw error;
 			if (data.user) {
 				setUser(data.user);
-				navigate("/create");
+				navigate("/dashboard");
 			}
 		} finally {
 			setLoading(false);

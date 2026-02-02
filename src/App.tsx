@@ -10,6 +10,7 @@ import { RequireAuth } from "./components/RequireAuth";
 import AuthPage from "./pages/Auth/Auth";
 import DashboardLayout from "./components/DashboardLayout";
 import { Toaster } from "react-hot-toast";
+import TakeQuizInput from "./pages/TakeQuizInput";
 
 function App() {
 	return (
@@ -21,7 +22,7 @@ function App() {
 				<Route path="/auth" element={<AuthPage />} />
 				<Route path="/quiz/:quizId" element={<TakeQuiz />} />
 				<Route path="/results" element={<Results />} />
-
+				<Route path="/take" element={<TakeQuizInput />} />
 				{/* Protected dashboard routes */}
 				<Route
 					path="/dashboard"
