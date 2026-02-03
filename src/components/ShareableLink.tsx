@@ -1,34 +1,99 @@
-import React from 'react'
-import toast from 'react-hot-toast';
-export default function ShareableLink({ shareableLink }: { shareableLink: string }) {
-  return (
-		<div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-			<h3 className="font-semibold text-green-800 mb-2">
-				 Quiz Published Successfully!
-			</h3>
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 
-			<p className="text-sm text-gray-600 mb-3">
-				Share this link with your students:
-			</p>
+export default function ShareableLink({
+	shareableLink,
+}: {
+	shareableLink: string;
+}) {
+	const [copied, setCopied] = useState(false);
+
+	const handleCopy = () => {
+		navigator.clipboard.writeText(shareableLink);
+		setCopied(true);
+		toast.success("Link copied!");
+		setTimeout(() => setCopied(false), 2000);
+	};
+
+	return (
+		<div className="backdrop-blur-xl bg-green-500/10 border border-green-500/20 rounded-2xl p-6">
+			<div className="flex items-start gap-3 mb-4">
+				<div className="p-2 bg-green-500/20 rounded-lg">
+					<svg
+						className="w-6 h-6 text-green-400"
+						viewBox="0 0 24 24"
+						fill="none"
+					>
+						<path
+							d="M20 6L9 17L4 12"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</svg>
+				</div>
+				<div>
+					<h3 className="text-lg font-semibold text-white mb-1">
+						Quiz Published Successfully!
+					</h3>
+					<p className="text-sm text-gray-400">
+						Share this link with students to take the quiz
+					</p>
+				</div>
+			</div>
 
 			<div className="flex gap-2">
 				<input
 					type="text"
 					value={shareableLink}
 					readOnly
-					className="flex-1 px-3 py-2 border rounded bg-white"
+					className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 transition cursor-pointer"
 					onClick={(e) => e.currentTarget.select()}
 				/>
 
 				<button
-					onClick={() => {
-						navigator.clipboard.writeText(shareableLink);
-
-						toast.success("Link copied!");
-					}}
-					className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+					onClick={handleCopy}
+					className="px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all shadow-lg flex items-center gap-2"
 				>
-					Copy
+					{copied ? (
+						<>
+							<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+								<path
+									d="M20 6L9 17L4 12"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+							Copied
+						</>
+					) : (
+						<>
+							<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+								<rect
+									x="9"
+									y="9"
+									width="13"
+									height="13"
+									rx="2"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+								<path
+									d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+							Copy
+						</>
+					)}
 				</button>
 			</div>
 		</div>

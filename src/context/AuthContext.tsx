@@ -18,6 +18,7 @@ import {
 interface AuthContextType {
 	user: User | null;
 	loading: boolean;
+	initializing: boolean; // New: separate state for initial load
 	error: string | null;
 	signUp: (email: string, password: string) => Promise<void>;
 	signIn: (email: string, password: string) => Promise<void>;
@@ -33,7 +34,8 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
 	const [user, setUser] = useState<User | null>(null);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false); 
+	const [initializing, setInitializing] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
 	const mountedRef = useRef(true);
@@ -45,7 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		supabase.auth.getUser().then(({ data }) => {
 			if (mountedRef.current) {
 				setUser(data.user ?? null);
-				setLoading(false);
+				setInitializing(false); 
 			}
 		});
 
@@ -156,7 +158,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 	return (
 		<AuthContext.Provider
-			value={{ user, loading, error, signUp, signIn, signOut, clearError }}
+			value={{
+				user,
+				loading,
+				initializing,
+				error,
+				signUp,
+				signIn,
+				signOut,
+				clearError,
+			}}
 		>
 			{children}
 		</AuthContext.Provider>

@@ -6,11 +6,12 @@ import {
 } from "@hugeicons/core-free-icons";
 import StatCard from "./StatCard";
 import { HugeiconsIcon } from "@hugeicons/react";
+import StatListLoading from "./StatListLoading";
 
 export default function Analytics() {
 	const { stats, loading } = useAnalyticsStats();
 
-	if (loading) return <p>Loading...</p>;
+	if (loading) return <StatListLoading />;
 
 	return (
 		<div className="space-y-3">
