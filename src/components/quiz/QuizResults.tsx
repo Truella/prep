@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import QuizReview from "./QuizReview";
+import { QuizQuestion } from "../../lib/types";
 
 interface QuizResultsProps {
 	quizTitle: string;
@@ -7,6 +9,9 @@ interface QuizResultsProps {
 	earnedPoints: number;
 	totalPoints: number;
 	onRetake: () => void;
+	quizId: string;
+	questions: QuizQuestion[];
+	userAnswers: { [key: number]: number };
 }
 
 export default function QuizResults({
@@ -15,11 +20,23 @@ export default function QuizResults({
 	totalQuestions,
 	earnedPoints,
 	totalPoints,
+	userAnswers,
+	questions,
 	onRetake,
 }: QuizResultsProps) {
+	const [showReview, setShowReview] = useState(false);
 	const percentage = Math.round((earnedPoints / totalPoints) * 100);
 	const passed = percentage >= 70;
 
+	if (showReview) {
+		return (
+			<QuizReview
+				questions={questions}
+				userAnswers={userAnswers}
+				onBack={() => setShowReview(false)}
+			/>
+		);
+	}
 	return (
 		<div className="max-w-2xl mx-auto">
 			<div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 text-center">
@@ -81,12 +98,12 @@ export default function QuizResults({
 
 				{/* Actions */}
 				<div className="flex gap-3">
-					<Link
-						to="/"
-						className="flex-1 px-6 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 transition-all font-medium text-center"
+					<button
+						onClick={() => setShowReview(true)}
+						className="flex-1 px-6 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 transition-all font-medium"
 					>
-						Back to Home
-					</Link>
+						Review Answers
+					</button>
 					<button
 						onClick={onRetake}
 						className="flex-1 px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all"

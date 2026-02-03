@@ -6,6 +6,7 @@ import QuestionCard from "../components/quiz/QuestionCard";
 import QuizNavigation from "../components/quiz/QuizNavigation";
 import QuestionOverview from "../components/quiz/QuestionOverview";
 import QuizResults from "../components/quiz/QuizResults";
+import { useEffect } from "react";
 
 export default function TakeQuiz() {
 	const { quizId } = useParams<{ quizId: string }>();
@@ -28,7 +29,9 @@ export default function TakeQuiz() {
 		calculateScore,
 		resetQuiz,
 	} = useTakeQuiz(quizId);
-
+	useEffect(() => {
+		console.log(selectedAnswers);
+	}, [selectedAnswers]);
 	if (loading) {
 		return <LoadingScreen message="Loading quiz..." />;
 	}
@@ -78,6 +81,9 @@ export default function TakeQuiz() {
 					earnedPoints={earnedPoints}
 					totalPoints={totalPoints}
 					onRetake={resetQuiz}
+					quizId={quizId || ""}
+					userAnswers={selectedAnswers}
+					questions={questions}
 				/>
 			</div>
 		);

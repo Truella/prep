@@ -11,7 +11,6 @@ import AuthPage from "./pages/Auth/Auth";
 import DashboardLayout from "./components/DashboardLayout";
 import { Toaster } from "react-hot-toast";
 import TakeQuizInput from "./pages/TakeQuizInput";
-
 function App() {
 	return (
 		<div className="min-h-screen bg-gray-50">
