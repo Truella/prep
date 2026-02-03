@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { supabase } from "../lib/supabase";
-import type { QuizDraft, Question } from "../lib/types";
+import type { QuizDraft, PreviewQuestion } from "../lib/types";
 import React from "react";
 import { parseAndValidateCSV } from "./csvParser";
 export const handleCreateQuiz = async (
@@ -48,7 +48,7 @@ export const handleCreateQuiz = async (
 	toast.success("Quiz created! Now upload questions.");
 };
 
-export const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>, setQuestions: React.Dispatch<React.SetStateAction<Question[]>>) => {
+export const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>, setQuestions: React.Dispatch<React.SetStateAction<PreviewQuestion[]>>) => {
 	const file = e.target.files?.[0];
 	if (!file) return;
 
@@ -76,7 +76,7 @@ export const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>, setQuest
 		});
 };
 
-export const handleUploadQuestions = async (quiz: QuizDraft, questions: Question[], setIsUploadingQuestions: React.Dispatch<React.SetStateAction<boolean>>, setShareableLink: React.Dispatch<React.SetStateAction<string | null>>) => {
+export const handleUploadQuestions = async (quiz: QuizDraft, questions: PreviewQuestion[], setIsUploadingQuestions: React.Dispatch<React.SetStateAction<boolean>>, setShareableLink: React.Dispatch<React.SetStateAction<string | null>>) => {
 	if (!quiz.id || questions.length === 0) {
 		toast.error("Quiz ID missing or no questions to upload");
 		return;

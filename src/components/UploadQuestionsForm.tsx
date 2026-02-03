@@ -1,6 +1,6 @@
 import React from "react";
 import { handleCSVUpload, handleUploadQuestions } from "../utils/handlers";
-import type { QuizDraft, Question } from "../lib/types";
+import type { QuizDraft, PreviewQuestion } from "../lib/types";
 
 export default function UploadQuestionsForm({
 	quiz,
@@ -11,9 +11,9 @@ export default function UploadQuestionsForm({
 	setShareableLink,
 }: {
 	quiz: QuizDraft;
-	questions: Question[];
+	questions: PreviewQuestion[];
 	isUploadingQuestions: boolean;
-	setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
+	setQuestions: React.Dispatch<React.SetStateAction<PreviewQuestion[]>>;
 	setIsUploadingQuestions: React.Dispatch<React.SetStateAction<boolean>>;
 	setShareableLink: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
