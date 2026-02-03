@@ -10,7 +10,6 @@ interface QuizNavigationProps {
 export default function QuizNavigation({
 	currentIndex,
 	totalQuestions,
-	isAnswered,
 	onPrevious,
 	onNext,
 	onSubmit,
@@ -58,7 +57,6 @@ export default function QuizNavigation({
 			) : (
 				<button
 					onClick={onNext}
-					disabled={!isAnswered}
 					className="px-8 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center gap-2"
 				>
 					Next
