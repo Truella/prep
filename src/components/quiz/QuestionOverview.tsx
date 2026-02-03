@@ -3,12 +3,14 @@ interface QuestionOverviewProps {
 	currentIndex: number;
 	answeredQuestions: Record<number, number>;
 	onSelectQuestion: (index: number) => void;
+	onSubmit: () => void;
 }
 
 export default function QuestionOverview({
 	totalQuestions,
 	currentIndex,
 	answeredQuestions,
+	onSubmit,
 	onSelectQuestion,
 }: QuestionOverviewProps) {
 	return (
@@ -38,6 +40,21 @@ export default function QuestionOverview({
 					);
 				})}
 			</div>
+			<button
+				onClick={onSubmit}
+				className="mt-8 px-8 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all shadow-lg flex items-center gap-2"
+			>
+				Submit Quiz
+				<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+					<path
+						d="M5 13L9 17L19 7"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					/>
+				</svg>
+			</button>
 		</div>
 	);
 }

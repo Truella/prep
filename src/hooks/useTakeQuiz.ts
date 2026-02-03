@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { QuizDraft, QuizQuestion } from "../lib/types";
 import { letterToIndex } from "../utils/helpers";
 export function useTakeQuiz(quizId: string | undefined) {
+	const [showSubmitModal, setShowSubmitModal] = useState(false);
 	const [quiz, setQuiz] = useState<QuizDraft | null>(null);
 	const [questions, setQuestions] = useState<QuizQuestion[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -86,21 +87,25 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const goToQuestion = (index: number) => {
 		setCurrentQuestionIndex(index);
 	};
+	const getAnsweredCount = () => {
+		return Object.keys(selectedAnswers).length;
+	};
 
-	const submitQuiz = () => {
-		const unanswered = questions.findIndex(
-			(_, i) => selectedAnswers[i] === undefined,
-		);
+	const getUnansweredCount = () => {
+		return questions.length - getAnsweredCount();
+	};
+	const initiateSubmit = () => {
+		const answeredCount = getAnsweredCount();
 
-		if (unanswered !== -1) {
-			toast.error(`Please answer question ${unanswered + 1}`);
-			setCurrentQuestionIndex(unanswered);
+		// No questions answered - show error toast
+		if (answeredCount === 0) {
+			toast.error("Please answer at least one question before submitting");
 			return;
 		}
 
-		setShowResults(true);
+		// Some or all questions answered - show confirmation modal
+		setShowSubmitModal(true);
 	};
-
 	const calculateScore = () => {
 		let correctCount = 0;
 		let totalPoints = 0;
@@ -116,7 +121,14 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 		return { correctCount, earnedPoints, totalPoints };
 	};
+	const confirmSubmit = () => {
+		setShowSubmitModal(false);
+		setShowResults(true);
+	};
 
+	const cancelSubmit = () => {
+		setShowSubmitModal(false);
+	};
 	const resetQuiz = () => {
 		setCurrentQuestionIndex(0);
 		setSelectedAnswers({});
@@ -138,12 +150,17 @@ export function useTakeQuiz(quizId: string | undefined) {
 		showResults,
 		progress,
 		isAnswered,
+		showSubmitModal,
 		handleAnswerSelect,
 		goToNext,
 		goToPrevious,
 		goToQuestion,
-		submitQuiz,
 		calculateScore,
 		resetQuiz,
+		initiateSubmit,
+		confirmSubmit,
+		cancelSubmit,
+		answeredCount: getAnsweredCount(),
+		unansweredCount: getUnansweredCount(),
 	};
 }

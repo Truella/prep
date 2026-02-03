@@ -6,7 +6,7 @@ import QuestionCard from "../components/quiz/QuestionCard";
 import QuizNavigation from "../components/quiz/QuizNavigation";
 import QuestionOverview from "../components/quiz/QuestionOverview";
 import QuizResults from "../components/quiz/QuizResults";
-import { useEffect } from "react";
+import SubmitConfirmationModal from "../components/quiz/SubmitConfirmationModal";
 
 export default function TakeQuiz() {
 	const { quizId } = useParams<{ quizId: string }>();
@@ -19,19 +19,21 @@ export default function TakeQuiz() {
 		currentQuestionIndex,
 		selectedAnswers,
 		showResults,
+		showSubmitModal,
 		progress,
 		isAnswered,
+		answeredCount,
+		unansweredCount,
 		handleAnswerSelect,
 		goToNext,
 		goToPrevious,
 		goToQuestion,
-		submitQuiz,
+		initiateSubmit,
+		confirmSubmit,
+		cancelSubmit,
 		calculateScore,
 		resetQuiz,
 	} = useTakeQuiz(quizId);
-	useEffect(() => {
-		console.log(selectedAnswers);
-	}, [selectedAnswers]);
 	if (loading) {
 		return <LoadingScreen message="Loading quiz..." />;
 	}
@@ -136,7 +138,7 @@ export default function TakeQuiz() {
 							isAnswered={isAnswered}
 							onPrevious={goToPrevious}
 							onNext={goToNext}
-							onSubmit={submitQuiz}
+							onSubmit={initiateSubmit}
 						/>
 					</div>
 
@@ -147,6 +149,15 @@ export default function TakeQuiz() {
 							currentIndex={currentQuestionIndex}
 							answeredQuestions={selectedAnswers}
 							onSelectQuestion={goToQuestion}
+							onSubmit={initiateSubmit}
+						/>
+						<SubmitConfirmationModal
+							isOpen={showSubmitModal}
+							onClose={cancelSubmit}
+							onConfirm={confirmSubmit}
+							totalQuestions={questions.length}
+							answeredCount={answeredCount}
+							unansweredCount={unansweredCount}
 						/>
 					</div>
 				</div>
