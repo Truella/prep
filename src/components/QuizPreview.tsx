@@ -1,7 +1,8 @@
 import React from "react";
-import type { Question } from "../lib/types";
+import type { PreviewQuestion } from "../lib/types";
+import { letterToIndex } from "../utils/helpers";
 
-export default function QuizPreview({ questions }: { questions: Question[] }) {
+export default function QuizPreview({ questions }: { questions: PreviewQuestion[] }) {
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
@@ -29,16 +30,16 @@ export default function QuizPreview({ questions }: { questions: Question[] }) {
 								<li
 									key={i}
 									className={`flex items-start gap-2 text-sm ${
-										i === q.answer ? "text-green-400" : "text-gray-400"
+										i === letterToIndex(q.answer) ? "text-green-400" : "text-gray-400"
 									}`}
 								>
 									<span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/10 text-xs flex-shrink-0 mt-0.5">
 										{String.fromCharCode(65 + i)}
 									</span>
 									<span>{option}</span>
-									{i === q.answer && (
+									{i === letterToIndex(q.answer) && (
 										<svg
-											className="w-4 h-4 flex-shrink-0 mt-0.5"
+											className="w-4 h-4 shrink-0 mt-0.5"
 											viewBox="0 0 24 24"
 											fill="none"
 										>

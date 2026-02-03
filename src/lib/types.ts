@@ -6,7 +6,7 @@ export interface QuizDraft {
 	description: string;
 }
 
-export interface Question {
+export interface PreviewQuestion {
 	text: string;
 	options: string[];
 	answer: string;
@@ -36,3 +36,16 @@ export interface ParsedData {
 	errors: ParseError[];
 }
 export type SupabaseError = PostgrestError | null;
+
+export interface QuizQuestion {
+	id: string;
+	quiz_id: string;
+	Question: string;
+	Option_A: string;
+	Option_B: string;
+	Option_C: string;
+	Option_D: string;
+	created_at: string;
+	Correct_Answer: "A" | "B" | "C" | "D";
+	Points: number;
+}

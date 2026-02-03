@@ -1,26 +1,23 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import type { QuizDraft, Question } from "../lib/types";
+import type { QuizDraft, PreviewQuestion } from "../lib/types";
 import CreateQuizForm from "../components/CreateQuizForm";
 import UploadQuestionsForm from "../components/UploadQuestionsForm";
 import QuizPreview from "../components/QuizPreview";
 import ShareableLink from "../components/ShareableLink";
 
 export default function CreateQuizCSV() {
-	const { signOut } = useAuth();
 	const [shareableLink, setShareableLink] = useState<string | null>(null);
 	const [quiz, setQuiz] = useState<QuizDraft>({
 		title: "",
 		description: "",
 	});
-	const [questions, setQuestions] = useState<Question[]>([]);
+	const [questions, setQuestions] = useState<PreviewQuestion[]>([]);
 	const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
 	const [isUploadingQuestions, setIsUploadingQuestions] = useState(false);
 
 	return (
 		<div className="min-h-screen bg-black">
 			<div className="container mx-auto px-4 py-8 space-y-8">
-
 				{/* Stats Cards */}
 				<div className="grid grid-cols-2 gap-4 max-w-md">
 					<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-center">
@@ -67,6 +64,12 @@ export default function CreateQuizCSV() {
 						setShareableLink={setShareableLink}
 					/>
 
+					{/* Shareable Link - Outside main container for emphasis */}
+					{shareableLink && (
+						<div className="max-w-3xl mx-auto">
+							<ShareableLink shareableLink={shareableLink} />
+						</div>
+					)}
 					{questions.length > 0 && (
 						<>
 							<div className="relative">
@@ -83,13 +86,6 @@ export default function CreateQuizCSV() {
 						</>
 					)}
 				</div>
-
-				{/* Shareable Link - Outside main container for emphasis */}
-				{shareableLink && (
-					<div className="max-w-3xl mx-auto">
-						<ShareableLink shareableLink={shareableLink} />
-					</div>
-				)}
 			</div>
 		</div>
 	);
