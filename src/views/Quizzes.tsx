@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { useQuizzes } from "../hooks/useQuizzes";
 import QuizCard from "../components/QuizCard";
