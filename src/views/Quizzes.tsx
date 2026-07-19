@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useQuizzes } from "../hooks/useQuizzes";
 import QuizCard from "../components/QuizCard";
 import QuizListEmpty from "../components/QuizListEmpty";
@@ -18,7 +18,7 @@ export default function Quizzes() {
 					<p className="text-gray-400">Manage and share your quizzes</p>
 				</div>
 				<Link
-					to="/dashboard/create"
+					href="/dashboard/create"
 					className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-100 transition font-semibold"
 				>
 					<HugeiconsIcon icon={PlusSignIcon}/>

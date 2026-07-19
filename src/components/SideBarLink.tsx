@@ -1,14 +1,17 @@
+"use client";
+
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { NavItem } from "../constants/navItems";
 
 export function SidebarLink({ label, path, icon }: NavItem) {
-	const location = useLocation();
-	const isActive = location.pathname === path;
+	const pathname = usePathname();
+	const isActive = pathname === path;
 
 	return (
 		<Link
-			to={path}
+			href={path}
 			className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition ${
 				isActive
 					? "bg-white text-black"

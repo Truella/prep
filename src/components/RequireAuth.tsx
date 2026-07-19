@@ -1,6 +1,8 @@
-import { Navigate } from "react-router-dom";
+"use client";
+
 import { useAuth } from "../context/AuthContext";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
 
 interface RequireAuthProps {
 	children: React.ReactNode;
@@ -8,7 +10,15 @@ interface RequireAuthProps {
 
 export function RequireAuth({ children }: RequireAuthProps) {
 	const { user, initializing } = useAuth();
-	if (initializing) {
+	const router = useRouter();
+
+	useEffect(() => {
+		if (!initializing && !user) {
+			router.replace("/auth");
+		}
+	}, [user, initializing, router]);
+
+	if (initializing || !user) {
 		return (
 			<div className="min-h-screen bg-black flex items-center justify-center">
 				<div className="text-center">
@@ -18,9 +28,6 @@ export function RequireAuth({ children }: RequireAuthProps) {
 			</div>
 		);
 	}
-	if (!user) {
-		return <Navigate to="/auth" replace />;
-	}
 
-	return children;
+	return <>{children}</>;
 }

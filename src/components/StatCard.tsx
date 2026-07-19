@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface StatCardProps {
 	icon: React.ReactNode;
@@ -10,7 +10,7 @@ interface StatCardProps {
 export default function StatCard({ icon, label, value, linkTo }: StatCardProps) {
 	return (
 		<Link
-			to={linkTo}
+			href={linkTo}
 			className="block p-3 backdrop-blur-sm bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition group"
 		>
 			<div className="flex items-center gap-3">

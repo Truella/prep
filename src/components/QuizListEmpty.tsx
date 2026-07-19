@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PlusSignIcon, TaskEdit01Icon } from "@hugeicons/core-free-icons";
 export default function QuizListEmpty() {
@@ -13,7 +13,7 @@ export default function QuizListEmpty() {
 				started.
 			</p>
 			<Link
-				to="/dashboard/create"
+				href="/dashboard/create"
 				className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-100 transition font-semibold"
 			>
 				<HugeiconsIcon icon={PlusSignIcon} />

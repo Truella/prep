@@ -1,6 +1,6 @@
 import { Calendar02Icon, Copy01Icon, EyeIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface QuizCardProps {
 	quiz: {
@@ -41,7 +41,7 @@ export default function QuizCard({ quiz, onCopyLink }: QuizCardProps) {
 					Copy Link
 				</button>
 				<Link
-					to={`/quiz/${quiz.id}`}
+					href={`/quiz/${quiz.id}`}
 					className="flex-1 px-4 py-2 rounded-lg bg-white text-black hover:bg-gray-100 transition flex items-center justify-center gap-2 text-sm font-medium"
 				>
 					{" "}

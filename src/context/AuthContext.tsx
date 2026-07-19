@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	createContext,
 	useContext,
@@ -6,7 +8,7 @@ import {
 	ReactNode,
 	useRef,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import {
 	User,
@@ -37,7 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const [loading, setLoading] = useState(false); 
 	const [initializing, setInitializing] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const navigate = useNavigate();
+	const router = useRouter();
 	const mountedRef = useRef(true);
 
 	useEffect(() => {
@@ -95,7 +97,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 			if (data.user) {
 				setUser(data.user);
-				navigate("/dashboard");
+				router.push("/dashboard");
 			}
 		} catch (err) {
 			setError(handleAuthError(err));
@@ -124,7 +126,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 			if (data.user) {
 				setUser(data.user);
-				navigate("/dashboard");
+				router.push("/dashboard");
 			}
 		} catch (err) {
 			setError(handleAuthError(err));
@@ -146,7 +148,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				setError(handleAuthError(signOutError));
 				return;
 			}
-			navigate("/auth");
+			router.push("/auth");
 		} catch (err) {
 			setError(handleAuthError(err));
 		} finally {
