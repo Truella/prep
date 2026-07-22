@@ -54,14 +54,14 @@ export function parseAndValidateCSV(file: File): Promise<CSVResult> {
 				for (let i = 0; i < results.data.length; i++) {
 					const row = results.data[i];
 
-					if (
-						!row.Question ||
-						!row.Option_A ||
-						!row.Option_B ||
-						!row.Option_C ||
-						!row.Option_D ||
-						!row.Correct_Answer
-					) {
+				if (
+					!row.Question?.trim() ||
+					!row.Option_A?.trim() ||
+					!row.Option_B?.trim() ||
+					!row.Option_C?.trim() ||
+					!row.Option_D?.trim() ||
+					!row.Correct_Answer?.trim()
+				) {
 						resolve({
 							success: false,
 							message: `Row ${i + 1} has missing values.`,
@@ -69,7 +69,8 @@ export function parseAndValidateCSV(file: File): Promise<CSVResult> {
 						return;
 					}
 
-					if (!["A", "B", "C", "D"].includes(row.Correct_Answer)) {
+					const answer = row.Correct_Answer?.trim().toUpperCase();
+				if (!["A", "B", "C", "D"].includes(answer)) {
 						resolve({
 							success: false,
 							message: `Row ${i + 1}: Correct_Answer must be A, B, C, or D.`,
