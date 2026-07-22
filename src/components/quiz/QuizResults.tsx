@@ -1,6 +1,6 @@
 import { useState } from "react";
 import QuizReview from "./QuizReview";
-import { QuizQuestion } from "../../lib/types";
+import { AppQuestion } from "../../lib/types";
 
 interface QuizResultsProps {
 	quizTitle: string;
@@ -10,7 +10,7 @@ interface QuizResultsProps {
 	totalPoints: number;
 	onRetake: () => void;
 	quizId: string;
-	questions: QuizQuestion[];
+	questions: AppQuestion[];
 	userAnswers: { [key: number]: number };
 }
 

@@ -1,9 +1,7 @@
-import { QuizQuestion } from "../../lib/types";
-import { letterToIndex } from "../../utils/helpers";
-
+import { AppQuestion } from "../../lib/types";
 
 interface QuizReviewProps {
-	questions: QuizQuestion[];
+	questions: AppQuestion[];
 	userAnswers: Record<number, number>;
 	onBack: () => void;
 }
@@ -38,12 +36,12 @@ export default function QuizReview({
 			{/* Questions Review */}
 			{questions.map((question, index) => {
 				const userAnswer = userAnswers[index];
-				const isCorrect = userAnswer === letterToIndex(question.Correct_Answer);
+				const isCorrect = userAnswer === question.correctIndex;
 				const options = [
-					question.Option_A,
-					question.Option_B,
-					question.Option_C,
-					question.Option_D,
+					question.optionA,
+					question.optionB,
+					question.optionC,
+					question.optionD,
 				];
 
 				return (
@@ -58,12 +56,12 @@ export default function QuizReview({
 									<span className="text-sm font-semibold text-gray-400">
 										Question {index + 1}
 									</span>
-									<span className="text-xs text-gray-500">
-										({question.Points} pts)
-									</span>
+								<span className="text-xs text-gray-500">
+									({question.points} pts)
+								</span>
 								</div>
 								<h3 className="text-lg font-semibold text-white">
-									{question.Question}
+									{question.questionText}
 								</h3>
 							</div>
 							<div
@@ -107,7 +105,7 @@ export default function QuizReview({
 						<div className="space-y-2">
 							{options.map((option, optionIndex) => {
 								const isUserAnswer = userAnswer === optionIndex;
-								const isCorrectAnswer = letterToIndex(question.Correct_Answer) === optionIndex;
+								const isCorrectAnswer = question.correctIndex === optionIndex;
 								const letter = String.fromCharCode(65 + optionIndex);
 
 								let bgColor = "bg-white/5";

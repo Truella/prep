@@ -1,14 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
-import { QuizDraft, QuizQuestion } from "../lib/types";
-import { letterToIndex } from "../utils/helpers";
+import { QuizDraft, DBQuestion, AppQuestion } from "../lib/types";
+import { dbToAppQuestion } from "../utils/transforms";
 import useQuizProgress from "./useQuizProgress";
 
 export function useTakeQuiz(quizId: string | undefined) {
 	const [showSubmitModal, setShowSubmitModal] = useState(false);
 	const [quiz, setQuiz] = useState<QuizDraft | null>(null);
-	const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+	const [questions, setQuestions] = useState<AppQuestion[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +55,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 			}
 
 			setQuiz(quizData);
-			setQuestions(questionsData);
+			setQuestions(questionsData.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i)));
 		} catch (err) {
 			const message =
 				err instanceof Error ? err.message : "Failed to load quiz";
@@ -151,11 +151,11 @@ export function useTakeQuiz(quizId: string | undefined) {
 		let earnedPoints = 0;
 
 		questions.forEach((q, index) => {
-			totalPoints += q.Points;
+			totalPoints += q.points;
 
-			if (selectedAnswers[index] === letterToIndex(q.Correct_Answer)) {
+			if (selectedAnswers[index] === q.correctIndex) {
 				correctCount++;
-				earnedPoints += q.Points;
+				earnedPoints += q.points;
 			}
 		});
 
