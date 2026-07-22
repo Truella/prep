@@ -1,0 +1,150 @@
+"use client";
+
+import { useState } from "react";
+import { supabase } from "../lib/supabase";
+import toast from "react-hot-toast";
+import { parseAndValidateCSV } from "../utils/csvParser";
+import { appToDBQuestion } from "../utils/transforms";
+import type { QuizDraft, MCQRow, AppQuestion } from "../lib/types";
+
+interface CreateQuizState {
+	quiz: QuizDraft;
+	questions: AppQuestion[];
+	shareableLink: string | null;
+	isCreatingQuiz: boolean;
+	isUploadingQuestions: boolean;
+	timeLimit: number | null;
+}
+
+export function useCreateQuiz() {
+	const [state, setState] = useState<CreateQuizState>({
+		quiz: { title: "", description: "" },
+		questions: [],
+		shareableLink: null,
+		isCreatingQuiz: false,
+		isUploadingQuestions: false,
+		timeLimit: null,
+	});
+
+	const setTitle = (title: string) =>
+		setState((prev) => ({ ...prev, quiz: { ...prev.quiz, title } }));
+
+	const setDescription = (description: string) =>
+		setState((prev) => ({ ...prev, quiz: { ...prev.quiz, description } }));
+
+	const setTimeLimit = (timeLimit: number | null) =>
+		setState((prev) => ({ ...prev, timeLimit }));
+
+	const createQuiz = async () => {
+		if (!state.quiz.title.trim()) {
+			toast.error("Quiz title is required");
+			return;
+		}
+		setState((prev) => ({ ...prev, isCreatingQuiz: true }));
+
+		const { data: userData, error: userError } = await supabase.auth.getUser();
+		if (userError || !userData?.user?.id) {
+			toast.error("You must be logged in to create a quiz");
+			setState((prev) => ({ ...prev, isCreatingQuiz: false }));
+			return;
+		}
+
+		const { data, error } = await supabase
+			.from("quizzes")
+			.insert({
+				title: state.quiz.title,
+				description: state.quiz.description,
+				created_by: userData.user.id,
+				time_limit: state.timeLimit,
+			})
+			.select()
+			.single();
+
+		setState((prev) => ({ ...prev, isCreatingQuiz: false }));
+
+		if (error || !data?.id) {
+			toast.error("Failed to create quiz");
+			return;
+		}
+
+		setState((prev) => ({ ...prev, quiz: { ...prev.quiz, id: data.id } }));
+		toast.success("Quiz created! Now upload questions.");
+	};
+
+	const setQuestionsFromCSV = async (file: File) => {
+		if (file.type !== "text/csv") {
+			toast.error("Please upload a valid CSV file");
+			return;
+		}
+		const result = await parseAndValidateCSV(file);
+		if (!result.success) {
+			toast.error(result.message);
+			return;
+		}
+		const parsed: AppQuestion[] = result.data.map((row: MCQRow, i: number) => ({
+			id: `temp-${i}`,
+			quizId: state.quiz.id ?? "",
+			questionText: row.Question.trim(),
+			optionA: row.Option_A.trim(),
+			optionB: row.Option_B.trim(),
+			optionC: row.Option_C.trim(),
+			optionD: row.Option_D.trim(),
+			correctIndex: ["A", "B", "C", "D"].indexOf(
+				row.Correct_Answer.trim().toUpperCase()
+			),
+			points: parseInt(row.Points) || 1,
+			order: i,
+		}));
+		setState((prev) => ({ ...prev, questions: parsed }));
+		toast.success(`${parsed.length} questions loaded`);
+	};
+
+	const uploadQuestions = async (questionsOverride?: AppQuestion[]) => {
+		const toUpload = questionsOverride ?? state.questions;
+		if (!state.quiz.id || toUpload.length === 0) {
+			toast.error("Quiz ID missing or no questions to upload");
+			return;
+		}
+		setState((prev) => ({ ...prev, isUploadingQuestions: true }));
+
+		const payload = toUpload.map((q) => ({
+			...appToDBQuestion(q),
+			quiz_id: state.quiz.id,
+		}));
+
+		const { error } = await supabase.from("questions").insert(payload);
+		setState((prev) => ({ ...prev, isUploadingQuestions: false }));
+
+		if (error) {
+			toast.error(`Failed to save questions: ${error.message}`);
+			return;
+		}
+
+		const quizLink = `${window.location.origin}/quiz/${state.quiz.id}`;
+		navigator.clipboard.writeText(quizLink);
+		setState((prev) => ({ ...prev, shareableLink: quizLink }));
+		toast.success("Quiz published! Link copied to clipboard.");
+	};
+
+	const reset = () => {
+		setState({
+			quiz: { title: "", description: "" },
+			questions: [],
+			shareableLink: null,
+			isCreatingQuiz: false,
+			isUploadingQuestions: false,
+			timeLimit: null,
+		});
+	};
+
+	return {
+		...state,
+		setTitle,
+		setDescription,
+		setTimeLimit,
+		createQuiz,
+		setQuestionsFromCSV,
+		uploadQuestions,
+		reset,
+	};
+}
