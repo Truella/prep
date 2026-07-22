@@ -37,7 +37,7 @@ export interface ParsedData {
 }
 export type SupabaseError = PostgrestError | null;
 
-export interface QuizQuestion {
+export interface DBQuestion {
 	id: string;
 	quiz_id: string;
 	Question: string;
@@ -48,4 +48,24 @@ export interface QuizQuestion {
 	created_at: string;
 	Correct_Answer: "A" | "B" | "C" | "D";
 	Points: number;
+}
+
+export interface AppQuestion {
+	id: string;
+	quizId: string;
+	questionText: string;
+	optionA: string;
+	optionB: string;
+	optionC: string;
+	optionD: string;
+	correctIndex: 0 | 1 | 2 | 3;
+	points: number;
+	order: number;
+}
+
+export interface AIReviewPayload {
+	questions: AppQuestion[];
+	selectedAnswers: Record<number, number>;
+	score: number;
+	totalPoints: number;
 }

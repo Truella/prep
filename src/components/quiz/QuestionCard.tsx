@@ -1,6 +1,6 @@
-import { QuizQuestion } from "../../lib/types";
+import { AppQuestion } from "../../lib/types";
 interface QuestionCardProps {
-	question: QuizQuestion;
+	question: AppQuestion;
 	selectedAnswer?: number;
 	onSelectAnswer: (index: number) => void;
 }
@@ -11,10 +11,10 @@ export default function QuestionCard({
 	onSelectAnswer,
 }: QuestionCardProps) {
 	const options = [
-		question.Option_A,
-		question.Option_B,
-		question.Option_C,
-		question.Option_D,
+		question.optionA,
+		question.optionB,
+		question.optionC,
+		question.optionD,
 	];
 	return (
 
@@ -22,10 +22,10 @@ export default function QuestionCard({
 			{/* Question */}
 			<div className="mb-6">
 				<h2 className="text-2xl font-semibold text-white mb-2">
-					{question.Question} 
+					{question.questionText} 
 				</h2>
 				<p className="text-sm text-gray-400">
-					{question.Points} point{question.Points !== 1 ? "s" : ""}
+					{question.points} point{question.points !== 1 ? "s" : ""}
 				</p>
 			</div>
 

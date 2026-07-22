@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 interface QuizProgress {
 	answers: Record<number, number>;
@@ -17,8 +17,7 @@ export default function useQuizProgress(
 
 	const isHydratedRef = useRef(false);
 
-	// Load progress
-	const loadProgress = (): Partial<QuizProgress> | null => {
+	const loadProgress = useCallback((): Partial<QuizProgress> | null => {
 		if (!quizId) return null;
 
 		try {
@@ -42,12 +41,11 @@ export default function useQuizProgress(
 			console.error("Failed to load quiz progress:", err);
 			return null;
 		}
-	};
+	}, [quizId]);
 
-	// Save progress
-	const saveProgress = () => {
+	const saveProgress = useCallback(() => {
 		if (!quizId || isSubmitted) return;
-		if (!isHydratedRef.current) return; 
+		if (!isHydratedRef.current) return;
 
 		const progress: QuizProgress = {
 			answers: selectedAnswers,
@@ -60,26 +58,25 @@ export default function useQuizProgress(
 		} catch (err) {
 			console.error("Failed to save quiz progress:", err);
 		}
-	};
+	}, [quizId, isSubmitted, selectedAnswers, currentQuestionIndex]);
 
-	// Clear progress
-	const clearProgress = () => {
+	const clearProgress = useCallback(() => {
 		if (!quizId) return;
 		localStorage.removeItem(STORAGE_KEY);
-	};
-	const markHydrated = () => {
+	}, [quizId]);
+	const markHydrated = useCallback(() => {
 		isHydratedRef.current = true;
-	};
+	}, []);
 
 	useEffect(() => {
 		saveProgress();
-	}, [selectedAnswers, currentQuestionIndex]);
+	}, [selectedAnswers, currentQuestionIndex, saveProgress]);
 
 	useEffect(() => {
 		if (isSubmitted) {
 			clearProgress();
 		}
-	}, [isSubmitted]);
+	}, [isSubmitted, clearProgress]);
 
 	return {
 		loadProgress,

@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^3.1.1",
@@ -27,7 +27,8 @@
     "@types/node": "^24.10.7",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.11",
     "globals": "^16.5.0",
     "supabase": "^2.109.1",
     "typescript": "~5.9.3",

@@ -1,21 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
-import type { QuizDraft, PreviewQuestion } from "../lib/types";
+import { useCreateQuiz } from "../hooks/useCreateQuiz";
 import CreateQuizForm from "../components/CreateQuizForm";
 import UploadQuestionsForm from "../components/UploadQuestionsForm";
-import QuizPreview from "../components/QuizPreview";
 import ShareableLink from "../components/ShareableLink";
 
 export default function CreateQuizCSV() {
-	const [shareableLink, setShareableLink] = useState<string | null>(null);
-	const [quiz, setQuiz] = useState<QuizDraft>({
-		title: "",
-		description: "",
-	});
-	const [questions, setQuestions] = useState<PreviewQuestion[]>([]);
-	const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
-	const [isUploadingQuestions, setIsUploadingQuestions] = useState(false);
+	const {
+		quiz,
+		questions,
+		shareableLink,
+		isCreatingQuiz,
+		isUploadingQuestions,
+		setTitle,
+		setDescription,
+		createQuiz,
+		setQuestionsFromCSV,
+		uploadQuestions,
+	} = useCreateQuiz();
 
 	return (
 		<div className="min-h-screen bg-black">
@@ -37,10 +39,13 @@ export default function CreateQuizCSV() {
 				{/* Main Form Container */}
 				<div className="max-w-3xl mx-auto backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl space-y-8">
 					<CreateQuizForm
-						quiz={quiz}
-						setQuiz={setQuiz}
-						setIsCreatingQuiz={setIsCreatingQuiz}
-						isCreatingQuiz={isCreatingQuiz}
+						title={quiz.title}
+						description={quiz.description}
+						onTitleChange={setTitle}
+						onDescriptionChange={setDescription}
+						onSubmit={createQuiz}
+						disabled={!!quiz.id}
+						isLoading={isCreatingQuiz}
 					/>
 
 					{/* Divider */}
@@ -58,35 +63,15 @@ export default function CreateQuizCSV() {
 					)}
 
 					<UploadQuestionsForm
-						quiz={quiz}
-						questions={questions}
-						isUploadingQuestions={isUploadingQuestions}
-						setQuestions={setQuestions}
-						setIsUploadingQuestions={setIsUploadingQuestions}
-						setShareableLink={setShareableLink}
+						onFileChange={setQuestionsFromCSV}
+						onSubmit={() => uploadQuestions()}
+						disabled={!quiz.id || !!shareableLink}
+						isUploading={isUploadingQuestions}
+						questionCount={questions.length}
 					/>
 
-					{/* Shareable Link - Outside main container for emphasis */}
-					{shareableLink && (
-						<div className="max-w-3xl mx-auto">
-							<ShareableLink shareableLink={shareableLink} />
-						</div>
-					)}
-					{questions.length > 0 && (
-						<>
-							<div className="relative">
-								<div className="absolute inset-0 flex items-center">
-									<div className="w-full border-t border-white/10" />
-								</div>
-								<div className="relative flex justify-center text-sm">
-									<span className="px-2 bg-black/50 text-gray-400">
-										Preview
-									</span>
-								</div>
-							</div>
-							<QuizPreview questions={questions} />
-						</>
-					)}
+					{/* Shareable Link */}
+					{shareableLink && <ShareableLink shareableLink={shareableLink} />}
 				</div>
 			</div>
 		</div>

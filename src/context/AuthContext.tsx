@@ -2,7 +2,6 @@
 
 import {
 	createContext,
-	useContext,
 	useEffect,
 	useState,
 	ReactNode,
@@ -17,7 +16,7 @@ import {
 	AuthError,
 } from "@supabase/supabase-js";
 
-interface AuthContextType {
+export interface AuthContextType {
 	user: User | null;
 	loading: boolean;
 	initializing: boolean; // New: separate state for initial load
@@ -28,7 +27,7 @@ interface AuthContextType {
 	clearError: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
 	children: ReactNode;
@@ -176,10 +175,4 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	);
 }
 
-export const useAuth = (): AuthContextType => {
-	const context = useContext(AuthContext);
-	if (!context) {
-		throw new Error("useAuth must be used within an AuthProvider");
-	}
-	return context;
-};
+
