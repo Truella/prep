@@ -17,8 +17,7 @@ export default function useQuizProgress(
 
 	const isHydratedRef = useRef(false);
 
-	// Load progress
-	const loadProgress = (): Partial<QuizProgress> | null => {
+	const loadProgress = useCallback((): Partial<QuizProgress> | null => {
 		if (!quizId) return null;
 
 		try {
@@ -42,7 +41,7 @@ export default function useQuizProgress(
 			console.error("Failed to load quiz progress:", err);
 			return null;
 		}
-	};
+	}, [quizId]);
 
 	const saveProgress = useCallback(() => {
 		if (!quizId || isSubmitted) return;
@@ -65,9 +64,9 @@ export default function useQuizProgress(
 		if (!quizId) return;
 		localStorage.removeItem(STORAGE_KEY);
 	}, [quizId]);
-	const markHydrated = () => {
+	const markHydrated = useCallback(() => {
 		isHydratedRef.current = true;
-	};
+	}, []);
 
 	useEffect(() => {
 		saveProgress();
