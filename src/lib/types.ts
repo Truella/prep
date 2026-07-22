@@ -58,7 +58,7 @@ export interface AppQuestion {
 	optionB: string;
 	optionC: string;
 	optionD: string;
-	correctIndex: number;
+	correctIndex: 0 | 1 | 2 | 3;
 	points: number;
 	order: number;
 }

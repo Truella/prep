@@ -71,10 +71,6 @@ export function useCreateQuiz() {
 	};
 
 	const setQuestionsFromCSV = async (file: File) => {
-		if (file.type !== "text/csv") {
-			toast.error("Please upload a valid CSV file");
-			return;
-		}
 		const result = await parseAndValidateCSV(file);
 		if (!result.success) {
 			toast.error(result.message);
@@ -90,7 +86,7 @@ export function useCreateQuiz() {
 			optionD: row.Option_D.trim(),
 			correctIndex: ["A", "B", "C", "D"].indexOf(
 				row.Correct_Answer.trim().toUpperCase()
-			),
+			) as 0 | 1 | 2 | 3,
 			points: parseInt(row.Points) || 1,
 			order: i,
 		}));
@@ -99,6 +95,10 @@ export function useCreateQuiz() {
 	};
 
 	const uploadQuestions = async (questionsOverride?: AppQuestion[]) => {
+		if (state.shareableLink) {
+			toast.error("Quiz already published");
+			return;
+		}
 		const toUpload = questionsOverride ?? state.questions;
 		if (!state.quiz.id || toUpload.length === 0) {
 			toast.error("Quiz ID missing or no questions to upload");
@@ -120,8 +120,13 @@ export function useCreateQuiz() {
 		}
 
 		const quizLink = `${window.location.origin}/quiz/${state.quiz.id}`;
-		navigator.clipboard.writeText(quizLink);
 		setState((prev) => ({ ...prev, shareableLink: quizLink }));
+		try {
+			await navigator.clipboard.writeText(quizLink);
+		} catch {
+			toast.success("Quiz published!");
+			return;
+		}
 		toast.success("Quiz published! Link copied to clipboard.");
 	};
 

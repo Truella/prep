@@ -65,7 +65,7 @@ export default function CreateQuizCSV() {
 					<UploadQuestionsForm
 						onFileChange={setQuestionsFromCSV}
 						onSubmit={() => uploadQuestions()}
-						disabled={!quiz.id}
+						disabled={!quiz.id || !!shareableLink}
 						isUploading={isUploadingQuestions}
 						questionCount={questions.length}
 					/>

@@ -18,7 +18,7 @@ export default function CreateQuizForm({
 	isLoading,
 }: CreateQuizFormProps) {
 	return (
-		<form className="space-y-4">
+		<form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="space-y-4">
 			<div>
 				<label className="block text-sm font-medium text-gray-300 mb-2">
 					Quiz Title
@@ -48,9 +48,8 @@ export default function CreateQuizForm({
 			</div>
 
 			<button
-				onClick={onSubmit}
 				disabled={disabled || isLoading}
-				type="button"
+				type="submit"
 				className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
 			>
 				{isLoading ? "Creating..." : "Create Quiz"}

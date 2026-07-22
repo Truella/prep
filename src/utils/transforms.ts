@@ -24,7 +24,7 @@ export function dbToAppQuestion(q: DBQuestion, order: number): AppQuestion {
 		optionB: q.Option_B,
 		optionC: q.Option_C,
 		optionD: q.Option_D,
-		correctIndex: letterToIndex(q.Correct_Answer),
+		correctIndex: letterToIndex(q.Correct_Answer) as 0 | 1 | 2 | 3,
 		points: q.Points,
 		order,
 	};
