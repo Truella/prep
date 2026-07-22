@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 import { QuizDraft, QuizQuestion } from "../lib/types";
@@ -28,17 +28,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		isSubmitted,
 	);
 
-	useEffect(() => {
-		if (!quizId) {
-			setError("No quiz ID provided");
-			setLoading(false);
-			return;
-		}
-
-		fetchQuizData();
-	}, [quizId]);
-
-	const fetchQuizData = async () => {
+	const fetchQuizData = useCallback(async () => {
 		if (!quizId) return;
 
 		try {
@@ -74,7 +64,17 @@ export function useTakeQuiz(quizId: string | undefined) {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [quizId]);
+
+	useEffect(() => {
+		if (!quizId) {
+			setError("No quiz ID provided");
+			setLoading(false);
+			return;
+		}
+
+		fetchQuizData();
+	}, [quizId, fetchQuizData]);
 
 	useEffect(() => {
 		if (!quiz || questions.length === 0) return;
@@ -91,7 +91,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 			toast.success("Progress restored!");
 		}
 		markHydrated();
-	}, [quiz?.id, questions.length]);
+	}, [quiz?.id, questions.length, loadProgress, markHydrated]);
 
 	const handleAnswerSelect = (answerIndex: number) => {
 		setSelectedAnswers((prev) => ({
