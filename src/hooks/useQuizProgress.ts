@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 interface QuizProgress {
 	answers: Record<number, number>;
@@ -44,10 +44,9 @@ export default function useQuizProgress(
 		}
 	};
 
-	// Save progress
-	const saveProgress = () => {
+	const saveProgress = useCallback(() => {
 		if (!quizId || isSubmitted) return;
-		if (!isHydratedRef.current) return; 
+		if (!isHydratedRef.current) return;
 
 		const progress: QuizProgress = {
 			answers: selectedAnswers,
@@ -60,26 +59,25 @@ export default function useQuizProgress(
 		} catch (err) {
 			console.error("Failed to save quiz progress:", err);
 		}
-	};
+	}, [quizId, isSubmitted, selectedAnswers, currentQuestionIndex]);
 
-	// Clear progress
-	const clearProgress = () => {
+	const clearProgress = useCallback(() => {
 		if (!quizId) return;
 		localStorage.removeItem(STORAGE_KEY);
-	};
+	}, [quizId]);
 	const markHydrated = () => {
 		isHydratedRef.current = true;
 	};
 
 	useEffect(() => {
 		saveProgress();
-	}, [selectedAnswers, currentQuestionIndex]);
+	}, [selectedAnswers, currentQuestionIndex, saveProgress]);
 
 	useEffect(() => {
 		if (isSubmitted) {
 			clearProgress();
 		}
-	}, [isSubmitted]);
+	}, [isSubmitted, clearProgress]);
 
 	return {
 		loadProgress,
