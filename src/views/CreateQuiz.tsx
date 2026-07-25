@@ -24,7 +24,6 @@ export default function CreateQuizCSV() {
 	} = useCreateQuiz();
 
 	const handleTabSwitch = (next: Tab) => {
-		if (next === "csv") localStorage.removeItem("quiz_builder_draft");
 		setTab(next);
 	};
 

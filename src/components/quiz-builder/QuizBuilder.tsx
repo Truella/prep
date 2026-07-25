@@ -46,23 +46,27 @@ export default function QuizBuilder({
 
 	useEffect(() => {
 		try {
-			const saved = localStorage.getItem(DRAFT_KEY);
-			if (saved) setQuestions(JSON.parse(saved));
+			const raw = localStorage.getItem(DRAFT_KEY);
+			if (!raw) return;
+			const draft = JSON.parse(raw) as { quizId: string; questions: AppQuestion[] };
+			// Only restore if the draft belongs to THIS quiz session
+			if (draft.quizId === quizId && Array.isArray(draft.questions)) {
+				setQuestions(draft.questions);
+			}
 		} catch {}
-	}, []);
+	}, [quizId]);
 
-	useEffect(() => {
+	const persist = (qs: AppQuestion[]) => {
 		try {
-			localStorage.setItem(DRAFT_KEY, JSON.stringify(questions));
+			localStorage.setItem(DRAFT_KEY, JSON.stringify({ quizId, questions: qs }));
 		} catch {}
-	}, [questions]);
+	};
 
 	const updateQuestion = (index: number, updated: AppQuestion) => {
 		const next = [...questions];
 		next[index] = updated;
 		setQuestions(next);
-		// Only clear an existing error for this card once it becomes valid —
-		// never surface new errors while the user is mid-edit.
+		persist(next);
 		if (errors.has(index)) {
 			if (validateQuestion(updated).length === 0) {
 				setErrors((prev) => {
@@ -75,26 +79,32 @@ export default function QuizBuilder({
 	};
 
 	const addQuestion = () => {
-		// Validate all existing questions before allowing a new one to be added.
 		const errs = validateQuizForSubmit(questions);
 		if (errs.size > 0) {
 			setErrors(errs);
 			return;
 		}
 		setQuestions((prev) => {
+			const next = [...prev, blankQuestion(prev.length)];
+			persist(next);
 			onQuestionAdded(prev, prev.length);
-			return [...prev, blankQuestion(prev.length)];
+			return next;
 		});
 	};
 
 	const deleteQuestion = (index: number) =>
-		setQuestions((prev) => prev.filter((_, i) => i !== index));
+		setQuestions((prev) => {
+			const next = prev.filter((_, i) => i !== index);
+			persist(next);
+			return next;
+		});
 
 	const moveUp = (index: number) => {
 		if (index === 0) return;
 		const next = [...questions];
 		[next[index - 1], next[index]] = [next[index], next[index - 1]];
 		setQuestions(next);
+		persist(next);
 	};
 
 	const moveDown = (index: number) => {
@@ -102,6 +112,7 @@ export default function QuizBuilder({
 		const next = [...questions];
 		[next[index], next[index + 1]] = [next[index + 1], next[index]];
 		setQuestions(next);
+		persist(next);
 	};
 
 	const handleSubmit = async () => {
