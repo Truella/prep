@@ -24,6 +24,10 @@ export function validateQuestion(q: AppQuestion): string[] {
 		errors.push("Correct answer must be A, B, C, or D");
 	}
 
+	if (q.points < 1 || q.points > 100) {
+		errors.push("Points must be between 1 and 100");
+	}
+
 	return errors;
 }
 

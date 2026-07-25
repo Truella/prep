@@ -134,6 +134,9 @@ export function useCreateQuiz() {
 		}
 
 		const quizLink = `${window.location.origin}/quiz/${state.quiz.id}`;
+		try {
+			localStorage.removeItem(QUIZ_META_KEY);
+		} catch {}
 		setState((prev) => ({ ...prev, shareableLink: quizLink }));
 		try {
 			await navigator.clipboard.writeText(quizLink);

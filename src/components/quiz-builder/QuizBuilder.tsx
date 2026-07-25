@@ -62,6 +62,10 @@ export default function QuizBuilder({
 		} catch {}
 	};
 
+	/** Re-stamp every question's .order to match its array index. */
+	const reorder = (qs: AppQuestion[]): AppQuestion[] =>
+		qs.map((q, i) => ({ ...q, order: i }));
+
 	const updateQuestion = (index: number, updated: AppQuestion) => {
 		const next = [...questions];
 		next[index] = updated;
@@ -84,17 +88,18 @@ export default function QuizBuilder({
 			setErrors(errs);
 			return;
 		}
+		const newIndex = questions.length;
+		onQuestionAdded(questions, newIndex);
 		setQuestions((prev) => {
 			const next = [...prev, blankQuestion(prev.length)];
 			persist(next);
-			onQuestionAdded(prev, prev.length);
 			return next;
 		});
 	};
 
 	const deleteQuestion = (index: number) =>
 		setQuestions((prev) => {
-			const next = prev.filter((_, i) => i !== index);
+			const next = reorder(prev.filter((_, i) => i !== index));
 			persist(next);
 			return next;
 		});
@@ -103,16 +108,18 @@ export default function QuizBuilder({
 		if (index === 0) return;
 		const next = [...questions];
 		[next[index - 1], next[index]] = [next[index], next[index - 1]];
-		setQuestions(next);
-		persist(next);
+		const reordered = reorder(next);
+		setQuestions(reordered);
+		persist(reordered);
 	};
 
 	const moveDown = (index: number) => {
 		if (index === questions.length - 1) return;
 		const next = [...questions];
 		[next[index], next[index + 1]] = [next[index + 1], next[index]];
-		setQuestions(next);
-		persist(next);
+		const reordered = reorder(next);
+		setQuestions(reordered);
+		persist(reordered);
 	};
 
 	const handleSubmit = async () => {
@@ -120,7 +127,6 @@ export default function QuizBuilder({
 		setErrors(errs);
 		if (errs.size > 0) return;
 		await onSubmit(questions);
-		localStorage.removeItem(DRAFT_KEY);
 	};
 
 	return (
