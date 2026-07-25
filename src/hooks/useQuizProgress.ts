@@ -62,8 +62,9 @@ export default function useQuizProgress(
 
 	const clearProgress = useCallback(() => {
 		if (!quizId) return;
+		isHydratedRef.current = false;
 		localStorage.removeItem(STORAGE_KEY);
-	}, [quizId]);
+	}, [quizId, STORAGE_KEY]);
 	const markHydrated = useCallback(() => {
 		isHydratedRef.current = true;
 	}, []);

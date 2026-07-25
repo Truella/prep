@@ -12,20 +12,20 @@ export function parseAndValidateCSV(file: File): Promise<CSVResult> {
 			skipEmptyLines: true,
 
 			complete: (results: ParseResult<MCQRow>) => {
-				/* Parse errors */
-				if (results.errors.length > 0) {
-					resolve({
-						success: false,
-						message: "CSV contains parsing errors.",
-					});
-					return;
-				}
-
 				/* Empty file */
 				if (!results.data || results.data.length === 0) {
 					resolve({
 						success: false,
 						message: "No data found in CSV.",
+					});
+					return;
+				}
+
+				/* Parse errors */
+				if (results.errors.length > 0) {
+					resolve({
+						success: false,
+						message: "CSV contains parsing errors.",
 					});
 					return;
 				}
