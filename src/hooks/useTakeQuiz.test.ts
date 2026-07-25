@@ -120,19 +120,17 @@ describe("useTakeQuiz", () => {
 		expect(result.current.showSubmitModal).toBe(false);
 	});
 
-	it("confirmSubmit sets showResults true and clears saved progress", async () => {
+	it("confirmSubmit sets showResults true", async () => {
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 
 		await waitFor(() => expect(result.current.loading).toBe(false));
 
-		localStorage.setItem("quiz_progress_quiz1", "should-be-removed");
 		act(() => result.current.handleAnswerSelect(3));
 		act(() => result.current.initiateSubmit());
 		expect(result.current.showSubmitModal).toBe(true);
 
 		act(() => result.current.confirmSubmit());
 		expect(result.current.showResults).toBe(true);
-		expect(localStorage.getItem("quiz_progress_quiz1")).toBeNull();
 	});
 
 	it("cancelSubmit sets showSubmitModal false", async () => {
@@ -148,18 +146,19 @@ describe("useTakeQuiz", () => {
 		expect(result.current.showSubmitModal).toBe(false);
 	});
 
-	it("resetQuiz clears selectedAnswers, resets currentQuestionIndex to 0, sets showResults false", async () => {
+	it("resetQuiz clears selectedAnswers, resets currentQuestionIndex to 0, sets showResults false, and clears progress", async () => {
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 
 		await waitFor(() => expect(result.current.loading).toBe(false));
 
 		act(() => result.current.handleAnswerSelect(3));
-		act(() => result.current.confirmSubmit());
-		expect(result.current.showResults).toBe(true);
+
+		localStorage.setItem("quiz_progress_quiz1", "should-be-removed");
 
 		act(() => result.current.resetQuiz());
 		expect(result.current.showResults).toBe(false);
 		expect(result.current.currentQuestionIndex).toBe(0);
 		expect(result.current.selectedAnswers).toEqual({});
+		expect(localStorage.getItem("quiz_progress_quiz1")).toBeNull();
 	});
 });
