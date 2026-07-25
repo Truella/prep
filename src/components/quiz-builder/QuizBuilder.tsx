@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { validateQuizForSubmit } from "../../utils/questionValidation";
+import {
+	validateQuestion,
+	validateQuizForSubmit,
+} from "../../utils/questionValidation";
 import BuilderQuestionCard from "./BuilderQuestionCard";
+import { useQuestionCollapse } from "../../hooks/useQuestionCollapse";
 import type { AppQuestion } from "../../lib/types";
 
 const DRAFT_KEY = "quiz_builder_draft";
@@ -38,6 +42,8 @@ export default function QuizBuilder({
 	]);
 	const [errors, setErrors] = useState<Map<number, string[]>>(new Map());
 
+	const { toggle, isExpanded, onQuestionAdded } = useQuestionCollapse(1);
+
 	useEffect(() => {
 		try {
 			const saved = localStorage.getItem(DRAFT_KEY);
@@ -55,11 +61,31 @@ export default function QuizBuilder({
 		const next = [...questions];
 		next[index] = updated;
 		setQuestions(next);
-		setErrors(validateQuizForSubmit(next));
+		// Only clear an existing error for this card once it becomes valid —
+		// never surface new errors while the user is mid-edit.
+		if (errors.has(index)) {
+			if (validateQuestion(updated).length === 0) {
+				setErrors((prev) => {
+					const next = new Map(prev);
+					next.delete(index);
+					return next;
+				});
+			}
+		}
 	};
 
-	const addQuestion = () =>
-		setQuestions((prev) => [...prev, blankQuestion(prev.length)]);
+	const addQuestion = () => {
+		// Validate all existing questions before allowing a new one to be added.
+		const errs = validateQuizForSubmit(questions);
+		if (errs.size > 0) {
+			setErrors(errs);
+			return;
+		}
+		setQuestions((prev) => {
+			onQuestionAdded(prev, prev.length);
+			return [...prev, blankQuestion(prev.length)];
+		});
+	};
 
 	const deleteQuestion = (index: number) =>
 		setQuestions((prev) => prev.filter((_, i) => i !== index));
@@ -94,6 +120,8 @@ export default function QuizBuilder({
 					question={q}
 					index={i}
 					total={questions.length}
+					isExpanded={isExpanded(i, q, (errors.get(i)?.length ?? 0) > 0)}
+					onToggle={() => toggle(i)}
 					onChange={(updated) => updateQuestion(i, updated)}
 					onDelete={() => deleteQuestion(i)}
 					onMoveUp={() => moveUp(i)}
