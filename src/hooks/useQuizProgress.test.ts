@@ -31,6 +31,9 @@ describe("useQuizProgress", () => {
 
 		act(() => vi.advanceTimersByTime(0));
 
+		const stored = JSON.parse(localStorage.getItem("quiz_progress_quiz1")!);
+		expect(stored.timestamp).toBeGreaterThan(0);
+
 		const loaded = result.current.loadProgress();
 		expect(loaded).not.toBeNull();
 		expect(loaded!.answers).toEqual({ 0: 2 });
@@ -70,6 +73,7 @@ describe("useQuizProgress", () => {
 		});
 
 		expect(result.current.loadProgress()).toBeNull();
+		expect(localStorage.getItem("quiz_progress_quiz1")).toBeNull();
 	});
 
 	it("clearProgress removes the storage key", () => {

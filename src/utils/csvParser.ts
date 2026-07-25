@@ -25,7 +25,7 @@ export function parseAndValidateCSV(file: File): Promise<CSVResult> {
 				if (results.errors.length > 0) {
 					resolve({
 						success: false,
-						message: "No data found in CSV.",
+						message: "CSV contains parsing errors.",
 					});
 					return;
 				}

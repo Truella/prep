@@ -56,6 +56,16 @@ What is 2+2?,1,2,3,4`;
 		}
 	});
 
+	it("rejects a malformed CSV with parse errors", async () => {
+		const csv = `Question,Option_A
+a,b,c`;
+		const result = await parseAndValidateCSV(makeFile(csv));
+		expect(result.success).toBe(false);
+		if (!result.success) {
+			expect(result.message).toBe("CSV contains parsing errors.");
+		}
+	});
+
 	it("rejects a row with missing question text", async () => {
 		const csv = `Question,Option_A,Option_B,Option_C,Option_D,Correct_Answer,Points
 ,1,2,3,4,D,1`;
