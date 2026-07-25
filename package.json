@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src/"
+    "lint": "eslint .",
+"test": "vitest run",
+"typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^3.1.1",
