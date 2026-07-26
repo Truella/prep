@@ -74,13 +74,13 @@ export default function SubmitConfirmationModal({
 				<p className="text-gray-400 text-center mb-6">
 					{allAnswered ? (
 						<>
-							You've answered all{" "}
+							You&apos;ve answered all{" "}
 							<span className="text-white font-semibold">{totalQuestions}</span>{" "}
 							questions. Ready to submit?
 						</>
 					) : (
 						<>
-							You've answered{" "}
+							You&apos;ve answered{" "}
 							<span className="text-white font-semibold">{answeredCount}</span>{" "}
 							out of{" "}
 							<span className="text-white font-semibold">{totalQuestions}</span>{" "}

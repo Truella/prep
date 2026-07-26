@@ -49,8 +49,8 @@ export default function QuizBuilder({
 			const raw = localStorage.getItem(DRAFT_KEY);
 			if (!raw) return;
 			const draft = JSON.parse(raw) as { quizId: string; questions: AppQuestion[] };
-			// Only restore if the draft belongs to THIS quiz session
 			if (draft.quizId === quizId && Array.isArray(draft.questions)) {
+				// eslint-disable-next-line react-hooks/set-state-in-effect
 				setQuestions(draft.questions);
 			}
 		} catch {}

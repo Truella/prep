@@ -14,10 +14,6 @@ export function useQuizzes() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		fetchQuizzes();
-	}, []);
-
 	const fetchQuizzes = async () => {
 		try {
 			setLoading(true);
@@ -55,6 +51,11 @@ export function useQuizzes() {
 			setLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
+		fetchQuizzes();
+	}, []);
 
 	const copyQuizLink = (quizId: string) => {
 		const link = `${window.location.origin}/quiz/${quizId}`;
