@@ -61,6 +61,7 @@ export function useQuizBank() {
 	}, [filters.category, filters.difficulty, filters.sort]);
 
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		fetchQuizzes();
 	}, [fetchQuizzes]);
 
