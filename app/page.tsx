@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { IceCubesIcon, TaskEdit01Icon } from "@hugeicons/core-free-icons";
+import {
+	IceCubesIcon,
+	TaskEdit01Icon,
+	LibraryIcon,
+} from "@hugeicons/core-free-icons";
 
 export default function Home() {
 	return (
@@ -34,6 +38,13 @@ export default function Home() {
 							>
 								<HugeiconsIcon icon={TaskEdit01Icon} />
 								Take a Quiz
+							</Link>
+							<Link
+								href="/quiz-bank"
+								className="group w-full sm:w-auto px-8 py-4 rounded-xl border border-white/20 text-white font-semibold backdrop-blur-sm hover:bg-white/5 transition-all flex items-center justify-center gap-2"
+							>
+								<HugeiconsIcon icon={LibraryIcon} />
+								Quiz Bank
 							</Link>
 						</div>
 					</div>
