@@ -65,6 +65,7 @@ export function useCreateQuiz() {
 				title: state.quiz.title,
 				description: state.quiz.description,
 				created_by: userData.user.id,
+				time_limit: state.timeLimit,
 			})
 			.select()
 			.single();

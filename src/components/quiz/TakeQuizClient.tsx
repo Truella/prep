@@ -7,6 +7,7 @@ import QuizProgress from "../../components/quiz/QuizProgress";
 import QuestionCard from "../../components/quiz/QuestionCard";
 import QuizNavigation from "../../components/quiz/QuizNavigation";
 import QuestionOverview from "../../components/quiz/QuestionOverview";
+import QuizTimer from "../../components/quiz/QuizTimer";
 import QuizResults from "../../components/quiz/QuizResults";
 import SubmitConfirmationModal from "../../components/quiz/SubmitConfirmationModal";
 
@@ -34,6 +35,9 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 		cancelSubmit,
 		calculateScore,
 		resetQuiz,
+		handleTimerExpire,
+		elapsedSeconds,
+		isAutoSubmit,
 	} = useTakeQuiz(quizId);
 
 	if (loading) {
@@ -88,6 +92,9 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 					quizId={quizId || ""}
 					userAnswers={selectedAnswers}
 					questions={questions}
+					elapsedSeconds={elapsedSeconds}
+					isAutoSubmit={isAutoSubmit}
+					timeLimit={quiz.time_limit}
 				/>
 			</div>
 		);
@@ -122,6 +129,15 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 				<div className="grid lg:grid-cols-3 gap-6">
 					{/* Main Content */}
 					<div className="lg:col-span-2 space-y-6">
+						{quiz.time_limit && !showResults && (
+							<div className="flex justify-end mb-2">
+								<QuizTimer
+									timeLimitSeconds={quiz.time_limit * 60}
+									onExpire={handleTimerExpire}
+								/>
+							</div>
+						)}
+
 						<QuizProgress
 							current={currentQuestionIndex + 1}
 							total={questions.length}
@@ -160,6 +176,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 							totalQuestions={questions.length}
 							answeredCount={answeredCount}
 							unansweredCount={unansweredCount}
+							isAutoSubmit={isAutoSubmit}
 						/>
 					</div>
 				</div>

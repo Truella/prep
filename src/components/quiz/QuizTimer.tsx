@@ -26,10 +26,6 @@ export default function QuizTimer({
 			setSecondsRemaining((prev) => {
 				if (prev <= 1) {
 					clearInterval(interval);
-					if (!expiredRef.current) {
-						expiredRef.current = true;
-						onExpireRef.current();
-					}
 					return 0;
 				}
 				if (prev === 61 && !warnedRef.current) {
@@ -42,6 +38,12 @@ export default function QuizTimer({
 
 		return () => clearInterval(interval);
 	}, []);
+
+	useEffect(() => {
+		if (secondsRemaining > 0 || expiredRef.current) return;
+		expiredRef.current = true;
+		onExpireRef.current();
+	}, [secondsRemaining]);
 
 	const ratio = secondsRemaining / timeLimitSeconds;
 	const colorClass =

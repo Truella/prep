@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 interface TimeLimitInputProps {
 	value: number | null;
 	onChange: (value: number | null) => void;
@@ -10,6 +12,25 @@ export default function TimeLimitInput({
 	onChange,
 }: TimeLimitInputProps) {
 	const enabled = value !== null;
+	const [raw, setRaw] = useState(value !== null ? String(value) : "");
+
+	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
+		setRaw(value !== null ? String(value) : "");
+	}, [value]);
+
+	const commit = (s: string) => {
+		if (s === "") {
+			setRaw(value !== null ? String(value) : "");
+			return;
+		}
+		const v = parseInt(s);
+		if (!isNaN(v)) {
+			const clamped = Math.max(1, Math.min(180, v));
+			onChange(clamped);
+			setRaw(String(clamped));
+		}
+	};
 
 	return (
 		<div className="flex items-center gap-4">
@@ -28,10 +49,11 @@ export default function TimeLimitInput({
 						type="number"
 						min={1}
 						max={180}
-						value={value ?? 30}
-						onChange={(e) => {
-							const v = parseInt(e.target.value);
-							if (!isNaN(v) && v >= 1 && v <= 180) onChange(v);
+						value={raw}
+						onChange={(e) => setRaw(e.target.value)}
+						onBlur={(e) => commit(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") commit((e.target as HTMLInputElement).value);
 						}}
 						className="w-20 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition"
 					/>
