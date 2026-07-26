@@ -126,7 +126,8 @@ describe("useQuizBank", () => {
 			result.current.setFilter("sort", "rated");
 		});
 		await act(async () => {});
-		const chain = vi.mocked(supabase.from).mock.results[0].value;
+		const results = vi.mocked(supabase.from).mock.results;
+		const chain = results[results.length - 1].value;
 		expect(chain.order).toHaveBeenCalledWith("average_rating", {
 			ascending: false,
 			nullsFirst: false,
