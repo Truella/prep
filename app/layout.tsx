@@ -5,8 +5,19 @@ import ErrorBoundary from "../src/components/ErrorBoundary";
 import "./globals.css";
 
 export const metadata: Metadata = {
-	title: "Prep - Quiz Builder",
-	description: "Create, upload, and share quizzes effortlessly.",
+	title: {
+		default: "PREP — Quiz Builder & Study Tool",
+		template: "%s — PREP",
+	},
+	description:
+		"Create and share multiple-choice quizzes. Build manually or upload a CSV. Get AI-powered performance reviews.",
+	openGraph: {
+		type: "website",
+		siteName: "PREP",
+		title: "PREP — Quiz Builder & Study Tool",
+		description:
+			"Create and share multiple-choice quizzes. Build manually or upload a CSV.",
+	},
 };
 
 export default function RootLayout({

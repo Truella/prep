@@ -1,7 +1,24 @@
+import type { Metadata } from "next";
+import { supabase } from "../../../src/lib/supabase";
 import TakeQuizClient from "../../../src/components/quiz/TakeQuizClient";
 
 interface PageProps {
 	params: Promise<{ quizId: string }>;
+}
+
+export async function generateMetadata({
+	params,
+}: PageProps): Promise<Metadata> {
+	const { quizId } = await params;
+	const { data } = await supabase
+		.from("quizzes")
+		.select("title")
+		.eq("id", quizId)
+		.single();
+
+	return {
+		title: data?.title ?? "Quiz",
+	};
 }
 
 export default async function TakeQuizPage({ params }: PageProps) {
