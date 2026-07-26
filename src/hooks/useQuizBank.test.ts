@@ -115,6 +115,35 @@ describe("useQuizBank", () => {
 		});
 	});
 
+	it("orders by average_rating descending for rated sort", async () => {
+		const supabase = (await import("../lib/supabase")).supabase;
+		vi.mocked(supabase.from).mockReturnValue(
+			createQueryChain({ data: [], error: null })
+		);
+		const { result } = renderHook(() => useQuizBank());
+		await act(async () => {});
+		act(() => {
+			result.current.setFilter("sort", "rated");
+		});
+		await act(async () => {});
+		const chain = vi.mocked(supabase.from).mock.results[0].value;
+		expect(chain.order).toHaveBeenCalledWith("average_rating", {
+			ascending: false,
+			nullsFirst: false,
+		});
+	});
+
+	it("sets error state when supabase query fails", async () => {
+		const supabase = (await import("../lib/supabase")).supabase;
+		vi.mocked(supabase.from).mockReset();
+		vi.mocked(supabase.from).mockReturnValue(
+			createQueryChain({ data: null, error: { message: "Network error" } })
+		);
+		const { result } = renderHook(() => useQuizBank());
+		await act(async () => {});
+		expect(result.current.error).toBe("Network error");
+	});
+
 	it("client-side search returns only quizzes matching the query substring", async () => {
 		const supabase = (await import("../lib/supabase")).supabase;
 		vi.mocked(supabase.from).mockReturnValue(

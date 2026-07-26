@@ -5,7 +5,6 @@ import QuizReview from "./QuizReview";
 import { AppQuestion } from "../../lib/types";
 import { useAIReview } from "../../hooks/useAIReview";
 import type { AIReviewPayload } from "../../lib/types";
-import RatingWidget from "../quiz-bank/RatingWidget";
 import ErrorBoundary from "../ErrorBoundary";
 
 // ---------------------------------------------------------------------------
@@ -235,12 +234,7 @@ export default function QuizResults({
 						})()}
 					</div>
 
-					{quizVisibility === "public" && quizId && (
-						<div className="mt-4">
-							<p className="text-xs text-gray-400 mb-2">Rate this quiz</p>
-							<RatingWidget quizId={quizId} />
-						</div>
-					)}
+
 
 					{/* AI Review */}
 					<ErrorBoundary
