@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 import { QuizDraft, DBQuestion, AppQuestion } from "../lib/types";
@@ -20,6 +20,10 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const [showResults, setShowResults] = useState(false);
 
 	const [isSubmitted, setIsSubmitted] = useState(false);
+
+	const startTimeRef = useRef<number>(0);
+	const [elapsedSeconds, setElapsedSeconds] = useState(0);
+	const [isAutoSubmit, setIsAutoSubmit] = useState(false);
 
 	const { loadProgress, clearProgress, markHydrated } = useQuizProgress(
 		quizId,
@@ -56,6 +60,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 			setQuiz(quizData);
 			setQuestions(questionsData.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i)));
+			startTimeRef.current = Date.now();
 		} catch (err) {
 			const message =
 				err instanceof Error ? err.message : "Failed to load quiz";
@@ -130,6 +135,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 	};
 
 	const confirmSubmit = () => {
+		setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
@@ -137,6 +143,14 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 	const cancelSubmit = () => {
 		setShowSubmitModal(false);
+	};
+
+	const handleTimerExpire = () => {
+		setIsAutoSubmit(true);
+		setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+		setShowSubmitModal(false);
+		setShowResults(true);
+		setIsSubmitted(true);
 	};
 
 	const resetQuiz = () => {
@@ -193,6 +207,9 @@ export function useTakeQuiz(quizId: string | undefined) {
 		initiateSubmit,
 		confirmSubmit,
 		cancelSubmit,
+		handleTimerExpire,
+		elapsedSeconds,
+		isAutoSubmit,
 		answeredCount,
 		unansweredCount,
 	};
