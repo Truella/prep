@@ -16,14 +16,39 @@ function readSavedResults(quizId: string | undefined): SavedQuizResults | null {
 	const resultsKey = `quiz_results_${quizId}`;
 	try {
 		const savedResults = localStorage.getItem(resultsKey);
-		if (savedResults) {
-			const parsed = JSON.parse(savedResults);
-			return {
-				answers: parsed.answers || {},
-				elapsedSeconds: parsed.elapsedSeconds || 0,
-				isAutoSubmit: !!parsed.isAutoSubmit,
-			};
+		if (!savedResults) return null;
+
+		const parsed = JSON.parse(savedResults);
+
+		if (!parsed || typeof parsed !== "object") {
+			return null;
 		}
+
+		const answers = parsed.answers;
+		if (!answers || typeof answers !== "object") {
+			return null;
+		}
+		const validatedAnswers: Record<number, number> = {};
+		for (const [key, value] of Object.entries(answers)) {
+			const numKey = Number(key);
+			const numValue = Number(value);
+			if (Number.isInteger(numKey) && numKey >= 0 && Number.isInteger(numValue) && numValue >= 0) {
+				validatedAnswers[numKey] = numValue;
+			}
+		}
+
+		const elapsedSeconds = parsed.elapsedSeconds;
+		if (!Number.isFinite(elapsedSeconds) || elapsedSeconds < 0) {
+			return null;
+		}
+
+		const isAutoSubmit = Boolean(parsed.isAutoSubmit);
+
+		return {
+			answers: validatedAnswers,
+			elapsedSeconds,
+			isAutoSubmit,
+		};
 	} catch (err) {
 		console.error("Failed to load saved quiz results:", err);
 	}

@@ -47,6 +47,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   ) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
+
+  for (let i = 0; i < questions.length; i++) {
+    const q = questions[i];
+    if (!q || typeof q !== "object") {
+      return NextResponse.json({ error: `Invalid question at index ${i}` }, { status: 400 });
+    }
+    if (typeof q.questionText !== "string" || q.questionText.trim().length === 0) {
+      return NextResponse.json({ error: `Invalid questionText at index ${i}` }, { status: 400 });
+    }
+    if (!Number.isInteger(q.correctIndex) || q.correctIndex < 0 || q.correctIndex > 3) {
+      return NextResponse.json({ error: `Invalid correctIndex at index ${i}` }, { status: 400 });
+    }
+    const userIdx = selectedAnswers[i];
+    if (userIdx !== undefined && (!Number.isInteger(userIdx) || userIdx < 0 || userIdx > 3)) {
+      return NextResponse.json({ error: `Invalid selected answer at index ${i}` }, { status: 400 });
+    }
+  }
+
   const percentage = Math.round((score / totalPoints) * 100);
 
   const questionLines = questions
@@ -71,6 +89,9 @@ Provide a brief, personalized performance review directly to the user (address t
 
 Be concise and specific to the questions above. Maintain a direct, encouraging tutor-to-student tone.`;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
   try {
     const groqResponse = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
@@ -86,8 +107,10 @@ Be concise and specific to the questions above. Maintain a direct, encouraging t
           temperature: 0.4,
           messages: [{ role: "user", content: prompt }],
         }),
+        signal: controller.signal,
       }
     );
+    clearTimeout(timeoutId);
 
     if (!groqResponse.ok) {
       return NextResponse.json(
@@ -108,6 +131,7 @@ Be concise and specific to the questions above. Maintain a direct, encouraging t
 
     return NextResponse.json({ review });
   } catch {
+    clearTimeout(timeoutId);
     return NextResponse.json(
       { error: "AI review temporarily unavailable." },
       { status: 502 }

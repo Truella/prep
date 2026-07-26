@@ -46,8 +46,12 @@ export function useAIReview(quizId: string) {
         signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
-      const data = await response.json();
+      let data: { review?: string; error?: string } | null = null;
+      try {
+        data = await response.json();
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       if (response.status === 429) {
         setState({
@@ -60,7 +64,7 @@ export function useAIReview(quizId: string) {
         return;
       }
 
-      if (!response.ok || data.error) {
+      if (!response.ok || data!.error) {
         setState({
           review: null,
           loading: false,
@@ -70,10 +74,10 @@ export function useAIReview(quizId: string) {
         return;
       }
 
-      setState({ review: data.review, loading: false, error: null, isRateLimited: false });
+      setState({ review: data!.review ?? null, loading: false, error: null, isRateLimited: false });
 
       try {
-        localStorage.setItem(cacheKey, data.review);
+        localStorage.setItem(cacheKey, data!.review ?? "");
       } catch (err) {
         console.error("Failed to cache AI review:", err);
       }
