@@ -39,11 +39,18 @@ export default function CSVGuide() {
 		message: string;
 	} | null>(null);
 	const [copied, setCopied] = useState(false);
+	const [copyFailed, setCopyFailed] = useState(false);
 
-	const handleCopy = () => {
-		navigator.clipboard.writeText(EXAMPLE_CSV);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
+	const handleCopy = async () => {
+		try {
+			await navigator.clipboard.writeText(EXAMPLE_CSV);
+			setCopied(true);
+			setCopyFailed(false);
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			setCopyFailed(true);
+			setTimeout(() => setCopyFailed(false), 2000);
+		}
 	};
 
 	const handleDownload = () => {
@@ -109,7 +116,7 @@ export default function CSVGuide() {
 							onClick={handleCopy}
 							className="text-xs px-3 py-1.5 rounded-lg border border-white/20 text-gray-400 hover:text-white transition"
 						>
-							{copied ? "Copied!" : "Copy"}
+							{copyFailed ? "Failed" : copied ? "Copied!" : "Copy"}
 						</button>
 						<button
 							onClick={handleDownload}
@@ -126,8 +133,11 @@ export default function CSVGuide() {
 
 			<div className="space-y-3">
 				<h2 className="text-lg font-semibold text-white">Validate your CSV</h2>
-				<p className="text-sm text-gray-400">Paste your CSV below to check it before uploading.</p>
+				<label htmlFor="csv-input" className="text-sm text-gray-400">
+					Paste your CSV below to check it before uploading.
+				</label>
 				<textarea
+					id="csv-input"
 					value={csvInput}
 					onChange={(e) => { setCsvInput(e.target.value); setValidationResult(null); }}
 					placeholder="Paste CSV content here..."
@@ -143,6 +153,7 @@ export default function CSVGuide() {
 				</button>
 				{validationResult && (
 					<p
+						aria-live="polite"
 						className={`text-sm font-medium ${
 							validationResult.ok ? "text-green-400" : "text-red-400"
 						}`}

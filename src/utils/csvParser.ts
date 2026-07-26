@@ -77,6 +77,15 @@ export function parseAndValidateCSV(file: File): Promise<CSVResult> {
 						});
 						return;
 					}
+
+					const pointsStr = row.Points?.trim();
+					if (pointsStr !== undefined && pointsStr !== "" && !/^\d+$/.test(pointsStr)) {
+						resolve({
+							success: false,
+							message: `Row ${i + 1}: Points must be a valid integer.`,
+						});
+						return;
+					}
 				}
 
 				resolve({

@@ -24,6 +24,7 @@ export default function DocsSidebar() {
 						<li key={s.slug}>
 							<Link
 								href={`/docs/${s.slug}`}
+								aria-current={isActive ? "page" : undefined}
 								className={`block px-3 py-2 rounded-lg text-sm transition ${
 									isActive
 										? "bg-white/10 text-white font-medium"
