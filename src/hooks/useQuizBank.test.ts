@@ -19,7 +19,7 @@ function createQueryChain(resolveValue: object) {
 		catch: promise.catch.bind(promise),
 		finally: promise.finally.bind(promise),
 	};
-	return chain;
+	return chain as any;
 }
 
 vi.mock("../lib/supabase", () => ({

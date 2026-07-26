@@ -8,6 +8,7 @@ function createQueryChain(resolveValue: object) {
 		select: ReturnType<typeof vi.fn>;
 		eq: ReturnType<typeof vi.fn>;
 		single: ReturnType<typeof vi.fn>;
+		maybeSingle: ReturnType<typeof vi.fn>;
 		upsert: ReturnType<typeof vi.fn>;
 		update: ReturnType<typeof vi.fn>;
 		then: Promise<object>["then"];
@@ -17,13 +18,14 @@ function createQueryChain(resolveValue: object) {
 		select: vi.fn(() => chain),
 		eq: vi.fn(() => chain),
 		single: vi.fn(() => chain),
+		maybeSingle: vi.fn(() => chain),
 		upsert: vi.fn(() => chain),
 		update: vi.fn(() => chain),
 		then: promise.then.bind(promise),
 		catch: promise.catch.bind(promise),
 		finally: promise.finally.bind(promise),
 	};
-	return chain;
+	return chain as any;
 }
 
 vi.mock("../lib/supabase", () => ({
@@ -48,14 +50,16 @@ describe("useRating", () => {
 		const { result } = renderHook(() => useRating("quiz1"));
 		await act(async () => {});
 
+		let success = false;
 		await act(async () => {
-			await result.current.submitRating(4);
+			success = await result.current.submitRating(4) as unknown as boolean;
 		});
 
 		expect(defaultChain.upsert).toHaveBeenCalledWith(
 			{ quiz_id: "quiz1", user_id: "u1", rating: 4 },
 			{ onConflict: "quiz_id,user_id" }
 		);
+		expect(success).toBe(true);
 	});
 
 	it("loading is true during submitRating and false after", async () => {
@@ -94,10 +98,12 @@ describe("useRating", () => {
 		const { result } = renderHook(() => useRating("quiz1"));
 		await act(async () => {});
 
+		let success = true;
 		await act(async () => {
-			await result.current.submitRating(5);
+			success = await result.current.submitRating(5) as unknown as boolean;
 		});
 		expect(result.current.error).toBe("DB error");
 		expect(result.current.loading).toBe(false);
+		expect(success).toBe(false);
 	});
 });

@@ -147,7 +147,9 @@ export default function CreateQuizCSV() {
 
 			<PublishModal
 				quizId={quiz.id ?? ""}
-				currentVisibility="private"
+				currentVisibility={quiz.visibility ?? "private"}
+				currentCategory={quiz.category}
+				currentDifficulty={quiz.difficulty}
 				isOpen={isPublishOpen}
 				onClose={() => setIsPublishOpen(false)}
 				onSuccess={() => {}}

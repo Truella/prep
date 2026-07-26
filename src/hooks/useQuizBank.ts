@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import type { PublicQuiz, QuizCategory, QuizDifficulty } from "../lib/types";
 
@@ -21,7 +21,10 @@ export function useQuizBank() {
 	});
 	const [searchQuery, setSearchQuery] = useState("");
 
+	const requestGenRef = useRef(0);
+
 	const fetchQuizzes = useCallback(async () => {
+		const currentGen = ++requestGenRef.current;
 		setLoading(true);
 		setError(null);
 
@@ -40,7 +43,7 @@ export function useQuizBank() {
 				query = query.order("times_taken", { ascending: false });
 				break;
 			case "rated":
-				query = query.order("average_rating", { ascending: false });
+				query = query.order("average_rating", { ascending: false, nullsFirst: false });
 				break;
 			case "newest":
 				query = query.order("created_at", { ascending: false });
@@ -51,6 +54,9 @@ export function useQuizBank() {
 		}
 
 		const { data, error: fetchError } = await query;
+		
+		if (currentGen !== requestGenRef.current) return;
+
 		setLoading(false);
 
 		if (fetchError) {

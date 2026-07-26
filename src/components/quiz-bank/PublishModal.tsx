@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePublishQuiz } from "../../hooks/usePublishQuiz";
 import { QUIZ_CATEGORIES } from "../../lib/types";
 import type {
@@ -12,6 +12,8 @@ import type {
 interface PublishModalProps {
 	quizId: string;
 	currentVisibility: QuizVisibility;
+	currentCategory?: QuizCategory | null;
+	currentDifficulty?: QuizDifficulty | null;
 	isOpen: boolean;
 	onClose: () => void;
 	onSuccess: () => void;
@@ -42,14 +44,62 @@ const VISIBILITY_OPTIONS: {
 export default function PublishModal({
 	quizId,
 	currentVisibility,
+	currentCategory = null,
+	currentDifficulty = null,
 	isOpen,
 	onClose,
 	onSuccess,
 }: PublishModalProps) {
 	const [visibility, setVisibility] =
 		useState<QuizVisibility>(currentVisibility);
-	const [category, setCategory] = useState<QuizCategory | null>(null);
-	const [difficulty, setDifficulty] = useState<QuizDifficulty | null>(null);
+	const [category, setCategory] = useState<QuizCategory | null>(currentCategory);
+	const [difficulty, setDifficulty] = useState<QuizDifficulty | null>(currentDifficulty);
+
+	const modalRef = useRef<HTMLDivElement>(null);
+	const previousFocusRef = useRef<HTMLElement | null>(null);
+
+	useEffect(() => {
+		if (isOpen) {
+			setVisibility(currentVisibility);
+			setCategory(currentCategory);
+			setDifficulty(currentDifficulty);
+
+			previousFocusRef.current = document.activeElement as HTMLElement;
+			// Focus modal on mount
+			setTimeout(() => modalRef.current?.focus(), 0);
+
+			const handleKeyDown = (e: KeyboardEvent) => {
+				if (e.key === "Escape") onClose();
+				if (e.key === "Tab" && modalRef.current) {
+					const focusableElements = modalRef.current.querySelectorAll(
+						'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+					);
+					const firstElement = focusableElements[0] as HTMLElement;
+					const lastElement = focusableElements[
+						focusableElements.length - 1
+					] as HTMLElement;
+
+					if (e.shiftKey) {
+						if (document.activeElement === firstElement) {
+							lastElement.focus();
+							e.preventDefault();
+						}
+					} else {
+						if (document.activeElement === lastElement) {
+							firstElement.focus();
+							e.preventDefault();
+						}
+					}
+				}
+			};
+
+			document.addEventListener("keydown", handleKeyDown);
+			return () => {
+				document.removeEventListener("keydown", handleKeyDown);
+				if (previousFocusRef.current) previousFocusRef.current.focus();
+			};
+		}
+	}, [isOpen, currentVisibility, currentCategory, currentDifficulty, onClose]);
 
 	const { publish, loading } = usePublishQuiz(quizId, () => {
 		onSuccess();
@@ -59,13 +109,30 @@ export default function PublishModal({
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+		<div
+			className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+			onClick={(e) => {
+				if (e.target === e.currentTarget) onClose();
+			}}
+		>
 			<div
-				className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-				onClick={onClose}
-			/>
-			<div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6">
-				<h3 className="text-xl font-bold text-white">Quiz Visibility</h3>
+				ref={modalRef}
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="modal-title"
+				tabIndex={-1}
+				className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 outline-none"
+			>
+				<button
+					onClick={onClose}
+					aria-label="Close modal"
+					className="absolute top-4 right-4 text-gray-400 hover:text-white transition p-2"
+				>
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+						<path d="M18 6L6 18M6 6l12 12"/>
+					</svg>
+				</button>
+				<h3 id="modal-title" className="text-xl font-bold text-white">Quiz Visibility</h3>
 
 				<div className="space-y-2">
 					{VISIBILITY_OPTIONS.map((opt) => (
@@ -92,10 +159,11 @@ export default function PublishModal({
 				{visibility === "public" && (
 					<>
 						<div>
-							<label className="block text-sm font-medium text-gray-300 mb-2">
+							<label htmlFor="publish-category" className="block text-sm font-medium text-gray-300 mb-2">
 								Category
 							</label>
 							<select
+								id="publish-category"
 								value={category ?? ""}
 								onChange={(e) =>
 									setCategory((e.target.value as QuizCategory) || null)
@@ -111,10 +179,11 @@ export default function PublishModal({
 							</select>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-gray-300 mb-2">
+							<label htmlFor="publish-difficulty" className="block text-sm font-medium text-gray-300 mb-2">
 								Difficulty
 							</label>
 							<select
+								id="publish-difficulty"
 								value={difficulty ?? ""}
 								onChange={(e) =>
 									setDifficulty(

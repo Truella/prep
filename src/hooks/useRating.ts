@@ -11,15 +11,19 @@ export function useRating(quizId: string) {
 
 	useEffect(() => {
 		if (!user || !quizId) return;
+		let mounted = true;
 		supabase
 			.from("quiz_ratings")
 			.select("rating")
 			.eq("quiz_id", quizId)
 			.eq("user_id", user.id)
-			.single()
+			.maybeSingle()
 			.then(({ data }) => {
-				if (data) setCurrentRating(data.rating);
+				if (mounted && data) setCurrentRating(data.rating);
 			});
+		return () => {
+			mounted = false;
+		};
 	}, [quizId, user]);
 
 	const submitRating = async (rating: number) => {
@@ -37,26 +41,13 @@ export function useRating(quizId: string) {
 		if (upsertError) {
 			setError(upsertError.message);
 			setLoading(false);
-			return;
-		}
-
-		const { data: ratings } = await supabase
-			.from("quiz_ratings")
-			.select("rating")
-			.eq("quiz_id", quizId);
-
-		if (ratings && ratings.length > 0) {
-			const avg =
-				ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
-			await supabase
-				.from("quizzes")
-				.update({ average_rating: avg })
-				.eq("id", quizId);
+			return false;
 		}
 
 		setCurrentRating(rating);
 		setLoading(false);
 		toast.success("Rating submitted!");
+		return true;
 	};
 
 	return { currentRating, loading, error, submitRating };

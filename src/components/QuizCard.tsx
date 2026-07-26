@@ -5,7 +5,7 @@ import { Calendar02Icon, Copy01Icon, EyeIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import PublishModal from "./quiz-bank/PublishModal";
-import type { QuizVisibility } from "../lib/types";
+import type { QuizVisibility, QuizCategory, QuizDifficulty } from "../lib/types";
 
 interface QuizCardProps {
 	quiz: {
@@ -14,6 +14,8 @@ interface QuizCardProps {
 		description: string;
 		created_at: string;
 		visibility?: QuizVisibility;
+		category?: QuizCategory | null;
+		difficulty?: QuizDifficulty | null;
 		times_taken?: number;
 		average_rating?: number | null;
 	};
@@ -90,6 +92,8 @@ export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps)
 			<PublishModal
 				quizId={quiz.id}
 				currentVisibility={visibility}
+				currentCategory={quiz.category}
+				currentDifficulty={quiz.difficulty}
 				isOpen={isPublishOpen}
 				onClose={() => setIsPublishOpen(false)}
 				onSuccess={() => onRefetch?.()}

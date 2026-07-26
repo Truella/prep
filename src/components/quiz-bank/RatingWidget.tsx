@@ -32,10 +32,11 @@ export default function RatingWidget({ quizId }: { quizId: string }) {
 			{[1, 2, 3, 4, 5].map((star) => (
 				<button
 					key={star}
+					type="button"
 					disabled={loading}
 					onClick={async () => {
-						await submitRating(star);
-						setSubmitted(true);
+						const success = await submitRating(star);
+						if (success) setSubmitted(true);
 					}}
 					onMouseEnter={() => setHovered(star)}
 					onMouseLeave={() => setHovered(null)}
