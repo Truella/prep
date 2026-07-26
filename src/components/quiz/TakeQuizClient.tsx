@@ -10,6 +10,8 @@ import QuestionOverview from "../../components/quiz/QuestionOverview";
 import QuizTimer from "../../components/quiz/QuizTimer";
 import QuizResults from "../../components/quiz/QuizResults";
 import SubmitConfirmationModal from "../../components/quiz/SubmitConfirmationModal";
+import { useEffect } from "react";
+import { useQuizKeyboard } from "../../hooks/useQuizKeyboard";
 
 export default function TakeQuizClient({ quizId }: { quizId: string }) {
 	const {
@@ -40,6 +42,30 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 		isAutoSubmit,
 		timerSeconds,
 	} = useTakeQuiz(quizId);
+
+	const quizActive = !loading && !error && !!quiz && !showResults && !showSubmitModal;
+
+	useQuizKeyboard({
+		onSelectAnswer: (i) => {
+			if (!showSubmitModal) handleAnswerSelect(i);
+		},
+		onNext: () => {
+			if (!showSubmitModal) goToNext();
+		},
+		onCancelModal: cancelSubmit,
+		isActive: quizActive,
+	});
+
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key.toLowerCase() !== "escape") return;
+			const t = e.target as HTMLElement;
+			if (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT") return;
+			cancelSubmit();
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [cancelSubmit]);
 
 	if (loading) {
 		return <LoadingScreen message="Loading quiz..." />;
@@ -95,8 +121,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 					questions={questions}
 					elapsedSeconds={elapsedSeconds}
 					isAutoSubmit={isAutoSubmit}
-					timeLimit={quiz.time_limit}
-					quizVisibility={quiz.visibility}
+					timeLimit={quiz.time_limit ?? null}
 				/>
 			</div>
 		);
@@ -130,7 +155,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 
 				<div className="grid lg:grid-cols-3 gap-6">
 					{/* Main Content */}
-					<div className="lg:col-span-2 space-y-6">
+					<div className="lg:col-span-2 space-y-6" aria-keyshortcuts="a b c d Enter Escape">
 						{timerSeconds !== null && !showResults && (
 							<div className="flex justify-end mb-2">
 								<QuizTimer
@@ -145,6 +170,10 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 							total={questions.length}
 							progress={progress}
 						/>
+
+						<p className="text-xs text-gray-500 text-center">
+							A–D: select answer &middot; Enter: continue &middot; Esc: close
+						</p>
 
 						<QuestionCard
 							question={currentQuestion}

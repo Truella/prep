@@ -50,4 +50,32 @@ describe("generateCSV", () => {
 		const result = await parseAndValidateCSV(file);
 		expect(result.success).toBe(true);
 	});
+
+	it("handles fields containing double quotes", async () => {
+		const q = { ...QUESTIONS[0], questionText: 'He said "hello"' };
+		const csv = generateCSV([q]);
+		expect(csv).toContain('"He said ""hello"""');
+		const file = new File([csv], "test.csv", { type: "text/csv" });
+		const result = await parseAndValidateCSV(file);
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data[0].Question).toBe('He said "hello"');
+		}
+	});
+
+	it("handles fields containing newlines", async () => {
+		const q = { ...QUESTIONS[0], questionText: "Line1\nLine2" };
+		const csv = generateCSV([q]);
+		const file = new File([csv], "test.csv", { type: "text/csv" });
+		const result = await parseAndValidateCSV(file);
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data[0].Question).toBe("Line1\nLine2");
+		}
+	});
+
+	it("generates header row correctly", () => {
+		const csv = generateCSV([]);
+		expect(csv).toBe("Question,Option_A,Option_B,Option_C,Option_D,Correct_Answer,Points");
+	});
 });

@@ -21,6 +21,16 @@ const PAYLOAD = {
 };
 
 describe("useAIReview", () => {
+  it("returns null review when quizId is empty", () => {
+    const { result } = renderHook(() => useAIReview(""));
+    expect(result.current.review).toBeNull();
+  });
+
+  it("returns null review when quizId is undefined", () => {
+    const { result } = renderHook(() => useAIReview(undefined as unknown as string));
+    expect(result.current.review).toBeNull();
+  });
+
   it("restores cached review from localStorage on mount", () => {
     localStorage.setItem("quiz_ai_review_quiz1", "Cached review text");
     const { result } = renderHook(() => useAIReview("quiz1"));
@@ -80,6 +90,27 @@ describe("useAIReview", () => {
       resolve!(makeResponse({ review: "Done" }, 200));
     });
     expect(result.current.loading).toBe(false);
+  });
+
+  it("handles localStorage.getItem failure on mount", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementationOnce(() => {
+      throw new Error("Storage error");
+    });
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    expect(result.current.review).toBeNull();
+  });
+
+  it("handles localStorage.setItem failure after successful review", async () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementationOnce(() => {
+      throw new Error("Storage full");
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(makeResponse({ review: "Great job!" }, 200))
+    );
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    await act(() => result.current.getReview(PAYLOAD));
+    expect(result.current.review).toBe("Great job!");
   });
 
   it("clearReview resets review and error to null", async () => {

@@ -5,7 +5,7 @@ import QuizReview from "./QuizReview";
 import { AppQuestion } from "../../lib/types";
 import { useAIReview } from "../../hooks/useAIReview";
 import type { AIReviewPayload } from "../../lib/types";
-import RatingWidget from "../quiz-bank/RatingWidget";
+import ErrorBoundary from "../ErrorBoundary";
 
 // ---------------------------------------------------------------------------
 // Lightweight markdown renderer — handles the subset Groq consistently outputs
@@ -114,9 +114,8 @@ interface QuizResultsProps {
 	questions: AppQuestion[];
 	userAnswers: { [key: number]: number };
 	elapsedSeconds: number;
-	isAutoSubmit?: boolean;
-	timeLimit?: number | null;
-	quizVisibility?: string;
+	isAutoSubmit: boolean;
+	timeLimit: number | null;
 }
 
 export default function QuizResults({
@@ -131,7 +130,6 @@ export default function QuizResults({
 	elapsedSeconds,
 	isAutoSubmit,
 	timeLimit,
-	quizVisibility,
 	quizId,
 }: QuizResultsProps) {
 	const [showReview, setShowReview] = useState(false);
@@ -234,84 +232,85 @@ export default function QuizResults({
 						})()}
 					</div>
 
-					{quizVisibility === "public" && quizId && (
-						<div className="mt-4">
-							<p className="text-xs text-gray-400 mb-2">Rate this quiz</p>
-							<RatingWidget quizId={quizId} />
-						</div>
-					)}
+
 
 					{/* AI Review */}
-					<div className="mt-6 text-left">
-						{!review && !loading && !error && (
-							<button
-								onClick={() => getReview(reviewPayload)}
-								className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all"
-							>
-								Get AI Review
-							</button>
-						)}
+					<ErrorBoundary
+						fallback={
+							<p className="text-sm text-gray-400 mt-4">AI review unavailable.</p>
+						}
+					>
+						<div className="mt-6 text-left">
+							{!review && !loading && !error && (
+								<button
+									onClick={() => getReview(reviewPayload)}
+									className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all"
+								>
+									Get AI Review
+								</button>
+							)}
 
-						{loading && (
-							<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-center text-gray-400 text-sm">
-								Analysing your results...
-							</div>
-						)}
+							{loading && (
+								<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-center text-gray-400 text-sm">
+									Analysing your results...
+								</div>
+							)}
 
-						{error && (
-							<div className="backdrop-blur-sm bg-white/5 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
-								{error}
-							</div>
-						)}
+							{error && (
+								<div className="backdrop-blur-sm bg-white/5 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+									{error}
+								</div>
+							)}
 
-						{review && (
-							<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
-								<div className="flex justify-between items-center">
-									<p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-										AI Review
-									</p>
-									<div className="flex gap-2">
-										<button
-											onClick={async () => {
-												if (!navigator.clipboard) {
-													setCopyFailed(true);
-													setTimeout(() => setCopyFailed(false), 2000);
-													return;
-												}
-												try {
-													await navigator.clipboard.writeText(review);
-													setCopied(true);
-													setCopyFailed(false);
-													setTimeout(() => setCopied(false), 2000);
-												} catch {
-													setCopyFailed(true);
-													setTimeout(() => setCopyFailed(false), 2000);
-												}
-											}}
-											className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
-										>
-											{copyFailed ? "Failed" : copied ? "Copied!" : "Copy"}
-										</button>
-										{!isRateLimited && (
+							{review && (
+								<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+									<div className="flex justify-between items-center">
+										<p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+											AI Review
+										</p>
+										<div className="flex gap-2">
 											<button
-												onClick={() => getReview(reviewPayload)}
+												onClick={async () => {
+													if (!navigator.clipboard) {
+														setCopyFailed(true);
+														setTimeout(() => setCopyFailed(false), 2000);
+														return;
+													}
+													try {
+														await navigator.clipboard.writeText(review);
+														setCopied(true);
+														setCopyFailed(false);
+														setTimeout(() => setCopied(false), 2000);
+													} catch {
+														setCopyFailed(true);
+														setTimeout(() => setCopyFailed(false), 2000);
+													}
+												}}
 												className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
 											>
-												Regenerate
+												{copyFailed ? "Failed" : copied ? "Copied!" : "Copy"}
 											</button>
-										)}
+											{!isRateLimited && (
+												<button
+													onClick={() => getReview(reviewPayload)}
+													className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
+												>
+													Regenerate
+												</button>
+											)}
+										</div>
+									</div>
+									<div className="text-gray-300">
+										{renderReview(review)}
 									</div>
 								</div>
-								<div className="text-gray-300">
-									{renderReview(review)}
-								</div>
-							</div>
-						)}
+							)}
 
-						<p className="text-xs text-gray-500 mt-3 text-center">
-							Or export manually to use with any AI tool
-						</p>
-					</div>
+							<p className="text-xs text-gray-500 mt-3 text-center">
+								Or export manually to use with any AI tool
+							</p>
+						</div>
+					</ErrorBoundary>
 				</div>
 
 				{/* Actions */}
