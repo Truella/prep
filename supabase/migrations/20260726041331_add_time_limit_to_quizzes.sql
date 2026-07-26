@@ -1,0 +1,1 @@
+alter table quizzes add column time_limit integer;
