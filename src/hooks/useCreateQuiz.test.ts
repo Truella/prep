@@ -2,6 +2,7 @@ import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { useCreateQuiz } from "./useCreateQuiz";
 import toast from "react-hot-toast";
+import type { MCQRow } from "../lib/types";
 
 vi.mock("../lib/supabase", () => ({
 	supabase: {
@@ -262,8 +263,7 @@ describe("useCreateQuiz", () => {
 					Correct_Answer: "D",
 					Points: "1",
 				},
-			],
-			message: "",
+			] as MCQRow[],
 		});
 
 		const { supabase } = await import("../lib/supabase");
@@ -299,7 +299,6 @@ describe("useCreateQuiz", () => {
 		const { parseAndValidateCSV } = await import("../utils/csvParser");
 		vi.mocked(parseAndValidateCSV).mockResolvedValue({
 			success: false,
-			data: [],
 			message: "Invalid CSV format",
 		});
 

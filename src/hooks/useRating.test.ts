@@ -18,6 +18,24 @@ function createChain(resolveValue: object) {
 	return chain;
 }
 
+function mockUser() {
+	return { id: "user1", app_metadata: {}, user_metadata: {}, aud: "", created_at: "" };
+}
+
+function mockAuthContext(overrides: Record<string, unknown> = {}) {
+	return {
+		user: mockUser(),
+		loading: false,
+		initializing: false,
+		error: null,
+		signUp: vi.fn(),
+		signIn: vi.fn(),
+		signOut: vi.fn(),
+		clearError: vi.fn(),
+		...overrides,
+	};
+}
+
 vi.mock("../lib/supabase", () => ({
 	supabase: {
 		from: vi.fn(),
@@ -39,7 +57,7 @@ beforeEach(() => {
 describe("useRating", () => {
 	it("submitRating succeeds and updates currentRating", async () => {
 		const { useAuth } = await import("./useAuth");
-		vi.mocked(useAuth).mockReturnValue({ user: { id: "user1" } });
+		vi.mocked(useAuth).mockReturnValue(mockAuthContext());
 
 		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
@@ -59,7 +77,7 @@ describe("useRating", () => {
 
 	it("submitRating when not logged in does nothing", async () => {
 		const { useAuth } = await import("./useAuth");
-		vi.mocked(useAuth).mockReturnValue({ user: null });
+		vi.mocked(useAuth).mockReturnValue(mockAuthContext({ user: null }));
 
 		const { result } = renderHook(() => useRating("quiz1"));
 
@@ -71,7 +89,7 @@ describe("useRating", () => {
 
 	it("submitRating with API error sets error state and returns false", async () => {
 		const { useAuth } = await import("./useAuth");
-		vi.mocked(useAuth).mockReturnValue({ user: { id: "user1" } });
+		vi.mocked(useAuth).mockReturnValue(mockAuthContext());
 
 		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
@@ -90,7 +108,7 @@ describe("useRating", () => {
 
 	it("loads current rating on mount", async () => {
 		const { useAuth } = await import("./useAuth");
-		vi.mocked(useAuth).mockReturnValue({ user: { id: "user1" } });
+		vi.mocked(useAuth).mockReturnValue(mockAuthContext());
 
 		const { supabase } = await import("../lib/supabase");
 		const chain = createChain({ data: { rating: 3 }, error: null });
@@ -102,7 +120,7 @@ describe("useRating", () => {
 
 	it("sets currentRating to null when supabase returns no data", async () => {
 		const { useAuth } = await import("./useAuth");
-		vi.mocked(useAuth).mockReturnValue({ user: { id: "user1" } });
+		vi.mocked(useAuth).mockReturnValue(mockAuthContext());
 
 		const { supabase } = await import("../lib/supabase");
 		const chain = createChain({ data: null, error: null });
@@ -114,7 +132,7 @@ describe("useRating", () => {
 
 	it("sets currentRating to null when user is not logged in", async () => {
 		const { useAuth } = await import("./useAuth");
-		vi.mocked(useAuth).mockReturnValue({ user: null });
+		vi.mocked(useAuth).mockReturnValue(mockAuthContext({ user: null }));
 
 		const { result } = renderHook(() => useRating("quiz1"));
 		expect(result.current.currentRating).toBeNull();
