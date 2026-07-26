@@ -19,6 +19,7 @@ function createQueryChain(resolveValue: object) {
 		catch: promise.catch.bind(promise),
 		finally: promise.finally.bind(promise),
 	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	return chain as any;
 }
 

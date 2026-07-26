@@ -60,9 +60,11 @@ export default function PublishModal({
 
 	useEffect(() => {
 		if (isOpen) {
+			/* eslint-disable react-hooks/set-state-in-effect */
 			setVisibility(currentVisibility);
 			setCategory(currentCategory);
 			setDifficulty(currentDifficulty);
+			/* eslint-enable react-hooks/set-state-in-effect */
 
 			previousFocusRef.current = document.activeElement as HTMLElement;
 			// Focus modal on mount
