@@ -2,84 +2,118 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import toast from "react-hot-toast";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { FlashIcon } from "@hugeicons/core-free-icons";
+import ExternalNav from "../ExternalNav";
 
 export default function TakeQuizInputClient() {
-	const [input, setInput] = useState("");
-	const router = useRouter();
+  const [input, setInput] = useState("");
+  const router = useRouter();
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-		if (!input.trim()) {
-			toast.error("Please enter a quiz link or ID");
-			return;
-		}
+    if (!input.trim()) {
+      toast.error("Please enter a quiz link or ID");
+      return;
+    }
 
-		// Extract ID from full link or use directly
-		let quizId = input.trim();
+    let quizId = input.trim();
 
-		// If it's a full URL, extract the ID
-		if (input.includes("/quiz/")) {
-			const parts = input.split("/quiz/");
-			quizId = parts[1].split("?")[0]; // Remove query params if any
-		}
+    if (input.includes("/quiz/")) {
+      const parts = input.split("/quiz/");
+      quizId = parts[1].split("?")[0];
+    }
 
-		if (!quizId) {
-			toast.error("Invalid quiz link or ID");
-			return;
-		}
+    if (!quizId) {
+      toast.error("Invalid quiz link or ID");
+      return;
+    }
 
-		router.push(`/quiz/${quizId}`);
-	};
+    router.push(`/quiz/${quizId}`);
+  };
 
-	return (
-		<div className="min-h-screen bg-black flex items-center justify-center px-4 relative overflow-hidden">
-			<div className="relative z-10 max-w-md w-full">
-				<div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl">
-					<div className="text-center space-y-6">
-						{/* Icon */}
-						<div className="mx-auto w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center">
-							<HugeiconsIcon icon={FlashIcon} color="white" />
-						</div>
+  return (
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: "var(--color-bg)" }}
+    >
+      <ExternalNav />
 
-						<div>
-							<h1 className="text-3xl font-bold text-white mb-2">
-								Take a Quiz
-							</h1>
-							<p className="text-gray-400">
-								Enter the quiz link or ID to get started
-							</p>
-						</div>
+      <div className="flex-1 flex items-center justify-center px-6 pt-20">
+        <div className="w-full max-w-sm space-y-8">
+          {/* Wordmark */}
+          <div className="text-center space-y-2">
+            <p
+              className="text-xs font-mono font-semibold tracking-widest uppercase"
+              style={{ color: "var(--color-accent)" }}
+            >
+              PREP
+            </p>
+            <h1
+              className="text-3xl"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--color-text-primary)",
+              }}
+            >
+              Take a quiz
+            </h1>
+            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              Paste a quiz link or enter an ID to start.
+            </p>
+          </div>
 
-						<form onSubmit={handleSubmit} className="space-y-4">
-							<input
-								type="text"
-								value={input}
-								onChange={(e) => setInput(e.target.value)}
-								placeholder="Paste quiz link or enter ID"
-								className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition"
-							/>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="https://prep.app/quiz/..."
+              autoFocus
+              className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none transition"
+              style={{
+                backgroundColor: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text-primary)",
+              }}
+            />
+            <button
+              type="submit"
+              className="w-full px-6 py-3.5 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
+              style={{
+                backgroundColor: "var(--color-accent)",
+                color: "#0A0A0F",
+              }}
+            >
+              Start Quiz
+            </button>
+          </form>
 
-							<button
-								type="submit"
-								className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all shadow-lg"
-							>
-								Start Quiz
-							</button>
-						</form>
+          <div className="text-center space-y-2">
+            <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              or
+            </p>
+            <Link
+              href="/quiz-bank"
+              className="text-sm font-medium"
+              style={{ color: "var(--color-accent)" }}
+            >
+              Browse public quizzes →
+            </Link>
+          </div>
 
-						<button
-							onClick={() => router.push("/")}
-							className="text-gray-400 hover:text-white transition text-sm"
-						>
-							← Back to home
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+          <div className="text-center">
+            <Link
+              href="/"
+              className="text-xs transition"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              ← Back to home
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
