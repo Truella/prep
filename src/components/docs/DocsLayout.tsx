@@ -27,6 +27,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
 			<div className="max-w-5xl mx-auto px-4 py-12">
 				<div className="md:hidden mb-6">
 					<select
+						aria-label="Documentation section"
 						value={currentSlug}
 						onChange={(e) => router.push(`/docs/${e.target.value}`)}
 						className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20"
