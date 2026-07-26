@@ -273,7 +273,6 @@ describe("useTakeQuiz", () => {
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 		await waitFor(() => expect(result.current.loading).toBe(false));
 		expect(result.current.timerSeconds).toBeGreaterThan(0);
-		const originalTimer = result.current.timerSeconds;
 
 		act(() => result.current.handleAnswerSelect(3));
 		act(() => result.current.handleTimerExpire());

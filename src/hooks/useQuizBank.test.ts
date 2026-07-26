@@ -1,27 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { useQuizBank } from "./useQuizBank";
-
-function createQueryChain(resolveValue: object) {
-	const promise = Promise.resolve(resolveValue);
-	const chain: {
-		select: ReturnType<typeof vi.fn>;
-		eq: ReturnType<typeof vi.fn>;
-		order: ReturnType<typeof vi.fn>;
-		then: Promise<object>["then"];
-		catch: Promise<object>["catch"];
-		finally: Promise<object>["finally"];
-	} = {
-		select: vi.fn(() => chain),
-		eq: vi.fn(() => chain),
-		order: vi.fn(() => chain),
-		then: promise.then.bind(promise),
-		catch: promise.catch.bind(promise),
-		finally: promise.finally.bind(promise),
-	};
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return chain as any;
-}
+import { createChain } from "../test-utils/chain";
 
 vi.mock("../lib/supabase", () => ({
 	supabase: { from: vi.fn() },
@@ -50,15 +30,17 @@ const MOCK_QUIZZES = [
 	},
 ];
 
-beforeEach(() => {
+beforeEach(async () => {
 	vi.clearAllMocks();
+	const { supabase } = await import("../lib/supabase");
+	vi.mocked(supabase.from).mockReset();
 });
 
 describe("useQuizBank", () => {
 	it("includes visibility = public filter in every query", async () => {
 		const supabase = (await import("../lib/supabase")).supabase;
 		vi.mocked(supabase.from).mockReturnValue(
-			createQueryChain({ data: [], error: null })
+			createChain({ data: [], error: null })
 		);
 		renderHook(() => useQuizBank());
 		await act(async () => {});
@@ -69,7 +51,7 @@ describe("useQuizBank", () => {
 	it("adds category filter when category is set", async () => {
 		const supabase = (await import("../lib/supabase")).supabase;
 		vi.mocked(supabase.from).mockReturnValue(
-			createQueryChain({ data: [], error: null })
+			createChain({ data: [], error: null })
 		);
 		const { result } = renderHook(() => useQuizBank());
 		await act(async () => {});
@@ -84,7 +66,7 @@ describe("useQuizBank", () => {
 	it("orders by times_taken descending for popular sort", async () => {
 		const supabase = (await import("../lib/supabase")).supabase;
 		vi.mocked(supabase.from).mockReturnValue(
-			createQueryChain({ data: [], error: null })
+			createChain({ data: [], error: null })
 		);
 		const { result } = renderHook(() => useQuizBank());
 		await act(async () => {});
@@ -101,7 +83,7 @@ describe("useQuizBank", () => {
 	it("orders by title ascending for alphabetical sort", async () => {
 		const supabase = (await import("../lib/supabase")).supabase;
 		vi.mocked(supabase.from).mockReturnValue(
-			createQueryChain({ data: [], error: null })
+			createChain({ data: [], error: null })
 		);
 		const { result } = renderHook(() => useQuizBank());
 		await act(async () => {});
@@ -118,7 +100,7 @@ describe("useQuizBank", () => {
 	it("orders by average_rating descending for rated sort", async () => {
 		const supabase = (await import("../lib/supabase")).supabase;
 		vi.mocked(supabase.from).mockReturnValue(
-			createQueryChain({ data: [], error: null })
+			createChain({ data: [], error: null })
 		);
 		const { result } = renderHook(() => useQuizBank());
 		await act(async () => {});
@@ -135,9 +117,8 @@ describe("useQuizBank", () => {
 
 	it("sets error state when supabase query fails", async () => {
 		const supabase = (await import("../lib/supabase")).supabase;
-		vi.mocked(supabase.from).mockReset();
 		vi.mocked(supabase.from).mockReturnValue(
-			createQueryChain({ data: null, error: { message: "Network error" } })
+			createChain({ data: null, error: { message: "Network error" } })
 		);
 		const { result } = renderHook(() => useQuizBank());
 		await act(async () => {});
@@ -147,7 +128,7 @@ describe("useQuizBank", () => {
 	it("client-side search returns only quizzes matching the query substring", async () => {
 		const supabase = (await import("../lib/supabase")).supabase;
 		vi.mocked(supabase.from).mockReturnValue(
-			createQueryChain({ data: MOCK_QUIZZES, error: null })
+			createChain({ data: MOCK_QUIZZES, error: null })
 		);
 		const { result } = renderHook(() => useQuizBank());
 		await act(async () => {});

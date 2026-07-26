@@ -52,7 +52,6 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 		onNext: () => {
 			if (!showSubmitModal) goToNext();
 		},
-		onSubmit: initiateSubmit,
 		onCancelModal: cancelSubmit,
 		isActive: quizActive,
 	});
@@ -122,8 +121,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 					questions={questions}
 					elapsedSeconds={elapsedSeconds}
 					isAutoSubmit={isAutoSubmit}
-					timeLimit={quiz.time_limit}
-					quizVisibility={quiz.visibility}
+					timeLimit={quiz.time_limit ?? null}
 				/>
 			</div>
 		);

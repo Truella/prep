@@ -1,9 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface QuizKeyboardOptions {
 	onSelectAnswer: (index: number) => void;
 	onNext: () => void;
-	onSubmit: () => void;
 	onCancelModal: () => void;
 	isActive: boolean;
 }
@@ -11,10 +10,25 @@ interface QuizKeyboardOptions {
 export function useQuizKeyboard({
 	onSelectAnswer,
 	onNext,
-	onSubmit,
 	onCancelModal,
 	isActive,
 }: QuizKeyboardOptions) {
+	const onSelectAnswerRef = useRef(onSelectAnswer);
+	const onNextRef = useRef(onNext);
+	const onCancelModalRef = useRef(onCancelModal);
+
+	useEffect(() => {
+		onSelectAnswerRef.current = onSelectAnswer;
+	}, [onSelectAnswer]);
+
+	useEffect(() => {
+		onNextRef.current = onNext;
+	}, [onNext]);
+
+	useEffect(() => {
+		onCancelModalRef.current = onCancelModal;
+	}, [onCancelModal]);
+
 	useEffect(() => {
 		if (!isActive) return;
 
@@ -32,27 +46,27 @@ export function useQuizKeyboard({
 
 			switch (e.key.toLowerCase()) {
 				case "a":
-					onSelectAnswer(0);
+					onSelectAnswerRef.current(0);
 					break;
 				case "b":
-					onSelectAnswer(1);
+					onSelectAnswerRef.current(1);
 					break;
 				case "c":
-					onSelectAnswer(2);
+					onSelectAnswerRef.current(2);
 					break;
 				case "d":
-					onSelectAnswer(3);
+					onSelectAnswerRef.current(3);
 					break;
 				case "enter":
-					onNext();
+					onNextRef.current();
 					break;
 				case "escape":
-					onCancelModal();
+					onCancelModalRef.current();
 					break;
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [isActive, onSelectAnswer, onNext, onSubmit, onCancelModal]);
+	}, [isActive]);
 }

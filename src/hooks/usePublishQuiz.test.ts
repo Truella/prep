@@ -2,22 +2,7 @@ import { renderHook, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { usePublishQuiz } from "./usePublishQuiz";
 import toast from "react-hot-toast";
-
-function createChain(resolveValue: object) {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const chain: any = {};
-	const promise = Promise.resolve(resolveValue);
-	chain.select = vi.fn(() => chain);
-	chain.eq = vi.fn(() => chain);
-	chain.single = vi.fn(() => chain);
-	chain.order = vi.fn(() => chain);
-	chain.update = vi.fn(() => chain);
-	chain.insert = vi.fn(() => chain);
-	chain.then = promise.then.bind(promise);
-	chain.catch = promise.catch.bind(promise);
-	chain.finally = promise.finally.bind(promise);
-	return chain;
-}
+import { createChain } from "../test-utils/chain";
 
 vi.mock("../lib/supabase", () => ({
 	supabase: {
@@ -84,7 +69,7 @@ describe("usePublishQuiz", () => {
 		const onSuccess = vi.fn();
 		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
-			createChain({ data: null, error: new Error("Update failed") })
+			createChain({ data: null, error: { message: "Update failed", code: "", details: "", hint: "" } })
 		);
 
 		const { result } = renderHook(() => usePublishQuiz("quiz1", onSuccess));

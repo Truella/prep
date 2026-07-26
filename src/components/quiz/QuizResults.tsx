@@ -114,9 +114,8 @@ interface QuizResultsProps {
 	questions: AppQuestion[];
 	userAnswers: { [key: number]: number };
 	elapsedSeconds: number;
-	isAutoSubmit?: boolean;
-	timeLimit?: number | null;
-	quizVisibility?: string;
+	isAutoSubmit: boolean;
+	timeLimit: number | null;
 }
 
 export default function QuizResults({
@@ -131,7 +130,6 @@ export default function QuizResults({
 	elapsedSeconds,
 	isAutoSubmit,
 	timeLimit,
-	quizVisibility,
 	quizId,
 }: QuizResultsProps) {
 	const [showReview, setShowReview] = useState(false);
