@@ -6,6 +6,7 @@ import { AppQuestion } from "../../lib/types";
 import { useAIReview } from "../../hooks/useAIReview";
 import type { AIReviewPayload } from "../../lib/types";
 import RatingWidget from "../quiz-bank/RatingWidget";
+import ErrorBoundary from "../ErrorBoundary";
 
 // ---------------------------------------------------------------------------
 // Lightweight markdown renderer — handles the subset Groq consistently outputs
@@ -242,6 +243,11 @@ export default function QuizResults({
 					)}
 
 					{/* AI Review */}
+					<ErrorBoundary
+						fallback={
+							<p className="text-sm text-gray-400 mt-4">AI review unavailable.</p>
+						}
+					>
 					<div className="mt-6 text-left">
 						{!review && !loading && !error && (
 							<button
@@ -312,6 +318,7 @@ export default function QuizResults({
 							Or export manually to use with any AI tool
 						</p>
 					</div>
+					</ErrorBoundary>
 				</div>
 
 				{/* Actions */}
