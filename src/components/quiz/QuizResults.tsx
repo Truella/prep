@@ -132,7 +132,9 @@ export default function QuizResults({
 	quizId,
 }: QuizResultsProps) {
 	const [showReview, setShowReview] = useState(false);
-	const { review, loading, error, getReview } = useAIReview(quizId);
+	const [copied, setCopied] = useState(false);
+	const [copyFailed, setCopyFailed] = useState(false);
+	const { review, loading, error, isRateLimited, getReview } = useAIReview(quizId);
 	const percentage = Math.round((earnedPoints / totalPoints) * 100);
 
 	const reviewPayload: AIReviewPayload = {
@@ -260,12 +262,27 @@ export default function QuizResults({
 									</p>
 									<div className="flex gap-2">
 										<button
-											onClick={() => navigator.clipboard.writeText(review)}
+											onClick={async () => {
+												if (!navigator.clipboard) {
+													setCopyFailed(true);
+													setTimeout(() => setCopyFailed(false), 2000);
+													return;
+												}
+												try {
+													await navigator.clipboard.writeText(review);
+													setCopied(true);
+													setCopyFailed(false);
+													setTimeout(() => setCopied(false), 2000);
+												} catch {
+													setCopyFailed(true);
+													setTimeout(() => setCopyFailed(false), 2000);
+												}
+											}}
 											className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
 										>
-											Copy
+											{copyFailed ? "Failed" : copied ? "Copied!" : "Copy"}
 										</button>
-										{!error?.includes("Rate limit") && (
+										{!isRateLimited && (
 											<button
 												onClick={() => getReview(reviewPayload)}
 												className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"

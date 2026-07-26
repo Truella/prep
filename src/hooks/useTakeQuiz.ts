@@ -5,6 +5,31 @@ import { QuizDraft, DBQuestion, AppQuestion } from "../lib/types";
 import { dbToAppQuestion } from "../utils/transforms";
 import useQuizProgress from "./useQuizProgress";
 
+interface SavedQuizResults {
+	answers: Record<number, number>;
+	elapsedSeconds: number;
+	isAutoSubmit: boolean;
+}
+
+function readSavedResults(quizId: string | undefined): SavedQuizResults | null {
+	if (!quizId) return null;
+	const resultsKey = `quiz_results_${quizId}`;
+	try {
+		const savedResults = localStorage.getItem(resultsKey);
+		if (savedResults) {
+			const parsed = JSON.parse(savedResults);
+			return {
+				answers: parsed.answers || {},
+				elapsedSeconds: parsed.elapsedSeconds || 0,
+				isAutoSubmit: !!parsed.isAutoSubmit,
+			};
+		}
+	} catch (err) {
+		console.error("Failed to load saved quiz results:", err);
+	}
+	return null;
+}
+
 export function useTakeQuiz(quizId: string | undefined) {
 	const [showSubmitModal, setShowSubmitModal] = useState(false);
 	const [quiz, setQuiz] = useState<QuizDraft | null>(null);
@@ -63,24 +88,15 @@ export function useTakeQuiz(quizId: string | undefined) {
 			setQuestions(questionsData.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i)));
 
 			// Check results right after questions are loaded, before configuring timer or ending loading!
-			const resultsKey = `quiz_results_${quizId}`;
-			let hasResults = false;
-			try {
-				const savedResults = localStorage.getItem(resultsKey);
-				if (savedResults) {
-					const parsed = JSON.parse(savedResults);
-					setSelectedAnswers(parsed.answers || {});
-					setElapsedSeconds(parsed.elapsedSeconds || 0);
-					setIsAutoSubmit(!!parsed.isAutoSubmit);
-					setShowResults(true);
-					setIsSubmitted(true);
-					hasResults = true;
-				}
-			} catch (err) {
-				console.error("Failed to load saved quiz results:", err);
-			}
+			const savedResults = readSavedResults(quizId);
 
-			if (hasResults) {
+			if (savedResults) {
+				setSelectedAnswers(savedResults.answers);
+				setElapsedSeconds(savedResults.elapsedSeconds);
+				setIsAutoSubmit(savedResults.isAutoSubmit);
+				setShowResults(true);
+				setIsSubmitted(true);
+				markHydrated();
 				setLoading(false);
 				return;
 			}
@@ -140,21 +156,15 @@ export function useTakeQuiz(quizId: string | undefined) {
 		if (!quiz || questions.length === 0) return;
 
 		// Check if quiz has been submitted previously
-		const resultsKey = `quiz_results_${quizId}`;
-		try {
-			const savedResults = localStorage.getItem(resultsKey);
-			if (savedResults) {
-				const parsed = JSON.parse(savedResults);
-				setSelectedAnswers(parsed.answers || {});
-				setElapsedSeconds(parsed.elapsedSeconds || 0);
-				setIsAutoSubmit(!!parsed.isAutoSubmit);
-				setShowResults(true);
-				setIsSubmitted(true);
-				markHydrated();
-				return;
-			}
-		} catch (err) {
-			console.error("Failed to load saved quiz results:", err);
+		const savedResults = readSavedResults(quizId);
+		if (savedResults) {
+			setSelectedAnswers(savedResults.answers);
+			setElapsedSeconds(savedResults.elapsedSeconds);
+			setIsAutoSubmit(savedResults.isAutoSubmit);
+			setShowResults(true);
+			setIsSubmitted(true);
+			markHydrated();
+			return;
 		}
 
 		const saved = loadProgress();

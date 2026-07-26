@@ -5,6 +5,7 @@ interface AIReviewState {
   review: string | null;
   loading: boolean;
   error: string | null;
+  isRateLimited: boolean;
 }
 
 export function useAIReview(quizId: string) {
@@ -12,6 +13,7 @@ export function useAIReview(quizId: string) {
     review: null,
     loading: false,
     error: null,
+    isRateLimited: false,
   });
 
   const cacheKey = `quiz_ai_review_${quizId}`;
@@ -31,15 +33,20 @@ export function useAIReview(quizId: string) {
   }, [quizId, cacheKey]);
 
   const getReview = async (payload: AIReviewPayload) => {
-    setState({ review: null, loading: true, error: null });
+    setState({ review: null, loading: true, error: null, isRateLimited: false });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
       const response = await fetch("/api/ai-review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const data = await response.json();
 
       if (response.status === 429) {
@@ -48,6 +55,7 @@ export function useAIReview(quizId: string) {
           loading: false,
           error:
             "You've used your 5 free reviews this hour. Try again later, or use the export option below.",
+          isRateLimited: true,
         });
         return;
       }
@@ -57,11 +65,12 @@ export function useAIReview(quizId: string) {
           review: null,
           loading: false,
           error: "AI review is temporarily unavailable.",
+          isRateLimited: false,
         });
         return;
       }
 
-      setState({ review: data.review, loading: false, error: null });
+      setState({ review: data.review, loading: false, error: null, isRateLimited: false });
 
       try {
         localStorage.setItem(cacheKey, data.review);
@@ -69,10 +78,12 @@ export function useAIReview(quizId: string) {
         console.error("Failed to cache AI review:", err);
       }
     } catch {
+      clearTimeout(timeoutId);
       setState({
         review: null,
         loading: false,
         error: "AI review is temporarily unavailable.",
+        isRateLimited: false,
       });
     }
   };
@@ -81,7 +92,7 @@ export function useAIReview(quizId: string) {
     try {
       localStorage.removeItem(cacheKey);
     } catch {}
-    setState({ review: null, loading: false, error: null });
+    setState({ review: null, loading: false, error: null, isRateLimited: false });
   };
 
   return { ...state, getReview, clearReview };

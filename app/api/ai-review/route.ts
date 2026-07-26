@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { AppQuestion } from "../../../src/lib/types";
-
-interface ReviewPayload {
-  questions: AppQuestion[];
-  selectedAnswers: Record<string, number>;
-  score: number;
-  totalPoints: number;
-}
+import type { AIReviewPayload } from "../../../src/lib/types";
 
 // In-memory rate limit store — resets on cold start, acceptable for portfolio scale
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
@@ -35,7 +28,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
   }
 
-  let payload: ReviewPayload;
+  let payload: AIReviewPayload;
   try {
     payload = await request.json();
   } catch {
@@ -43,6 +36,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const { questions, selectedAnswers, score, totalPoints } = payload;
+
+  if (
+    !Array.isArray(questions) ||
+    typeof selectedAnswers !== "object" ||
+    selectedAnswers === null ||
+    !Number.isFinite(score) ||
+    !Number.isFinite(totalPoints) ||
+    totalPoints <= 0
+  ) {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
   const percentage = Math.round((score / totalPoints) * 100);
 
   const questionLines = questions

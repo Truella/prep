@@ -8,7 +8,10 @@ const makeResponse = (body: object, status: number) =>
     headers: { "Content-Type": "application/json" },
   });
 
-beforeEach(() => vi.restoreAllMocks());
+beforeEach(() => {
+  vi.restoreAllMocks();
+  localStorage.clear();
+});
 
 const PAYLOAD = {
   questions: [],
@@ -18,6 +21,11 @@ const PAYLOAD = {
 };
 
 describe("useAIReview", () => {
+  it("restores cached review from localStorage on mount", () => {
+    localStorage.setItem("quiz_ai_review_quiz1", "Cached review text");
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    expect(result.current.review).toBe("Cached review text");
+  });
   it("sets review on 200 response", async () => {
     vi.stubGlobal(
       "fetch",
@@ -28,6 +36,7 @@ describe("useAIReview", () => {
     expect(result.current.review).toBe("Great job!");
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
+    expect(result.current.isRateLimited).toBe(false);
   });
 
   it("sets rate limit error message on 429", async () => {
@@ -38,6 +47,7 @@ describe("useAIReview", () => {
     const { result } = renderHook(() => useAIReview("quiz1"));
     await act(() => result.current.getReview(PAYLOAD));
     expect(result.current.error).toContain("5 free reviews");
+    expect(result.current.isRateLimited).toBe(true);
   });
 
   it("sets generic error on non-429 failure", async () => {
