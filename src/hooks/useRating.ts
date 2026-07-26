@@ -10,8 +10,14 @@ export function useRating(quizId: string) {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!user || !quizId) return;
+		/* eslint-disable react-hooks/set-state-in-effect */
+		if (!user || !quizId) {
+			setCurrentRating(null);
+			return;
+		}
 		let mounted = true;
+		setCurrentRating(null);
+		/* eslint-enable react-hooks/set-state-in-effect */
 		supabase
 			.from("quiz_ratings")
 			.select("rating")
@@ -19,7 +25,9 @@ export function useRating(quizId: string) {
 			.eq("user_id", user.id)
 			.maybeSingle()
 			.then(({ data }) => {
-				if (mounted && data) setCurrentRating(data.rating);
+				if (mounted) {
+					setCurrentRating(data ? data.rating : null);
+				}
 			});
 		return () => {
 			mounted = false;

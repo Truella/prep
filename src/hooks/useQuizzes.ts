@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 
-import type { QuizVisibility } from "../lib/types";
+import type { QuizVisibility, QuizCategory, QuizDifficulty } from "../lib/types";
 
 interface Quiz {
 	id: string;
@@ -10,8 +10,8 @@ interface Quiz {
 	description: string;
 	created_at: string;
 	visibility?: QuizVisibility;
-	category?: string | null;
-	difficulty?: string | null;
+	category?: QuizCategory | null;
+	difficulty?: QuizDifficulty | null;
 	times_taken?: number;
 	average_rating?: number | null;
 }

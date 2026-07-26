@@ -16,7 +16,7 @@ interface PublishModalProps {
 	currentDifficulty?: QuizDifficulty | null;
 	isOpen: boolean;
 	onClose: () => void;
-	onSuccess: () => void;
+	onSuccess: (updates: { visibility: QuizVisibility; category: QuizCategory | null; difficulty: QuizDifficulty | null }) => void;
 }
 
 const VISIBILITY_OPTIONS: {
@@ -104,7 +104,7 @@ export default function PublishModal({
 	}, [isOpen, currentVisibility, currentCategory, currentDifficulty, onClose]);
 
 	const { publish, loading } = usePublishQuiz(quizId, () => {
-		onSuccess();
+		onSuccess({ visibility, category, difficulty });
 		onClose();
 	});
 

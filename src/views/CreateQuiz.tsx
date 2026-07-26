@@ -26,6 +26,7 @@ export default function CreateQuizCSV() {
 		createQuiz,
 		setQuestionsFromCSV,
 		uploadQuestions,
+		updateQuizMeta,
 	} = useCreateQuiz();
 
 	const handleTabSwitch = (next: Tab) => {
@@ -152,7 +153,7 @@ export default function CreateQuizCSV() {
 				currentDifficulty={quiz.difficulty}
 				isOpen={isPublishOpen}
 				onClose={() => setIsPublishOpen(false)}
-				onSuccess={() => {}}
+				onSuccess={(updates) => updateQuizMeta(updates)}
 			/>
 		</div>
 	);

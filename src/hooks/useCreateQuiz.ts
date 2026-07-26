@@ -45,6 +45,16 @@ export function useCreateQuiz() {
 	const setTimeLimit = (timeLimit: number | null) =>
 		setState((prev) => ({ ...prev, timeLimit }));
 
+	const updateQuizMeta = (updates: Partial<QuizDraft>) => {
+		setState((prev) => {
+			const updatedQuiz = { ...prev.quiz, ...updates };
+			try {
+				localStorage.setItem(QUIZ_META_KEY, JSON.stringify(updatedQuiz));
+			} catch {}
+			return { ...prev, quiz: updatedQuiz };
+		});
+	};
+
 	const createQuiz = async () => {
 		if (!state.quiz.title.trim()) {
 			toast.error("Quiz title is required");
@@ -172,5 +182,6 @@ export function useCreateQuiz() {
 		setQuestionsFromCSV,
 		uploadQuestions,
 		reset,
+		updateQuizMeta,
 	};
 }

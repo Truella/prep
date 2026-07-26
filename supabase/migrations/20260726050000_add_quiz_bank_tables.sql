@@ -32,12 +32,25 @@ create policy "Auth users can update own rating on public quizzes" on quiz_ratin
 create or replace function update_quiz_average_rating()
 returns trigger as $$
 begin
-  if TG_OP = 'INSERT' or TG_OP = 'UPDATE' then
+  if TG_OP = 'INSERT' then
     update quizzes
     set average_rating = (
       select avg(rating)::numeric from quiz_ratings where quiz_id = NEW.quiz_id
     )
     where id = NEW.quiz_id;
+  elsif TG_OP = 'UPDATE' then
+    update quizzes
+    set average_rating = (
+      select avg(rating)::numeric from quiz_ratings where quiz_id = NEW.quiz_id
+    )
+    where id = NEW.quiz_id;
+    if NEW.quiz_id <> OLD.quiz_id then
+      update quizzes
+      set average_rating = (
+        select avg(rating)::numeric from quiz_ratings where quiz_id = OLD.quiz_id
+      )
+      where id = OLD.quiz_id;
+    end if;
   elsif TG_OP = 'DELETE' then
     update quizzes
     set average_rating = (
