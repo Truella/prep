@@ -1,10 +1,34 @@
 import type { ParseError } from "papaparse";
 import { PostgrestError } from "@supabase/supabase-js";
+
+export type QuizVisibility = "private" | "public" | "unlisted";
+export type QuizDifficulty = "Beginner" | "Intermediate" | "Advanced";
+
+export const QUIZ_CATEGORIES = [
+	"General Knowledge",
+	"Science",
+	"History",
+	"Mathematics",
+	"Language & Literature",
+	"Technology",
+	"Arts & Culture",
+	"Geography",
+	"Health & Medicine",
+	"Business & Economics",
+] as const;
+
+export type QuizCategory = (typeof QUIZ_CATEGORIES)[number];
+
 export interface QuizDraft {
 	id?: string;
 	title: string;
 	description: string;
 	time_limit?: number | null;
+	visibility?: QuizVisibility;
+	category?: QuizCategory | null;
+	difficulty?: QuizDifficulty | null;
+	times_taken?: number;
+	average_rating?: number | null;
 }
 
 export interface PreviewQuestion {
@@ -62,6 +86,18 @@ export interface AppQuestion {
 	correctIndex: 0 | 1 | 2 | 3;
 	points: number;
 	order: number;
+}
+
+export interface PublicQuiz {
+	id: string;
+	title: string;
+	description: string;
+	category: QuizCategory | null;
+	difficulty: QuizDifficulty | null;
+	times_taken: number;
+	average_rating: number | null;
+	created_at: string;
+	question_count?: number;
 }
 
 export interface AIReviewPayload {

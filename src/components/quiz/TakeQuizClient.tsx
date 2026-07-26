@@ -96,6 +96,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 					elapsedSeconds={elapsedSeconds}
 					isAutoSubmit={isAutoSubmit}
 					timeLimit={quiz.time_limit}
+					quizVisibility={quiz.visibility}
 				/>
 			</div>
 		);

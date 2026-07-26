@@ -6,11 +6,13 @@ import QuizBuilder from "../components/quiz-builder/QuizBuilder";
 import TimeLimitInput from "../components/quiz-builder/TimeLimitInput";
 import UploadQuestionsForm from "../components/UploadQuestionsForm";
 import ShareableLink from "../components/ShareableLink";
+import PublishModal from "../components/quiz-bank/PublishModal";
 
 type Tab = "build" | "csv";
 
 export default function CreateQuizCSV() {
 	const [tab, setTab] = useState<Tab>("build");
+	const [isPublishOpen, setIsPublishOpen] = useState(false);
 	const {
 		quiz,
 		questions,
@@ -24,6 +26,7 @@ export default function CreateQuizCSV() {
 		createQuiz,
 		setQuestionsFromCSV,
 		uploadQuestions,
+		updateQuizMeta,
 	} = useCreateQuiz();
 
 	const handleTabSwitch = (next: Tab) => {
@@ -128,9 +131,30 @@ export default function CreateQuizCSV() {
 						</>
 					)}
 
+					{quiz.id && (
+						<div className="pt-2">
+							<button
+								onClick={() => setIsPublishOpen(true)}
+								className="w-full px-4 py-3 rounded-xl border border-white/20 text-gray-400 hover:text-white hover:bg-white/5 transition font-medium text-sm"
+							>
+								Publish Settings
+							</button>
+						</div>
+					)}
+
 					{shareableLink && <ShareableLink shareableLink={shareableLink} />}
 				</div>
 			</div>
+
+			<PublishModal
+				quizId={quiz.id ?? ""}
+				currentVisibility={quiz.visibility ?? "private"}
+				currentCategory={quiz.category}
+				currentDifficulty={quiz.difficulty}
+				isOpen={isPublishOpen}
+				onClose={() => setIsPublishOpen(false)}
+				onSuccess={(updates) => updateQuizMeta(updates)}
+			/>
 		</div>
 	);
 }

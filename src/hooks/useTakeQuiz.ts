@@ -163,7 +163,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		} finally {
 			setLoading(false);
 		}
-	}, [quizId]);
+	}, [quizId, markHydrated]);
 
 	useEffect(() => {
 		if (!quizId) {

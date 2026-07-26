@@ -5,6 +5,7 @@ import QuizReview from "./QuizReview";
 import { AppQuestion } from "../../lib/types";
 import { useAIReview } from "../../hooks/useAIReview";
 import type { AIReviewPayload } from "../../lib/types";
+import RatingWidget from "../quiz-bank/RatingWidget";
 
 // ---------------------------------------------------------------------------
 // Lightweight markdown renderer — handles the subset Groq consistently outputs
@@ -115,6 +116,7 @@ interface QuizResultsProps {
 	elapsedSeconds: number;
 	isAutoSubmit?: boolean;
 	timeLimit?: number | null;
+	quizVisibility?: string;
 }
 
 export default function QuizResults({
@@ -129,6 +131,7 @@ export default function QuizResults({
 	elapsedSeconds,
 	isAutoSubmit,
 	timeLimit,
+	quizVisibility,
 	quizId,
 }: QuizResultsProps) {
 	const [showReview, setShowReview] = useState(false);
@@ -230,6 +233,13 @@ export default function QuizResults({
 							return <p className="text-gray-400 mt-2">Completed in {timeStr}</p>;
 						})()}
 					</div>
+
+					{quizVisibility === "public" && quizId && (
+						<div className="mt-4">
+							<p className="text-xs text-gray-400 mb-2">Rate this quiz</p>
+							<RatingWidget quizId={quizId} />
+						</div>
+					)}
 
 					{/* AI Review */}
 					<div className="mt-6 text-left">
