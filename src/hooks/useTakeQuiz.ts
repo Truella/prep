@@ -81,18 +81,14 @@ export function useTakeQuiz(quizId: string | undefined) {
 				if (remaining <= 0) {
 					setTimerSeconds(0);
 					setIsAutoSubmit(true);
-					setElapsedSeconds(
-						Math.max(
-							0,
-							Math.floor((Date.now() - startTimeRef.current) / 1000),
-						),
-					);
+					setElapsedSeconds(quizData.time_limit * 60);
 					setShowResults(true);
 					setIsSubmitted(true);
 				} else {
 					setTimerSeconds(remaining);
 				}
 			} else {
+				startTimeRef.current = Date.now();
 				setTimerSeconds(null);
 			}
 		} catch (err) {
@@ -160,6 +156,11 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const answeredCount = Object.keys(selectedAnswers).length;
 	const unansweredCount = questions.length - answeredCount;
 
+	const clearDeadline = () => {
+		if (!quizId) return;
+		try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
+	};
+
 	const initiateSubmit = () => {
 		if (answeredCount === 0) {
 			toast.error("Answer at least one question before submitting");
@@ -173,9 +174,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
-		if (quizId) {
-			try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
-		}
+		clearDeadline();
 	};
 
 	const cancelSubmit = () => {
@@ -188,9 +187,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
-		if (quizId) {
-			try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
-		}
+		clearDeadline();
 	};
 
 	const resetQuiz = () => {
@@ -202,11 +199,12 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setSelectedAnswers({});
 		setShowResults(false);
 		startTimeRef.current = Date.now();
-		if (quizId) {
-			try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
-		}
+		clearDeadline();
 		if (quiz?.time_limit) {
 			const fullSeconds = quiz.time_limit * 60;
+			const newDeadline = Date.now() + fullSeconds * 1000;
+			try { localStorage.setItem(`quiz_deadline_${quizId}`, String(newDeadline)); } catch {}
+			startTimeRef.current = newDeadline - fullSeconds * 1000;
 			setTimerSeconds(fullSeconds);
 		} else {
 			setTimerSeconds(null);
