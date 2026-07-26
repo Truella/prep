@@ -1,6 +1,10 @@
+"use client";
+
 import { useState } from "react";
 import QuizReview from "./QuizReview";
 import { AppQuestion } from "../../lib/types";
+import { useAIReview } from "../../hooks/useAIReview";
+import type { AIReviewPayload } from "../../lib/types";
 
 interface QuizResultsProps {
 	quizTitle: string;
@@ -15,6 +19,7 @@ interface QuizResultsProps {
 	elapsedSeconds: number;
 	isAutoSubmit?: boolean;
 	timeLimit?: number | null;
+	quizVisibility?: string;
 }
 
 export default function QuizResults({
@@ -29,9 +34,18 @@ export default function QuizResults({
 	elapsedSeconds,
 	isAutoSubmit,
 	timeLimit,
+	quizVisibility,
 }: QuizResultsProps) {
 	const [showReview, setShowReview] = useState(false);
+	const { review, loading, error, getReview } = useAIReview();
 	const percentage = Math.round((earnedPoints / totalPoints) * 100);
+
+	const reviewPayload: AIReviewPayload = {
+		questions,
+		selectedAnswers: userAnswers,
+		score: earnedPoints,
+		totalPoints,
+	};
 	const passed = percentage >= 70;
 
 	if (showReview) {
@@ -118,6 +132,63 @@ export default function QuizResults({
 							}
 							return <p className="text-gray-400 mt-2">Completed in {timeStr}</p>;
 						})()}
+					</div>
+
+					{/* AI Review */}
+					<div className="mt-6 text-left">
+						{!review && !loading && !error && (
+							<button
+								onClick={() => getReview(reviewPayload)}
+								className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all"
+							>
+								Get AI Review
+							</button>
+						)}
+
+						{loading && (
+							<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-center text-gray-400 text-sm">
+								Analysing your results...
+							</div>
+						)}
+
+						{error && (
+							<div className="backdrop-blur-sm bg-white/5 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+								{error}
+							</div>
+						)}
+
+						{review && (
+							<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+								<div className="flex justify-between items-center">
+									<p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+										AI Review
+									</p>
+									<div className="flex gap-2">
+										<button
+											onClick={() => navigator.clipboard.writeText(review)}
+											className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
+										>
+											Copy
+										</button>
+										{!error?.includes("Rate limit") && (
+											<button
+												onClick={() => getReview(reviewPayload)}
+												className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
+											>
+												Regenerate
+											</button>
+										)}
+									</div>
+								</div>
+								<p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
+									{review}
+								</p>
+							</div>
+						)}
+
+						<p className="text-xs text-gray-500 mt-3 text-center">
+							Or export manually to use with any AI tool
+						</p>
 					</div>
 				</div>
 
