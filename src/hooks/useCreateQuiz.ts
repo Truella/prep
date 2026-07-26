@@ -108,15 +108,15 @@ export function useCreateQuiz() {
 		toast.success(`${parsed.length} questions loaded`);
 	};
 
-	const uploadQuestions = async (questionsOverride?: AppQuestion[]) => {
+	const uploadQuestions = async (questionsOverride?: AppQuestion[]): Promise<boolean> => {
 		if (state.shareableLink) {
 			toast.error("Quiz already published");
-			return;
+			return false;
 		}
 		const toUpload = questionsOverride ?? state.questions;
 		if (!state.quiz.id || toUpload.length === 0) {
 			toast.error("Quiz ID missing or no questions to upload");
-			return;
+			return false;
 		}
 		setState((prev) => ({ ...prev, isUploadingQuestions: true }));
 
@@ -130,7 +130,7 @@ export function useCreateQuiz() {
 
 		if (error) {
 			toast.error(`Failed to save questions: ${error.message}`);
-			return;
+			return false;
 		}
 
 		const quizLink = `${window.location.origin}/quiz/${state.quiz.id}`;
@@ -142,9 +142,10 @@ export function useCreateQuiz() {
 			await navigator.clipboard.writeText(quizLink);
 		} catch {
 			toast.success("Quiz published!");
-			return;
+			return true;
 		}
 		toast.success("Quiz published! Link copied to clipboard.");
+		return true;
 	};
 
 	const reset = () => {

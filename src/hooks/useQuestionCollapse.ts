@@ -62,7 +62,30 @@ export function useQuestionCollapse(initialCount: number) {
 		[expandedMap],
 	);
 
-	return { toggle, expand, isExpanded, onQuestionAdded };
+	const removeAtIndex = useCallback((index: number) => {
+		setExpandedMap((prev) => {
+			const next: Record<number, boolean> = {};
+			for (const [key, val] of Object.entries(prev)) {
+				const k = Number(key);
+				if (k < index) next[k] = val;
+				else if (k > index) next[k - 1] = val;
+			}
+			return next;
+		});
+	}, []);
+
+	const swapIndices = useCallback((a: number, b: number) => {
+		setExpandedMap((prev) => {
+			if (prev[a] === undefined && prev[b] === undefined) return prev;
+			const next = { ...prev };
+			const tmp = next[a];
+			next[a] = next[b];
+			next[b] = tmp;
+			return next;
+		});
+	}, []);
+
+	return { toggle, expand, isExpanded, onQuestionAdded, removeAtIndex, swapIndices };
 }
 
 export { isComplete };

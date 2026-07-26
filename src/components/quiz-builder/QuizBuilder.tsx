@@ -28,7 +28,7 @@ function blankQuestion(order: number): AppQuestion {
 
 interface QuizBuilderProps {
 	quizId: string | undefined;
-	onSubmit: (questions: AppQuestion[]) => Promise<void>;
+	onSubmit: (questions: AppQuestion[]) => Promise<boolean>;
 	isUploading: boolean;
 }
 
@@ -42,16 +42,38 @@ export default function QuizBuilder({
 	]);
 	const [errors, setErrors] = useState<Map<number, string[]>>(new Map());
 
-	const { toggle, isExpanded, onQuestionAdded } = useQuestionCollapse(1);
+	const { toggle, isExpanded, onQuestionAdded, removeAtIndex, swapIndices } =
+		useQuestionCollapse(1);
 
 	useEffect(() => {
 		try {
 			const raw = localStorage.getItem(DRAFT_KEY);
 			if (!raw) return;
-			const draft = JSON.parse(raw) as { quizId: string; questions: AppQuestion[] };
-			if (draft.quizId === quizId && Array.isArray(draft.questions)) {
+			const draft = JSON.parse(raw) as Record<string, unknown>;
+			if (draft?.quizId !== quizId || !Array.isArray(draft?.questions)) return;
+			const validated: AppQuestion[] = [];
+			for (const q of draft.questions as unknown[]) {
+				const r = q as Record<string, unknown> | null;
+				if (
+					r &&
+					typeof r.id === "string" &&
+					typeof r.questionText === "string" &&
+					typeof r.optionA === "string" &&
+					typeof r.optionB === "string" &&
+					typeof r.optionC === "string" &&
+					typeof r.optionD === "string" &&
+					typeof r.correctIndex === "number" &&
+					r.correctIndex >= 0 &&
+					r.correctIndex <= 3 &&
+					typeof r.points === "number" &&
+					typeof r.order === "number"
+				) {
+					validated.push(r as unknown as AppQuestion);
+				}
+			}
+			if (validated.length > 0) {
 				// eslint-disable-next-line react-hooks/set-state-in-effect
-				setQuestions(draft.questions);
+				setQuestions(validated);
 			}
 		} catch {}
 	}, [quizId]);
@@ -97,12 +119,22 @@ export default function QuizBuilder({
 		});
 	};
 
-	const deleteQuestion = (index: number) =>
+	const deleteQuestion = (index: number) => {
+		removeAtIndex(index);
+		setErrors((prev) => {
+			const next = new Map<number, string[]>();
+			prev.forEach((val, key) => {
+				if (key < index) next.set(key, val);
+				else if (key > index) next.set(key - 1, val);
+			});
+			return next;
+		});
 		setQuestions((prev) => {
 			const next = reorder(prev.filter((_, i) => i !== index));
 			persist(next);
 			return next;
 		});
+	};
 
 	const moveUp = (index: number) => {
 		if (index === 0) return;
@@ -111,6 +143,22 @@ export default function QuizBuilder({
 		const reordered = reorder(next);
 		setQuestions(reordered);
 		persist(reordered);
+		swapIndices(index - 1, index);
+		setErrors((prev) => {
+			const next = new Map(prev);
+			const tmp = next.get(index - 1);
+			if (next.has(index)) {
+				next.set(index - 1, next.get(index)!);
+			} else {
+				next.delete(index - 1);
+			}
+			if (tmp !== undefined) {
+				next.set(index, tmp);
+			} else {
+				next.delete(index);
+			}
+			return next;
+		});
 	};
 
 	const moveDown = (index: number) => {
@@ -120,13 +168,32 @@ export default function QuizBuilder({
 		const reordered = reorder(next);
 		setQuestions(reordered);
 		persist(reordered);
+		swapIndices(index, index + 1);
+		setErrors((prev) => {
+			const next = new Map(prev);
+			const tmp = next.get(index);
+			if (next.has(index + 1)) {
+				next.set(index, next.get(index + 1)!);
+			} else {
+				next.delete(index);
+			}
+			if (tmp !== undefined) {
+				next.set(index + 1, tmp);
+			} else {
+				next.delete(index + 1);
+			}
+			return next;
+		});
 	};
 
 	const handleSubmit = async () => {
 		const errs = validateQuizForSubmit(questions);
 		setErrors(errs);
 		if (errs.size > 0) return;
-		await onSubmit(questions);
+		const ok = await onSubmit(questions);
+		if (ok) {
+			localStorage.removeItem(DRAFT_KEY);
+		}
 	};
 
 	return (
