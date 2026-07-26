@@ -46,8 +46,12 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 	const quizActive = !loading && !error && !!quiz && !showResults && !showSubmitModal;
 
 	useQuizKeyboard({
-		onSelectAnswer: handleAnswerSelect,
-		onNext: goToNext,
+		onSelectAnswer: (i) => {
+			if (!showSubmitModal) handleAnswerSelect(i);
+		},
+		onNext: () => {
+			if (!showSubmitModal) goToNext();
+		},
 		onSubmit: initiateSubmit,
 		onCancelModal: cancelSubmit,
 		isActive: quizActive,

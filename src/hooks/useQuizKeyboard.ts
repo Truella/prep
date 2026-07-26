@@ -19,11 +19,13 @@ export function useQuizKeyboard({
 		if (!isActive) return;
 
 		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.metaKey || e.ctrlKey || e.altKey) return;
 			const target = e.target as HTMLElement;
 			if (
 				target.tagName === "INPUT" ||
 				target.tagName === "TEXTAREA" ||
-				target.tagName === "SELECT"
+				target.tagName === "SELECT" ||
+				target.isContentEditable
 			) {
 				return;
 			}

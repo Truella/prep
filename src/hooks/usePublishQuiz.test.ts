@@ -37,7 +37,8 @@ describe("usePublishQuiz", () => {
 	it("publish with public visibility calls supabase.update and calls onSuccess", async () => {
 		const onSuccess = vi.fn();
 		const { supabase } = await import("../lib/supabase");
-		vi.mocked(supabase.from).mockReturnValue(createChain({ data: null, error: null }));
+		const chain = createChain({ data: null, error: null });
+		vi.mocked(supabase.from).mockReturnValue(chain);
 
 		const { result } = renderHook(() => usePublishQuiz("quiz1", onSuccess));
 
@@ -50,6 +51,12 @@ describe("usePublishQuiz", () => {
 		});
 
 		expect(supabase.from).toHaveBeenCalledWith("quizzes");
+		expect(chain.update).toHaveBeenCalledWith({
+			visibility: "public",
+			category: "Mathematics",
+			difficulty: "Beginner",
+		});
+		expect(chain.eq).toHaveBeenCalledWith("id", "quiz1");
 		expect(toast.success).toHaveBeenCalledWith("Quiz published to the Quiz Bank!");
 		expect(onSuccess).toHaveBeenCalled();
 	});

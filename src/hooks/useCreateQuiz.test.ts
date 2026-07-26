@@ -28,6 +28,7 @@ beforeEach(() => {
 
 describe("useCreateQuiz", () => {
 	it("createQuiz with empty title calls toast.error without calling supabase", async () => {
+		const { supabase } = await import("../lib/supabase");
 		const { result } = renderHook(() => useCreateQuiz());
 
 		await act(async () => {
@@ -35,6 +36,7 @@ describe("useCreateQuiz", () => {
 		});
 
 		expect(toast.error).toHaveBeenCalledWith("Quiz title is required");
+		expect(supabase.from).not.toHaveBeenCalled();
 	});
 
 	it("createQuiz with valid title and authenticated user calls supabase.insert", async () => {
