@@ -6,6 +6,102 @@ import { AppQuestion } from "../../lib/types";
 import { useAIReview } from "../../hooks/useAIReview";
 import type { AIReviewPayload } from "../../lib/types";
 
+// ---------------------------------------------------------------------------
+// Lightweight markdown renderer — handles the subset Groq consistently outputs
+// ---------------------------------------------------------------------------
+
+function renderInline(text: string): React.ReactNode[] {
+	// Split on **...** to produce alternating plain / bold segments
+	const parts = text.split(/(\*\*[^*]+\*\*)/g);
+	return parts.map((part, i) => {
+		if (part.startsWith("**") && part.endsWith("**")) {
+			return (
+				<strong key={i} className="text-white font-semibold">
+					{part.slice(2, -2)}
+				</strong>
+			);
+		}
+		return part;
+	});
+}
+
+function renderReview(text: string): React.ReactNode {
+	const lines = text.split(/\r?\n/);
+	const nodes: React.ReactNode[] = [];
+	let bulletBuffer: string[] = [];
+
+	const flushBullets = () => {
+		if (bulletBuffer.length === 0) return;
+		nodes.push(
+			<ul key={`ul-${nodes.length}`} className="space-y-1.5 my-2">
+				{bulletBuffer.map((b, i) => (
+					<li key={i} className="flex items-start gap-2 text-sm text-gray-300">
+						<span className="mt-1 w-1.5 h-1.5 rounded-full bg-gray-500 shrink-0" />
+						<span>{renderInline(b)}</span>
+					</li>
+				))}
+			</ul>
+		);
+		bulletBuffer = [];
+	};
+
+	for (const raw of lines) {
+		const line = raw.trim();
+
+		if (!line) {
+			flushBullets();
+			nodes.push(<div key={`gap-${nodes.length}`} className="h-2" />);
+			continue;
+		}
+
+		// Heading: ### or ## or **Heading:**
+		if (/^#{1,3}\s/.test(line)) {
+			flushBullets();
+			const headingText = line.replace(/^#{1,3}\s+/, "");
+			nodes.push(
+				<p key={`h-${nodes.length}`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-1">
+					{headingText.replace(/\*\*/g, "")}
+				</p>
+			);
+			continue;
+		}
+
+		// Bold-only line used as a heading (e.g. "**What you did well:**")
+		if (/^\*\*.+\*\*:?$/.test(line)) {
+			flushBullets();
+			nodes.push(
+				<p key={`bh-${nodes.length}`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-1">
+					{line.replace(/\*\*/g, "").replace(/:$/, "")}
+				</p>
+			);
+			continue;
+		}
+
+		// Bullet: - or * or •
+		if (/^[-*•]\s+/.test(line)) {
+			bulletBuffer.push(line.replace(/^[-*•]\s+/, ""));
+			continue;
+		}
+
+		// Numbered list: 1. 2. etc.
+		if (/^\d+\.\s+/.test(line)) {
+			bulletBuffer.push(line.replace(/^\d+\.\s+/, ""));
+			continue;
+		}
+
+		// Plain paragraph
+		flushBullets();
+		nodes.push(
+			<p key={`p-${nodes.length}`} className="text-sm text-gray-300 leading-relaxed">
+				{renderInline(line)}
+			</p>
+		);
+	}
+
+	flushBullets();
+	return <div className="space-y-1">{nodes}</div>;
+}
+
 interface QuizResultsProps {
 	quizTitle: string;
 	correctCount: number;
@@ -35,9 +131,10 @@ export default function QuizResults({
 	isAutoSubmit,
 	timeLimit,
 	quizVisibility,
+	quizId,
 }: QuizResultsProps) {
 	const [showReview, setShowReview] = useState(false);
-	const { review, loading, error, getReview } = useAIReview();
+	const { review, loading, error, getReview } = useAIReview(quizId);
 	const percentage = Math.round((earnedPoints / totalPoints) * 100);
 
 	const reviewPayload: AIReviewPayload = {
@@ -180,9 +277,9 @@ export default function QuizResults({
 										)}
 									</div>
 								</div>
-								<p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-									{review}
-								</p>
+								<div className="text-gray-300">
+									{renderReview(review)}
+								</div>
 							</div>
 						)}
 

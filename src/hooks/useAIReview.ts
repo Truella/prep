@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { AIReviewPayload } from "../lib/types";
 
 interface AIReviewState {
@@ -7,12 +7,27 @@ interface AIReviewState {
   error: string | null;
 }
 
-export function useAIReview() {
+export function useAIReview(quizId: string) {
   const [state, setState] = useState<AIReviewState>({
     review: null,
     loading: false,
     error: null,
   });
+
+  const cacheKey = `quiz_ai_review_${quizId}`;
+
+  // Restore cached review on client side mount
+  useEffect(() => {
+    if (!quizId) return;
+    try {
+      const saved = localStorage.getItem(cacheKey);
+      if (saved) {
+        setState((prev) => ({ ...prev, review: saved }));
+      }
+    } catch (err) {
+      console.error("Failed to restore cached AI review:", err);
+    }
+  }, [quizId, cacheKey]);
 
   const getReview = async (payload: AIReviewPayload) => {
     setState({ review: null, loading: true, error: null });
@@ -46,6 +61,12 @@ export function useAIReview() {
       }
 
       setState({ review: data.review, loading: false, error: null });
+
+      try {
+        localStorage.setItem(cacheKey, data.review);
+      } catch (err) {
+        console.error("Failed to cache AI review:", err);
+      }
     } catch {
       setState({
         review: null,
@@ -55,8 +76,13 @@ export function useAIReview() {
     }
   };
 
-  const clearReview = () =>
+  const clearReview = () => {
+    try {
+      localStorage.removeItem(cacheKey);
+    } catch {}
     setState({ review: null, loading: false, error: null });
+  };
 
   return { ...state, getReview, clearReview };
 }
+

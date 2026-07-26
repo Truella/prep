@@ -62,6 +62,29 @@ export function useTakeQuiz(quizId: string | undefined) {
 			setQuiz(quizData);
 			setQuestions(questionsData.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i)));
 
+			// Check results right after questions are loaded, before configuring timer or ending loading!
+			const resultsKey = `quiz_results_${quizId}`;
+			let hasResults = false;
+			try {
+				const savedResults = localStorage.getItem(resultsKey);
+				if (savedResults) {
+					const parsed = JSON.parse(savedResults);
+					setSelectedAnswers(parsed.answers || {});
+					setElapsedSeconds(parsed.elapsedSeconds || 0);
+					setIsAutoSubmit(!!parsed.isAutoSubmit);
+					setShowResults(true);
+					setIsSubmitted(true);
+					hasResults = true;
+				}
+			} catch (err) {
+				console.error("Failed to load saved quiz results:", err);
+			}
+
+			if (hasResults) {
+				setLoading(false);
+				return;
+			}
+
 			if (quizData.time_limit) {
 				const storageKey = `quiz_deadline_${quizId}`;
 				let deadline: number;
@@ -115,6 +138,24 @@ export function useTakeQuiz(quizId: string | undefined) {
 	useEffect(() => {
 		if (!quiz || questions.length === 0) return;
 
+		// Check if quiz has been submitted previously
+		const resultsKey = `quiz_results_${quizId}`;
+		try {
+			const savedResults = localStorage.getItem(resultsKey);
+			if (savedResults) {
+				const parsed = JSON.parse(savedResults);
+				setSelectedAnswers(parsed.answers || {});
+				setElapsedSeconds(parsed.elapsedSeconds || 0);
+				setIsAutoSubmit(!!parsed.isAutoSubmit);
+				setShowResults(true);
+				setIsSubmitted(true);
+				markHydrated();
+				return;
+			}
+		} catch (err) {
+			console.error("Failed to load saved quiz results:", err);
+		}
+
 		const saved = loadProgress();
 
 		if (saved && saved.answers) {
@@ -128,7 +169,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 			toast.success("Progress restored!");
 		}
 		markHydrated();
-	}, [quiz, questions.length, loadProgress, markHydrated]);
+	}, [quiz, questions.length, loadProgress, markHydrated, quizId]);
 
 	const handleAnswerSelect = (answerIndex: number) => {
 		setSelectedAnswers((prev) => ({
@@ -170,11 +211,25 @@ export function useTakeQuiz(quizId: string | undefined) {
 	};
 
 	const confirmSubmit = () => {
-		setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
 		clearDeadline();
+
+		try {
+			localStorage.setItem(
+				`quiz_results_${quizId}`,
+				JSON.stringify({
+					answers: selectedAnswers,
+					elapsedSeconds: elapsed,
+					isAutoSubmit: false,
+				})
+			);
+		} catch (err) {
+			console.error("Failed to save quiz results:", err);
+		}
 	};
 
 	const cancelSubmit = () => {
@@ -183,14 +238,32 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 	const handleTimerExpire = () => {
 		setIsAutoSubmit(true);
-		setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
 		clearDeadline();
+
+		try {
+			localStorage.setItem(
+				`quiz_results_${quizId}`,
+				JSON.stringify({
+					answers: selectedAnswers,
+					elapsedSeconds: elapsed,
+					isAutoSubmit: true,
+				})
+			);
+		} catch (err) {
+			console.error("Failed to save quiz results:", err);
+		}
 	};
 
 	const resetQuiz = () => {
+		try {
+			localStorage.removeItem(`quiz_results_${quizId}`);
+			localStorage.removeItem(`quiz_ai_review_${quizId}`);
+		} catch {}
 		clearProgress();
 		setIsSubmitted(false);
 		setIsAutoSubmit(false);

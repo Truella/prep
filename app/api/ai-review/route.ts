@@ -56,7 +56,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     })
     .join("\n\n");
 
-  const prompt = `A student scored ${score}/${totalPoints} (${percentage}%) on a quiz.\n\n${questionLines}\n\nProvide a brief performance review with:\n- 3-5 sentences on what the student did well\n- 3-5 sentences on areas to improve\n- 2-3 specific study suggestions\n\nBe concise and specific to the questions above.`;
+  const prompt = `You are a supportive, insightful tutor reviewing a user's quiz performance. The user scored ${score}/${totalPoints} (${percentage}%) on the quiz.
+
+${questionLines}
+
+Provide a brief, personalized performance review directly to the user (address them as "you"):
+- 3-5 sentences on what you did well
+- 3-5 sentences on areas for you to improve
+- 2-3 specific, actionable study suggestions
+
+Be concise and specific to the questions above. Maintain a direct, encouraging tutor-to-student tone.`;
 
   try {
     const groqResponse = await fetch(

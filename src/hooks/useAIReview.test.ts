@@ -23,7 +23,7 @@ describe("useAIReview", () => {
       "fetch",
       vi.fn().mockResolvedValue(makeResponse({ review: "Great job!" }, 200))
     );
-    const { result } = renderHook(() => useAIReview());
+    const { result } = renderHook(() => useAIReview("quiz1"));
     await act(() => result.current.getReview(PAYLOAD));
     expect(result.current.review).toBe("Great job!");
     expect(result.current.loading).toBe(false);
@@ -35,7 +35,7 @@ describe("useAIReview", () => {
       "fetch",
       vi.fn().mockResolvedValue(makeResponse({ error: "Rate limit" }, 429))
     );
-    const { result } = renderHook(() => useAIReview());
+    const { result } = renderHook(() => useAIReview("quiz1"));
     await act(() => result.current.getReview(PAYLOAD));
     expect(result.current.error).toContain("5 free reviews");
   });
@@ -45,14 +45,14 @@ describe("useAIReview", () => {
       "fetch",
       vi.fn().mockResolvedValue(makeResponse({ error: "Server error" }, 500))
     );
-    const { result } = renderHook(() => useAIReview());
+    const { result } = renderHook(() => useAIReview("quiz1"));
     await act(() => result.current.getReview(PAYLOAD));
     expect(result.current.error).toContain("temporarily unavailable");
   });
 
   it("sets generic error on network failure", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Network")));
-    const { result } = renderHook(() => useAIReview());
+    const { result } = renderHook(() => useAIReview("quiz1"));
     await act(() => result.current.getReview(PAYLOAD));
     expect(result.current.error).toContain("temporarily unavailable");
   });
@@ -61,7 +61,7 @@ describe("useAIReview", () => {
     let resolve: (r: Response) => void;
     const pending = new Promise<Response>((res) => (resolve = res));
     vi.stubGlobal("fetch", vi.fn().mockReturnValue(pending));
-    const { result } = renderHook(() => useAIReview());
+    const { result } = renderHook(() => useAIReview("quiz1"));
     act(() => {
       result.current.getReview(PAYLOAD);
     });
@@ -77,7 +77,7 @@ describe("useAIReview", () => {
       "fetch",
       vi.fn().mockResolvedValue(makeResponse({ review: "Good" }, 200))
     );
-    const { result } = renderHook(() => useAIReview());
+    const { result } = renderHook(() => useAIReview("quiz1"));
     await act(() => result.current.getReview(PAYLOAD));
     act(() => result.current.clearReview());
     expect(result.current.review).toBeNull();
