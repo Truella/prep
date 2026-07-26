@@ -5,6 +5,56 @@ import { QuizDraft, DBQuestion, AppQuestion } from "../lib/types";
 import { dbToAppQuestion } from "../utils/transforms";
 import useQuizProgress from "./useQuizProgress";
 
+interface SavedQuizResults {
+	answers: Record<number, number>;
+	elapsedSeconds: number;
+	isAutoSubmit: boolean;
+}
+
+function readSavedResults(quizId: string | undefined): SavedQuizResults | null {
+	if (!quizId) return null;
+	const resultsKey = `quiz_results_${quizId}`;
+	try {
+		const savedResults = localStorage.getItem(resultsKey);
+		if (!savedResults) return null;
+
+		const parsed = JSON.parse(savedResults);
+
+		if (!parsed || typeof parsed !== "object") {
+			return null;
+		}
+
+		const answers = parsed.answers;
+		if (!answers || typeof answers !== "object") {
+			return null;
+		}
+		const validatedAnswers: Record<number, number> = {};
+		for (const [key, value] of Object.entries(answers)) {
+			const numKey = Number(key);
+			const numValue = Number(value);
+			if (Number.isInteger(numKey) && numKey >= 0 && Number.isInteger(numValue) && numValue >= 0) {
+				validatedAnswers[numKey] = numValue;
+			}
+		}
+
+		const elapsedSeconds = parsed.elapsedSeconds;
+		if (!Number.isFinite(elapsedSeconds) || elapsedSeconds < 0) {
+			return null;
+		}
+
+		const isAutoSubmit = Boolean(parsed.isAutoSubmit);
+
+		return {
+			answers: validatedAnswers,
+			elapsedSeconds,
+			isAutoSubmit,
+		};
+	} catch (err) {
+		console.error("Failed to load saved quiz results:", err);
+	}
+	return null;
+}
+
 export function useTakeQuiz(quizId: string | undefined) {
 	const [showSubmitModal, setShowSubmitModal] = useState(false);
 	const [quiz, setQuiz] = useState<QuizDraft | null>(null);
@@ -62,6 +112,20 @@ export function useTakeQuiz(quizId: string | undefined) {
 			setQuiz(quizData);
 			setQuestions(questionsData.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i)));
 
+			// Check results right after questions are loaded, before configuring timer or ending loading!
+			const savedResults = readSavedResults(quizId);
+
+			if (savedResults) {
+				setSelectedAnswers(savedResults.answers);
+				setElapsedSeconds(savedResults.elapsedSeconds);
+				setIsAutoSubmit(savedResults.isAutoSubmit);
+				setShowResults(true);
+				setIsSubmitted(true);
+				markHydrated();
+				setLoading(false);
+				return;
+			}
+
 			if (quizData.time_limit) {
 				const storageKey = `quiz_deadline_${quizId}`;
 				let deadline: number;
@@ -113,12 +177,24 @@ export function useTakeQuiz(quizId: string | undefined) {
 	}, [quizId, fetchQuizData]);
 
 	useEffect(() => {
+		/* eslint-disable react-hooks/set-state-in-effect */
 		if (!quiz || questions.length === 0) return;
+
+		// Check if quiz has been submitted previously
+		const savedResults = readSavedResults(quizId);
+		if (savedResults) {
+			setSelectedAnswers(savedResults.answers);
+			setElapsedSeconds(savedResults.elapsedSeconds);
+			setIsAutoSubmit(savedResults.isAutoSubmit);
+			setShowResults(true);
+			setIsSubmitted(true);
+			markHydrated();
+			return;
+		}
 
 		const saved = loadProgress();
 
 		if (saved && saved.answers) {
-			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setSelectedAnswers(saved.answers);
 
 			if (saved.currentIndex !== undefined) {
@@ -128,7 +204,8 @@ export function useTakeQuiz(quizId: string | undefined) {
 			toast.success("Progress restored!");
 		}
 		markHydrated();
-	}, [quiz, questions.length, loadProgress, markHydrated]);
+		/* eslint-enable react-hooks/set-state-in-effect */
+	}, [quiz, questions.length, loadProgress, markHydrated, quizId]);
 
 	const handleAnswerSelect = (answerIndex: number) => {
 		setSelectedAnswers((prev) => ({
@@ -170,11 +247,25 @@ export function useTakeQuiz(quizId: string | undefined) {
 	};
 
 	const confirmSubmit = () => {
-		setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
 		clearDeadline();
+
+		try {
+			localStorage.setItem(
+				`quiz_results_${quizId}`,
+				JSON.stringify({
+					answers: selectedAnswers,
+					elapsedSeconds: elapsed,
+					isAutoSubmit: false,
+				})
+			);
+		} catch (err) {
+			console.error("Failed to save quiz results:", err);
+		}
 	};
 
 	const cancelSubmit = () => {
@@ -183,14 +274,32 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 	const handleTimerExpire = () => {
 		setIsAutoSubmit(true);
-		setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
 		clearDeadline();
+
+		try {
+			localStorage.setItem(
+				`quiz_results_${quizId}`,
+				JSON.stringify({
+					answers: selectedAnswers,
+					elapsedSeconds: elapsed,
+					isAutoSubmit: true,
+				})
+			);
+		} catch (err) {
+			console.error("Failed to save quiz results:", err);
+		}
 	};
 
 	const resetQuiz = () => {
+		try {
+			localStorage.removeItem(`quiz_results_${quizId}`);
+			localStorage.removeItem(`quiz_ai_review_${quizId}`);
+		} catch {}
 		clearProgress();
 		setIsSubmitted(false);
 		setIsAutoSubmit(false);

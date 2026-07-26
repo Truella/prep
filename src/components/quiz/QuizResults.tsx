@@ -1,6 +1,106 @@
+"use client";
+
 import { useState } from "react";
 import QuizReview from "./QuizReview";
 import { AppQuestion } from "../../lib/types";
+import { useAIReview } from "../../hooks/useAIReview";
+import type { AIReviewPayload } from "../../lib/types";
+
+// ---------------------------------------------------------------------------
+// Lightweight markdown renderer — handles the subset Groq consistently outputs
+// ---------------------------------------------------------------------------
+
+function renderInline(text: string): React.ReactNode[] {
+	// Split on **...** to produce alternating plain / bold segments
+	const parts = text.split(/(\*\*[^*]+\*\*)/g);
+	return parts.map((part, i) => {
+		if (part.startsWith("**") && part.endsWith("**")) {
+			return (
+				<strong key={i} className="text-white font-semibold">
+					{part.slice(2, -2)}
+				</strong>
+			);
+		}
+		return part;
+	});
+}
+
+function renderReview(text: string): React.ReactNode {
+	const lines = text.split(/\r?\n/);
+	const nodes: React.ReactNode[] = [];
+	let bulletBuffer: string[] = [];
+
+	const flushBullets = () => {
+		if (bulletBuffer.length === 0) return;
+		nodes.push(
+			<ul key={`ul-${nodes.length}`} className="space-y-1.5 my-2">
+				{bulletBuffer.map((b, i) => (
+					<li key={i} className="flex items-start gap-2 text-sm text-gray-300">
+						<span className="mt-1 w-1.5 h-1.5 rounded-full bg-gray-500 shrink-0" />
+						<span>{renderInline(b)}</span>
+					</li>
+				))}
+			</ul>
+		);
+		bulletBuffer = [];
+	};
+
+	for (const raw of lines) {
+		const line = raw.trim();
+
+		if (!line) {
+			flushBullets();
+			nodes.push(<div key={`gap-${nodes.length}`} className="h-2" />);
+			continue;
+		}
+
+		// Heading: ### or ## or **Heading:**
+		if (/^#{1,3}\s/.test(line)) {
+			flushBullets();
+			const headingText = line.replace(/^#{1,3}\s+/, "");
+			nodes.push(
+				<p key={`h-${nodes.length}`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-1">
+					{headingText.replace(/\*\*/g, "")}
+				</p>
+			);
+			continue;
+		}
+
+		// Bold-only line used as a heading (e.g. "**What you did well:**")
+		if (/^\*\*.+\*\*:?$/.test(line)) {
+			flushBullets();
+			nodes.push(
+				<p key={`bh-${nodes.length}`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-1">
+					{line.replace(/\*\*/g, "").replace(/:$/, "")}
+				</p>
+			);
+			continue;
+		}
+
+		// Bullet: - or * or •
+		if (/^[-*•]\s+/.test(line)) {
+			bulletBuffer.push(line.replace(/^[-*•]\s+/, ""));
+			continue;
+		}
+
+		// Numbered list: 1. 2. etc.
+		if (/^\d+\.\s+/.test(line)) {
+			bulletBuffer.push(line.replace(/^\d+\.\s+/, ""));
+			continue;
+		}
+
+		// Plain paragraph
+		flushBullets();
+		nodes.push(
+			<p key={`p-${nodes.length}`} className="text-sm text-gray-300 leading-relaxed">
+				{renderInline(line)}
+			</p>
+		);
+	}
+
+	flushBullets();
+	return <div className="space-y-1">{nodes}</div>;
+}
 
 interface QuizResultsProps {
 	quizTitle: string;
@@ -29,9 +129,20 @@ export default function QuizResults({
 	elapsedSeconds,
 	isAutoSubmit,
 	timeLimit,
+	quizId,
 }: QuizResultsProps) {
 	const [showReview, setShowReview] = useState(false);
+	const [copied, setCopied] = useState(false);
+	const [copyFailed, setCopyFailed] = useState(false);
+	const { review, loading, error, isRateLimited, getReview } = useAIReview(quizId);
 	const percentage = Math.round((earnedPoints / totalPoints) * 100);
+
+	const reviewPayload: AIReviewPayload = {
+		questions,
+		selectedAnswers: userAnswers,
+		score: earnedPoints,
+		totalPoints,
+	};
 	const passed = percentage >= 70;
 
 	if (showReview) {
@@ -118,6 +229,78 @@ export default function QuizResults({
 							}
 							return <p className="text-gray-400 mt-2">Completed in {timeStr}</p>;
 						})()}
+					</div>
+
+					{/* AI Review */}
+					<div className="mt-6 text-left">
+						{!review && !loading && !error && (
+							<button
+								onClick={() => getReview(reviewPayload)}
+								className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all"
+							>
+								Get AI Review
+							</button>
+						)}
+
+						{loading && (
+							<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-center text-gray-400 text-sm">
+								Analysing your results...
+							</div>
+						)}
+
+						{error && (
+							<div className="backdrop-blur-sm bg-white/5 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+								{error}
+							</div>
+						)}
+
+						{review && (
+							<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+								<div className="flex justify-between items-center">
+									<p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+										AI Review
+									</p>
+									<div className="flex gap-2">
+										<button
+											onClick={async () => {
+												if (!navigator.clipboard) {
+													setCopyFailed(true);
+													setTimeout(() => setCopyFailed(false), 2000);
+													return;
+												}
+												try {
+													await navigator.clipboard.writeText(review);
+													setCopied(true);
+													setCopyFailed(false);
+													setTimeout(() => setCopied(false), 2000);
+												} catch {
+													setCopyFailed(true);
+													setTimeout(() => setCopyFailed(false), 2000);
+												}
+											}}
+											className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
+										>
+											{copyFailed ? "Failed" : copied ? "Copied!" : "Copy"}
+										</button>
+										{!isRateLimited && (
+											<button
+												onClick={() => getReview(reviewPayload)}
+												className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
+											>
+												Regenerate
+											</button>
+										)}
+									</div>
+								</div>
+								<div className="text-gray-300">
+									{renderReview(review)}
+								</div>
+							</div>
+						)}
+
+						<p className="text-xs text-gray-500 mt-3 text-center">
+							Or export manually to use with any AI tool
+						</p>
 					</div>
 				</div>
 
