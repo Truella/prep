@@ -10,6 +10,10 @@ interface Quiz {
 	description: string;
 	created_at: string;
 	visibility?: QuizVisibility;
+	category?: string | null;
+	difficulty?: string | null;
+	times_taken?: number;
+	average_rating?: number | null;
 }
 
 export function useQuizzes() {
