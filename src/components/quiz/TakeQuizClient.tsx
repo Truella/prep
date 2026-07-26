@@ -10,6 +10,7 @@ import QuestionOverview from "../../components/quiz/QuestionOverview";
 import QuizTimer from "../../components/quiz/QuizTimer";
 import QuizResults from "../../components/quiz/QuizResults";
 import SubmitConfirmationModal from "../../components/quiz/SubmitConfirmationModal";
+import { useQuizKeyboard } from "../../hooks/useQuizKeyboard";
 
 export default function TakeQuizClient({ quizId }: { quizId: string }) {
 	const {
@@ -40,6 +41,16 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 		isAutoSubmit,
 		timerSeconds,
 	} = useTakeQuiz(quizId);
+
+	const quizActive = !loading && !error && !!quiz && !showResults;
+
+	useQuizKeyboard({
+		onSelectAnswer: handleAnswerSelect,
+		onNext: goToNext,
+		onSubmit: initiateSubmit,
+		onCancelModal: cancelSubmit,
+		isActive: quizActive,
+	});
 
 	if (loading) {
 		return <LoadingScreen message="Loading quiz..." />;
