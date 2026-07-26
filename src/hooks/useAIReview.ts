@@ -22,6 +22,7 @@ export function useAIReview(quizId: string) {
     try {
       const saved = localStorage.getItem(cacheKey);
       if (saved) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setState((prev) => ({ ...prev, review: saved }));
       }
     } catch (err) {

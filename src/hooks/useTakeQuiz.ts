@@ -136,6 +136,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 	}, [quizId, fetchQuizData]);
 
 	useEffect(() => {
+		/* eslint-disable react-hooks/set-state-in-effect */
 		if (!quiz || questions.length === 0) return;
 
 		// Check if quiz has been submitted previously
@@ -159,7 +160,6 @@ export function useTakeQuiz(quizId: string | undefined) {
 		const saved = loadProgress();
 
 		if (saved && saved.answers) {
-			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setSelectedAnswers(saved.answers);
 
 			if (saved.currentIndex !== undefined) {
@@ -169,6 +169,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 			toast.success("Progress restored!");
 		}
 		markHydrated();
+		/* eslint-enable react-hooks/set-state-in-effect */
 	}, [quiz, questions.length, loadProgress, markHydrated, quizId]);
 
 	const handleAnswerSelect = (answerIndex: number) => {
