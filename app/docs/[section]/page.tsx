@@ -19,22 +19,22 @@ const CONTENT: Record<string, React.ComponentType> = {
 	"question-tips": QuestionTips,
 };
 
+interface PageProps {
+	params: Promise<{ section: string }>;
+}
+
 export async function generateMetadata({
 	params,
-}: {
-	params: { section: string };
-}): Promise<Metadata> {
+}: PageProps): Promise<Metadata> {
+	const { section } = await params;
 	return {
-		title: SECTION_TITLES[params.section] ?? "PREP Docs",
+		title: SECTION_TITLES[section] ?? "PREP Docs",
 	};
 }
 
-export default function DocsSection({
-	params,
-}: {
-	params: { section: string };
-}) {
-	const Content = CONTENT[params.section] ?? GettingStarted;
+export default async function DocsSection({ params }: PageProps) {
+	const { section } = await params;
+	const Content = CONTENT[section] ?? GettingStarted;
 	return (
 		<DocsLayout>
 			<Content />
