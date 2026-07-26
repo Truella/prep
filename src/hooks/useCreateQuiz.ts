@@ -7,6 +7,16 @@ import { parseAndValidateCSV } from "../utils/csvParser";
 import { appToDBQuestion } from "../utils/transforms";
 import type { QuizDraft, MCQRow, AppQuestion } from "../lib/types";
 
+const QUIZ_META_KEY = "quiz_meta_draft";
+
+function loadSavedQuizMeta(): QuizDraft {
+	try {
+		const raw = localStorage.getItem(QUIZ_META_KEY);
+		if (raw) return JSON.parse(raw) as QuizDraft;
+	} catch {}
+	return { title: "", description: "" };
+}
+
 interface CreateQuizState {
 	quiz: QuizDraft;
 	questions: AppQuestion[];
@@ -17,14 +27,14 @@ interface CreateQuizState {
 }
 
 export function useCreateQuiz() {
-	const [state, setState] = useState<CreateQuizState>({
-		quiz: { title: "", description: "" },
+	const [state, setState] = useState<CreateQuizState>(() => ({
+		quiz: loadSavedQuizMeta(),
 		questions: [],
 		shareableLink: null,
 		isCreatingQuiz: false,
 		isUploadingQuestions: false,
 		timeLimit: null,
-	});
+	}));
 
 	const setTitle = (title: string) =>
 		setState((prev) => ({ ...prev, quiz: { ...prev.quiz, title } }));
@@ -66,7 +76,11 @@ export function useCreateQuiz() {
 			return;
 		}
 
-		setState((prev) => ({ ...prev, quiz: { ...prev.quiz, id: data.id } }));
+		const updatedQuiz = { ...state.quiz, id: data.id };
+		try {
+			localStorage.setItem(QUIZ_META_KEY, JSON.stringify(updatedQuiz));
+		} catch {}
+		setState((prev) => ({ ...prev, quiz: updatedQuiz }));
 		toast.success("Quiz created! Now upload questions.");
 	};
 
@@ -94,15 +108,15 @@ export function useCreateQuiz() {
 		toast.success(`${parsed.length} questions loaded`);
 	};
 
-	const uploadQuestions = async (questionsOverride?: AppQuestion[]) => {
+	const uploadQuestions = async (questionsOverride?: AppQuestion[]): Promise<boolean> => {
 		if (state.shareableLink) {
 			toast.error("Quiz already published");
-			return;
+			return false;
 		}
 		const toUpload = questionsOverride ?? state.questions;
 		if (!state.quiz.id || toUpload.length === 0) {
 			toast.error("Quiz ID missing or no questions to upload");
-			return;
+			return false;
 		}
 		setState((prev) => ({ ...prev, isUploadingQuestions: true }));
 
@@ -116,21 +130,28 @@ export function useCreateQuiz() {
 
 		if (error) {
 			toast.error(`Failed to save questions: ${error.message}`);
-			return;
+			return false;
 		}
 
 		const quizLink = `${window.location.origin}/quiz/${state.quiz.id}`;
+		try {
+			localStorage.removeItem(QUIZ_META_KEY);
+		} catch {}
 		setState((prev) => ({ ...prev, shareableLink: quizLink }));
 		try {
 			await navigator.clipboard.writeText(quizLink);
 		} catch {
 			toast.success("Quiz published!");
-			return;
+			return true;
 		}
 		toast.success("Quiz published! Link copied to clipboard.");
+		return true;
 	};
 
 	const reset = () => {
+		try {
+			localStorage.removeItem(QUIZ_META_KEY);
+		} catch {}
 		setState({
 			quiz: { title: "", description: "" },
 			questions: [],

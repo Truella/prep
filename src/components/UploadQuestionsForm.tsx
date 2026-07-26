@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface UploadQuestionsFormProps {
 	onFileChange: (file: File) => void;
 	onSubmit: () => void;
@@ -32,8 +34,10 @@ export default function UploadQuestionsForm({
 					/>
 				</div>
 				<p className="mt-2 text-xs text-gray-400">
-					Format: Question, Option_A, Option_B, Option_C, Option_D,
-					Correct_Answer, Points
+					Format: Question, Option_A, Option_B, Option_C, Option_D, Correct_Answer, Points.{" "}
+					<Link href="/docs/csv-guide" className="underline hover:text-white transition">
+						Need help?
+					</Link>
 				</p>
 			</div>
 

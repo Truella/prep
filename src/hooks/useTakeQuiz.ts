@@ -68,6 +68,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 	useEffect(() => {
 		if (!quizId) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setError("No quiz ID provided");
 			setLoading(false);
 			return;
@@ -82,6 +83,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		const saved = loadProgress();
 
 		if (saved && saved.answers) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setSelectedAnswers(saved.answers);
 
 			if (saved.currentIndex !== undefined) {
@@ -91,7 +93,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 			toast.success("Progress restored!");
 		}
 		markHydrated();
-	}, [quiz?.id, questions.length, loadProgress, markHydrated]);
+	}, [quiz, questions.length, loadProgress, markHydrated]);
 
 	const handleAnswerSelect = (answerIndex: number) => {
 		setSelectedAnswers((prev) => ({

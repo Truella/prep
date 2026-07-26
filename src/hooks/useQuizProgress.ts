@@ -41,7 +41,7 @@ export default function useQuizProgress(
 			console.error("Failed to load quiz progress:", err);
 			return null;
 		}
-	}, [quizId]);
+	}, [quizId, STORAGE_KEY]);
 
 	const saveProgress = useCallback(() => {
 		if (!quizId || isSubmitted) return;
@@ -58,7 +58,7 @@ export default function useQuizProgress(
 		} catch (err) {
 			console.error("Failed to save quiz progress:", err);
 		}
-	}, [quizId, isSubmitted, selectedAnswers, currentQuestionIndex]);
+	}, [quizId, isSubmitted, selectedAnswers, currentQuestionIndex, STORAGE_KEY]);
 
 	const clearProgress = useCallback(() => {
 		if (!quizId) return;

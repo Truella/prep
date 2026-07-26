@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { letterToIndex, indexToLetter, dbToAppQuestion, appToDBQuestion } from "./transforms";
+import { letterToIndex, dbToAppQuestion, appToDBQuestion } from "./transforms";
 import type { DBQuestion, AppQuestion } from "../lib/types";
 
 const DB_Q: DBQuestion = {

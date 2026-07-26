@@ -9,7 +9,7 @@ export default function QuizListEmpty() {
 			</div>
 			<h3 className="text-xl font-semibold text-white mb-2">No Quizzes Yet</h3>
 			<p className="text-gray-400 mb-6 max-w-md mx-auto">
-				You haven't created any quizzes yet. Create your first quiz to get
+				You haven&apos;t created any quizzes yet. Create your first quiz to get
 				started.
 			</p>
 			<Link
