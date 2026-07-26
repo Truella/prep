@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useCreateQuiz } from "../hooks/useCreateQuiz";
 import QuizBuilder from "../components/quiz-builder/QuizBuilder";
+import TimeLimitInput from "../components/quiz-builder/TimeLimitInput";
 import UploadQuestionsForm from "../components/UploadQuestionsForm";
 import ShareableLink from "../components/ShareableLink";
 
@@ -18,6 +19,8 @@ export default function CreateQuizCSV() {
 		isUploadingQuestions,
 		setTitle,
 		setDescription,
+		timeLimit,
+		setTimeLimit,
 		createQuiz,
 		setQuestionsFromCSV,
 		uploadQuestions,
@@ -74,7 +77,7 @@ export default function CreateQuizCSV() {
 								className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition disabled:opacity-50 disabled:cursor-not-allowed resize-none"
 							/>
 						</div>
-						{/* TimeLimitInput goes here in PR-4 */}
+						<TimeLimitInput value={timeLimit} onChange={setTimeLimit} disabled={!!quiz.id} />
 						{!quiz.id && (
 							<button
 								onClick={createQuiz}

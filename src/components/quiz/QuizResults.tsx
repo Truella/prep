@@ -12,6 +12,9 @@ interface QuizResultsProps {
 	quizId: string;
 	questions: AppQuestion[];
 	userAnswers: { [key: number]: number };
+	elapsedSeconds: number;
+	isAutoSubmit?: boolean;
+	timeLimit?: number | null;
 }
 
 export default function QuizResults({
@@ -23,6 +26,9 @@ export default function QuizResults({
 	userAnswers,
 	questions,
 	onRetake,
+	elapsedSeconds,
+	isAutoSubmit,
+	timeLimit,
 }: QuizResultsProps) {
 	const [showReview, setShowReview] = useState(false);
 	const percentage = Math.round((earnedPoints / totalPoints) * 100);
@@ -93,6 +99,25 @@ export default function QuizResults({
 						<p>
 							{earnedPoints} out of {totalPoints} points earned
 						</p>
+						{(() => {
+							const m = Math.floor(elapsedSeconds / 60);
+							const s = elapsedSeconds % 60;
+							const timeStr = `${m}m ${s}s`;
+							if (isAutoSubmit) {
+								return <p className="text-red-400 font-medium mt-2">Time&apos;s up!</p>;
+							}
+							if (timeLimit && elapsedSeconds < timeLimit * 60) {
+								const remaining = timeLimit * 60 - elapsedSeconds;
+								const rm = Math.floor(remaining / 60);
+								const rs = remaining % 60;
+								return (
+									<p className="text-gray-400 mt-2">
+										Completed in {timeStr} &middot; {rm}m {rs}s remaining
+									</p>
+								);
+							}
+							return <p className="text-gray-400 mt-2">Completed in {timeStr}</p>;
+						})()}
 					</div>
 				</div>
 

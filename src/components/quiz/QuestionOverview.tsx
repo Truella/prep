@@ -18,6 +18,20 @@ export default function QuestionOverview({
 			<h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">
 				Question Overview
 			</h3>
+			<div className="flex justify-center gap-4 mb-4 text-xs text-gray-500">
+				<span className="flex items-center gap-1.5">
+					<span className="w-2.5 h-2.5 rounded-sm bg-white/20" />
+					Answered
+				</span>
+				<span className="flex items-center gap-1.5">
+					<span className="w-2.5 h-2.5 rounded-sm bg-white/5" />
+					Unanswered
+				</span>
+				<span className="flex items-center gap-1.5">
+					<span className="w-2.5 h-2.5 rounded-sm bg-white" />
+					Current
+				</span>
+			</div>
 			<div className="grid grid-cols-5 gap-2">
 				{Array.from({ length: totalQuestions }).map((_, index) => {
 					const isAnswered = answeredQuestions[index] !== undefined;
@@ -42,7 +56,7 @@ export default function QuestionOverview({
 			</div>
 			<button
 				onClick={onSubmit}
-				className="mt-8 px-8 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all shadow-lg flex items-center gap-2"
+				className="mt-6 px-8 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all shadow-lg flex items-center gap-2"
 			>
 				Submit Quiz
 				<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">

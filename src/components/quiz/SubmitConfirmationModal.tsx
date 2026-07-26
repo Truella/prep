@@ -5,6 +5,7 @@ interface SubmitConfirmationModalProps {
 	totalQuestions: number;
 	answeredCount: number;
 	unansweredCount: number;
+	isAutoSubmit?: boolean;
 }
 
 export default function SubmitConfirmationModal({
@@ -14,10 +15,25 @@ export default function SubmitConfirmationModal({
 	totalQuestions,
 	answeredCount,
 	unansweredCount,
+	isAutoSubmit,
 }: SubmitConfirmationModalProps) {
 	if (!isOpen) return null;
 
 	const allAnswered = unansweredCount === 0;
+
+	if (isAutoSubmit) {
+		return (
+			<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+				<div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+				<div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center">
+					<h3 className="text-xl font-bold text-white mb-2">Time&apos;s up!</h3>
+					<p className="text-gray-400 mb-6">
+						Your quiz has been submitted.
+					</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">

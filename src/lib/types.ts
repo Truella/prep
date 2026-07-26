@@ -4,6 +4,7 @@ export interface QuizDraft {
 	id?: string;
 	title: string;
 	description: string;
+	time_limit?: number | null;
 }
 
 export interface PreviewQuestion {

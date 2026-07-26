@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 import { QuizDraft, DBQuestion, AppQuestion } from "../lib/types";
@@ -20,6 +20,11 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const [showResults, setShowResults] = useState(false);
 
 	const [isSubmitted, setIsSubmitted] = useState(false);
+
+	const startTimeRef = useRef<number>(0);
+	const [elapsedSeconds, setElapsedSeconds] = useState(0);
+	const [isAutoSubmit, setIsAutoSubmit] = useState(false);
+	const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
 
 	const { loadProgress, clearProgress, markHydrated } = useQuizProgress(
 		quizId,
@@ -56,6 +61,36 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 			setQuiz(quizData);
 			setQuestions(questionsData.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i)));
+
+			if (quizData.time_limit) {
+				const storageKey = `quiz_deadline_${quizId}`;
+				let deadline: number;
+				try {
+					deadline = Number(localStorage.getItem(storageKey));
+				} catch {
+					deadline = 0;
+				}
+				if (!deadline || deadline <= Date.now()) {
+					deadline = Date.now() + quizData.time_limit * 60 * 1000;
+					try {
+						localStorage.setItem(storageKey, String(deadline));
+					} catch {}
+				}
+				startTimeRef.current = deadline - quizData.time_limit * 60 * 1000;
+				const remaining = Math.ceil((deadline - Date.now()) / 1000);
+				if (remaining <= 0) {
+					setTimerSeconds(0);
+					setIsAutoSubmit(true);
+					setElapsedSeconds(quizData.time_limit * 60);
+					setShowResults(true);
+					setIsSubmitted(true);
+				} else {
+					setTimerSeconds(remaining);
+				}
+			} else {
+				startTimeRef.current = Date.now();
+				setTimerSeconds(null);
+			}
 		} catch (err) {
 			const message =
 				err instanceof Error ? err.message : "Failed to load quiz";
@@ -121,6 +156,11 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const answeredCount = Object.keys(selectedAnswers).length;
 	const unansweredCount = questions.length - answeredCount;
 
+	const clearDeadline = () => {
+		if (!quizId) return;
+		try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
+	};
+
 	const initiateSubmit = () => {
 		if (answeredCount === 0) {
 			toast.error("Answer at least one question before submitting");
@@ -130,21 +170,45 @@ export function useTakeQuiz(quizId: string | undefined) {
 	};
 
 	const confirmSubmit = () => {
+		setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
+		clearDeadline();
 	};
 
 	const cancelSubmit = () => {
 		setShowSubmitModal(false);
 	};
 
+	const handleTimerExpire = () => {
+		setIsAutoSubmit(true);
+		setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+		setShowSubmitModal(false);
+		setShowResults(true);
+		setIsSubmitted(true);
+		clearDeadline();
+	};
+
 	const resetQuiz = () => {
 		clearProgress();
 		setIsSubmitted(false);
+		setIsAutoSubmit(false);
+		setElapsedSeconds(0);
 		setCurrentQuestionIndex(0);
 		setSelectedAnswers({});
 		setShowResults(false);
+		startTimeRef.current = Date.now();
+		clearDeadline();
+		if (quiz?.time_limit) {
+			const fullSeconds = quiz.time_limit * 60;
+			const newDeadline = Date.now() + fullSeconds * 1000;
+			try { localStorage.setItem(`quiz_deadline_${quizId}`, String(newDeadline)); } catch {}
+			startTimeRef.current = newDeadline - fullSeconds * 1000;
+			setTimerSeconds(fullSeconds);
+		} else {
+			setTimerSeconds(null);
+		}
 	};
 
 	const calculateScore = () => {
@@ -193,6 +257,10 @@ export function useTakeQuiz(quizId: string | undefined) {
 		initiateSubmit,
 		confirmSubmit,
 		cancelSubmit,
+		handleTimerExpire,
+		elapsedSeconds,
+		isAutoSubmit,
+		timerSeconds,
 		answeredCount,
 		unansweredCount,
 	};
