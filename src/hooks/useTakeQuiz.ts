@@ -24,6 +24,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const startTimeRef = useRef<number>(0);
 	const [elapsedSeconds, setElapsedSeconds] = useState(0);
 	const [isAutoSubmit, setIsAutoSubmit] = useState(false);
+	const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
 
 	const { loadProgress, clearProgress, markHydrated } = useQuizProgress(
 		quizId,
@@ -60,7 +61,40 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 			setQuiz(quizData);
 			setQuestions(questionsData.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i)));
-			startTimeRef.current = Date.now();
+
+			if (quizData.time_limit) {
+				const storageKey = `quiz_deadline_${quizId}`;
+				let deadline: number;
+				try {
+					deadline = Number(localStorage.getItem(storageKey));
+				} catch {
+					deadline = 0;
+				}
+				if (!deadline || deadline <= Date.now()) {
+					deadline = Date.now() + quizData.time_limit * 60 * 1000;
+					try {
+						localStorage.setItem(storageKey, String(deadline));
+					} catch {}
+				}
+				startTimeRef.current = deadline - quizData.time_limit * 60 * 1000;
+				const remaining = Math.ceil((deadline - Date.now()) / 1000);
+				if (remaining <= 0) {
+					setTimerSeconds(0);
+					setIsAutoSubmit(true);
+					setElapsedSeconds(
+						Math.max(
+							0,
+							Math.floor((Date.now() - startTimeRef.current) / 1000),
+						),
+					);
+					setShowResults(true);
+					setIsSubmitted(true);
+				} else {
+					setTimerSeconds(remaining);
+				}
+			} else {
+				setTimerSeconds(null);
+			}
 		} catch (err) {
 			const message =
 				err instanceof Error ? err.message : "Failed to load quiz";
@@ -139,6 +173,9 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
+		if (quizId) {
+			try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
+		}
 	};
 
 	const cancelSubmit = () => {
@@ -151,14 +188,29 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setShowSubmitModal(false);
 		setShowResults(true);
 		setIsSubmitted(true);
+		if (quizId) {
+			try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
+		}
 	};
 
 	const resetQuiz = () => {
 		clearProgress();
 		setIsSubmitted(false);
+		setIsAutoSubmit(false);
+		setElapsedSeconds(0);
 		setCurrentQuestionIndex(0);
 		setSelectedAnswers({});
 		setShowResults(false);
+		startTimeRef.current = Date.now();
+		if (quizId) {
+			try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
+		}
+		if (quiz?.time_limit) {
+			const fullSeconds = quiz.time_limit * 60;
+			setTimerSeconds(fullSeconds);
+		} else {
+			setTimerSeconds(null);
+		}
 	};
 
 	const calculateScore = () => {
@@ -210,6 +262,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		handleTimerExpire,
 		elapsedSeconds,
 		isAutoSubmit,
+		timerSeconds,
 		answeredCount,
 		unansweredCount,
 	};

@@ -38,6 +38,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 		handleTimerExpire,
 		elapsedSeconds,
 		isAutoSubmit,
+		timerSeconds,
 	} = useTakeQuiz(quizId);
 
 	if (loading) {
@@ -129,10 +130,10 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 				<div className="grid lg:grid-cols-3 gap-6">
 					{/* Main Content */}
 					<div className="lg:col-span-2 space-y-6">
-						{quiz.time_limit && !showResults && (
+						{timerSeconds !== null && !showResults && (
 							<div className="flex justify-end mb-2">
 								<QuizTimer
-									timeLimitSeconds={quiz.time_limit * 60}
+									timeLimitSeconds={timerSeconds}
 									onExpire={handleTimerExpire}
 								/>
 							</div>

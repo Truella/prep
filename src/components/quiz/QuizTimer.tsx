@@ -12,6 +12,7 @@ export default function QuizTimer({
 	timeLimitSeconds,
 	onExpire,
 }: QuizTimerProps) {
+	const deadlineRef = useRef(0);
 	const [secondsRemaining, setSecondsRemaining] = useState(timeLimitSeconds);
 	const warnedRef = useRef(false);
 	const expiredRef = useRef(false);
@@ -22,18 +23,23 @@ export default function QuizTimer({
 	}, [onExpire]);
 
 	useEffect(() => {
+		deadlineRef.current = Date.now() + timeLimitSeconds * 1000;
+	}, [timeLimitSeconds]);
+
+	useEffect(() => {
 		const interval = setInterval(() => {
-			setSecondsRemaining((prev) => {
-				if (prev <= 1) {
-					clearInterval(interval);
-					return 0;
-				}
-				if (prev === 61 && !warnedRef.current) {
-					warnedRef.current = true;
-					toast("1 minute remaining!", { icon: "⏱" });
-				}
-				return prev - 1;
-			});
+			const remaining = Math.ceil(
+				(deadlineRef.current - Date.now()) / 1000,
+			);
+			if (remaining <= 0) {
+				setSecondsRemaining(0);
+				return;
+			}
+			if (remaining <= 60 && !warnedRef.current) {
+				warnedRef.current = true;
+				toast("1 minute remaining!", { icon: "⏱" });
+			}
+			setSecondsRemaining(remaining);
 		}, 1000);
 
 		return () => clearInterval(interval);

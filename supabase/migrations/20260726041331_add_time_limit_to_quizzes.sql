@@ -1,1 +1,1 @@
-alter table quizzes add column time_limit integer;
+alter table quizzes add column time_limit integer check (time_limit is null or time_limit between 1 and 180);
