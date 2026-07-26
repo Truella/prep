@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 
+import type { QuizVisibility } from "../lib/types";
+
 interface Quiz {
 	id: string;
 	title: string;
 	description: string;
 	created_at: string;
+	visibility?: QuizVisibility;
 }
 
 export function useQuizzes() {
