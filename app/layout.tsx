@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, Inter, JetBrains_Mono } from "next/font/google";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "../src/lib/theme";
 import { AuthProvider } from "../src/context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "../src/components/ErrorBoundary";
@@ -53,10 +53,25 @@ export default function RootLayout({
       className={`${inter.variable} ${dmSerifDisplay.variable} ${jetbrainsMono.variable}`}
     >
       <body>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  var theme = localStorage.getItem("theme");
+                  if (theme !== "light" && theme !== "dark") theme = "dark";
+                  document.documentElement.classList.add(theme);
+                } catch (e) {
+                  document.documentElement.classList.add("dark");
+                }
+              })();
+            `,
+          }}
+        />
+        <ThemeProvider>
           <AuthProvider>
-            <Toaster position="top-right" reverseOrder={false} />
             <ErrorBoundary>{children}</ErrorBoundary>
+            <Toaster position="top-right" reverseOrder={false} />
           </AuthProvider>
         </ThemeProvider>
       </body>
