@@ -84,97 +84,101 @@ export default function HeroCard() {
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -16 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="rounded-2xl border p-6 space-y-5"
-          style={{
-            backgroundColor: "var(--color-surface)",
-            borderColor: "var(--color-border)",
-          }}
-        >
-          {/* Category + level */}
-          <div className="flex items-center gap-2">
-            <span
-              className="text-xs font-semibold px-2 py-0.5 rounded font-mono"
-              style={{
-                backgroundColor: "var(--color-accent-dim)",
-                color: "var(--color-accent)",
-              }}
-            >
-              {q.category}
-            </span>
-            <span
-              className="text-xs"
-              style={{ color: "var(--color-text-secondary)" }}
-            >
-              {q.level}
-            </span>
-          </div>
-
-          {/* Question */}
-          <p
-            className="text-sm font-medium leading-relaxed"
-            style={{ color: "var(--color-text-primary)" }}
+      {/* Static container — never animates enter/exit */}
+      <div
+        className="rounded-2xl border p-6 space-y-5"
+        style={{
+          backgroundColor: "var(--color-surface)",
+          borderColor: "var(--color-border)",
+        }}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
           >
-            {q.question}
-          </p>
+            {/* Category + level */}
+            <div className="flex items-center gap-2">
+              <span
+                className="text-xs font-semibold px-2 py-0.5 rounded font-mono"
+                style={{
+                  backgroundColor: "var(--color-accent-dim)",
+                  color: "var(--color-accent)",
+                }}
+              >
+                {q.category}
+              </span>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                {q.level}
+              </span>
+            </div>
 
-          {/* Options */}
-          <div className="space-y-2">
-            {q.options.map((option, i) => {
-              const isCorrect = i === q.correct;
-              const isHighlighted = highlightedAnswer !== null && isCorrect;
+            {/* Question */}
+            <p
+              className="text-sm font-medium leading-relaxed"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              {q.question}
+            </p>
 
-              return (
-                <motion.div
-                  key={i}
-                  animate={
-                    isHighlighted
-                      ? {
-                          backgroundColor: "var(--color-accent-dim)",
-                          borderColor: "var(--color-accent)",
-                        }
-                      : {
-                          backgroundColor: "var(--color-surface-raised)",
-                          borderColor: "var(--color-border)",
-                        }
-                  }
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm"
-                >
-                  <span
-                    className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold font-mono transition-all duration-200"
-                    style={{
-                      backgroundColor: isHighlighted
-                        ? "var(--color-accent)"
-                        : "var(--color-border)",
-                      color: isHighlighted
-                        ? "#0A0A0F"
-                        : "var(--color-text-secondary)",
-                    }}
+            {/* Options */}
+            <div className="space-y-2 mt-5">
+              {q.options.map((option, i) => {
+                const isCorrect = i === q.correct;
+                const isHighlighted = highlightedAnswer !== null && isCorrect;
+
+                return (
+                  <motion.div
+                    key={i}
+                    animate={
+                      isHighlighted
+                        ? {
+                            backgroundColor: "var(--color-accent-dim)",
+                            borderColor: "var(--color-accent)",
+                          }
+                        : {
+                            backgroundColor: "var(--color-surface-raised)",
+                            borderColor: "var(--color-border)",
+                          }
+                    }
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm"
                   >
-                    {OPTION_LABELS[i]}
-                  </span>
-                  <span
-                    style={{
-                      color: isHighlighted
-                        ? "var(--color-text-primary)"
-                        : "var(--color-text-secondary)",
-                    }}
-                  >
-                    {option}
-                  </span>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </AnimatePresence>
+                    <span
+                      className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold font-mono transition-all duration-200"
+                      style={{
+                        backgroundColor: isHighlighted
+                          ? "var(--color-accent)"
+                          : "var(--color-border)",
+                        color: isHighlighted
+                          ? "#0A0A0F"
+                          : "var(--color-text-secondary)",
+                      }}
+                    >
+                      {OPTION_LABELS[i]}
+                    </span>
+                    <span
+                      style={{
+                        color: isHighlighted
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-secondary)",
+                      }}
+                    >
+                      {option}
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -1,13 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { supabase } from "../../lib/supabase";
+import { useState, useEffect } from "react";
 import FadeUp from "./FadeUp";
-
-const SAMPLE_QUIZZES = [
-  { title: "Cell Biology — Chapter 3", category: "Biology", difficulty: "Intermediate", taken: 142 },
-  { title: "WAEC Mathematics 2023", category: "Mathematics", difficulty: "Advanced", taken: 891 },
-  { title: "Introduction to Microeconomics", category: "Economics", difficulty: "Beginner", taken: 204 },
-];
+import type { PublicQuiz } from "../../lib/types";
 
 const DIFFICULTY_STYLES: Record<string, string> = {
   Beginner: "text-green-500 bg-green-500/10 border-green-500/20",
@@ -16,6 +13,22 @@ const DIFFICULTY_STYLES: Record<string, string> = {
 };
 
 export default function QuizBankPreview() {
+  const [preview, setPreview] = useState<PublicQuiz[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("quizzes")
+      .select("id, title, description, category, difficulty, times_taken, average_rating, created_at")
+      .eq("visibility", "public")
+      .order("times_taken", { ascending: false })
+      .limit(3)
+      .then(({ data, error }) => {
+        if (!error && data) setPreview(data);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <section
       className="py-24 px-6 border-t"
@@ -49,48 +62,72 @@ export default function QuizBankPreview() {
           </Link>
         </FadeUp>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {SAMPLE_QUIZZES.map((quiz, i) => (
-            <FadeUp key={i} delay={i * 0.1}>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
               <div
-                className="p-5 rounded-2xl border space-y-3"
+                key={i}
+                className="p-5 rounded-2xl border animate-pulse"
                 style={{
                   backgroundColor: "var(--color-surface)",
                   borderColor: "var(--color-border)",
                 }}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <h3
-                    className="font-semibold text-sm leading-snug"
-                    style={{ color: "var(--color-text-primary)" }}
-                  >
-                    {quiz.title}
-                  </h3>
-                  <span
-                    className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded border ${DIFFICULTY_STYLES[quiz.difficulty]}`}
-                  >
-                    {quiz.difficulty}
-                  </span>
-                </div>
-                <span
-                  className="inline-block text-xs px-2 py-0.5 rounded font-mono"
-                  style={{
-                    backgroundColor: "var(--color-surface-raised)",
-                    color: "var(--color-text-secondary)",
-                  }}
-                >
-                  {quiz.category}
-                </span>
-                <p
-                  className="text-xs"
-                  style={{ color: "var(--color-text-secondary)" }}
-                >
-                  {quiz.taken.toLocaleString()} taken
-                </p>
+                <div className="h-4 w-3/4 rounded mb-3" style={{ backgroundColor: "var(--color-surface-raised)" }} />
+                <div className="h-3 w-1/2 rounded" style={{ backgroundColor: "var(--color-surface-raised)" }} />
               </div>
-            </FadeUp>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {preview.map((quiz, i) => (
+              <Link key={quiz.id} href={`/quiz/${quiz.id}`}>
+                <FadeUp delay={i * 0.1}>
+                  <div
+                    className="p-5 rounded-2xl border space-y-3"
+                    style={{
+                      backgroundColor: "var(--color-surface)",
+                      borderColor: "var(--color-border)",
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <h3
+                        className="font-semibold text-sm leading-snug"
+                        style={{ color: "var(--color-text-primary)" }}
+                      >
+                        {quiz.title}
+                      </h3>
+                      {quiz.difficulty && (
+                        <span
+                          className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded border ${DIFFICULTY_STYLES[quiz.difficulty] || ""}`}
+                        >
+                          {quiz.difficulty}
+                        </span>
+                      )}
+                    </div>
+                    {quiz.category && (
+                      <span
+                        className="inline-block text-xs px-2 py-0.5 rounded font-mono"
+                        style={{
+                          backgroundColor: "var(--color-surface-raised)",
+                          color: "var(--color-text-secondary)",
+                        }}
+                      >
+                        {quiz.category}
+                      </span>
+                    )}
+                    <p
+                      className="text-xs"
+                      style={{ color: "var(--color-text-secondary)" }}
+                    >
+                      {quiz.times_taken.toLocaleString()} taken
+                    </p>
+                  </div>
+                </FadeUp>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className="mt-6 sm:hidden text-center">
           <Link

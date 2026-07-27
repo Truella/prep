@@ -45,17 +45,17 @@ export default function Hero() {
                   color: "#0A0A0F",
                 }}
               >
-                Start building free
+                Create a quiz
               </a>
               <a
-                href="/quiz-bank"
+                href="/take"
                 className="px-7 py-3.5 rounded-xl font-semibold text-sm border transition-all hover:bg-[var(--color-surface)]"
                 style={{
                   borderColor: "var(--color-border)",
                   color: "var(--color-text-primary)",
                 }}
               >
-                Browse Quiz Bank
+                Take a quiz
               </a>
             </div>
 

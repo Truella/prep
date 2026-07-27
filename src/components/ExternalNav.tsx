@@ -26,6 +26,12 @@ export default function ExternalNav() {
 
       <div className="flex items-center gap-6">
         <Link
+          href="/take"
+          className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
+        >
+          Take a Quiz
+        </Link>
+        <Link
           href="/quiz-bank"
           className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
         >

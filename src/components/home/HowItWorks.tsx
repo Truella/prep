@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import FadeUp from "./FadeUp";
 
 const STEPS = [
@@ -48,13 +49,23 @@ export default function HowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {STEPS.map((step, i) => (
             <FadeUp key={i} delay={i * 0.1}>
-              <div className="space-y-3">
-                <span
-                  className="text-xs font-mono font-bold"
+              <motion.div
+                className="rounded-2xl border p-6 space-y-3 cursor-default"
+                style={{
+                  backgroundColor: "var(--color-surface)",
+                  borderColor: "var(--color-border)",
+                }}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              >
+                <motion.span
+                  className="text-xs font-mono font-bold inline-block"
                   style={{ color: "var(--color-accent)" }}
+                  whileHover={{ scale: 1.15 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                 >
                   0{i + 1}
-                </span>
+                </motion.span>
                 <h3
                   className="font-semibold text-base"
                   style={{ color: "var(--color-text-primary)" }}
@@ -67,7 +78,7 @@ export default function HowItWorks() {
                 >
                   {step.description}
                 </p>
-              </div>
+              </motion.div>
             </FadeUp>
           ))}
         </div>

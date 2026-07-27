@@ -9,6 +9,15 @@ import type { QuizDraft, MCQRow, AppQuestion } from "../lib/types";
 
 const QUIZ_META_KEY = "quiz_meta_draft";
 
+function generateCode(): string {
+	const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+	let code = "";
+	for (let i = 0; i < 6; i++) {
+		code += chars[Math.floor(Math.random() * chars.length)];
+	}
+	return code;
+}
+
 function loadSavedQuizMeta(): QuizDraft {
 	try {
 		const raw = localStorage.getItem(QUIZ_META_KEY);
@@ -69,6 +78,8 @@ export function useCreateQuiz() {
 			return;
 		}
 
+		let code = generateCode();
+
 		const { data, error } = await supabase
 			.from("quizzes")
 			.insert({
@@ -76,9 +87,37 @@ export function useCreateQuiz() {
 				description: state.quiz.description,
 				created_by: userData.user.id,
 				time_limit: state.timeLimit,
+				code,
 			})
 			.select()
 			.single();
+
+		if (error?.message?.includes("duplicate key") || error?.message?.includes("idx_quizzes_code")) {
+			code = generateCode();
+			const { data: retry, error: retryError } = await supabase
+				.from("quizzes")
+				.insert({
+					title: state.quiz.title,
+					description: state.quiz.description,
+					created_by: userData.user.id,
+					time_limit: state.timeLimit,
+					code,
+				})
+				.select()
+				.single();
+			if (retryError || !retry?.id) {
+				toast.error("Failed to create quiz");
+				setState((prev) => ({ ...prev, isCreatingQuiz: false }));
+				return;
+			}
+			const updatedQuiz = { ...state.quiz, id: retry.id, code: retry.code };
+			try {
+				localStorage.setItem(QUIZ_META_KEY, JSON.stringify(updatedQuiz));
+			} catch {}
+			setState((prev) => ({ ...prev, quiz: updatedQuiz }));
+			toast.success("Quiz created! Now upload questions.");
+			return;
+		}
 
 		setState((prev) => ({ ...prev, isCreatingQuiz: false }));
 
@@ -87,7 +126,7 @@ export function useCreateQuiz() {
 			return;
 		}
 
-		const updatedQuiz = { ...state.quiz, id: data.id };
+		const updatedQuiz = { ...state.quiz, id: data.id, code: data.code };
 		try {
 			localStorage.setItem(QUIZ_META_KEY, JSON.stringify(updatedQuiz));
 		} catch {}

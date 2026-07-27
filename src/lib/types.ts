@@ -29,6 +29,7 @@ export interface QuizDraft {
 	difficulty?: QuizDifficulty | null;
 	times_taken?: number;
 	average_rating?: number | null;
+	code?: string;
 }
 
 export interface PreviewQuestion {
@@ -97,6 +98,7 @@ export interface PublicQuiz {
 	times_taken: number;
 	average_rating: number | null;
 	created_at: string;
+	code?: string;
 	question_count?: number;
 }
 

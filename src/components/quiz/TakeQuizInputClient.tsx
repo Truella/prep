@@ -4,13 +4,17 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { supabase } from "../../lib/supabase";
 import ExternalNav from "../ExternalNav";
+
+const CODE_REGEX = /^[A-Z0-9]{6}$/;
 
 export default function TakeQuizInputClient() {
   const [input, setInput] = useState("");
+  const [resolving, setResolving] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!input.trim()) {
@@ -27,6 +31,23 @@ export default function TakeQuizInputClient() {
 
     if (!quizId) {
       toast.error("Invalid quiz link or ID");
+      return;
+    }
+
+    if (CODE_REGEX.test(quizId)) {
+      setResolving(true);
+      const { data, error } = await supabase
+        .from("quizzes")
+        .select("id")
+        .eq("code", quizId)
+        .maybeSingle();
+      setResolving(false);
+
+      if (error || !data) {
+        toast.error("No quiz found with that code");
+        return;
+      }
+      router.push(`/quiz/${data.id}`);
       return;
     }
 
@@ -69,7 +90,7 @@ export default function TakeQuizInputClient() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="https://prep.app/quiz/..."
+              placeholder="https://prep.app/quiz/... or code"
               autoFocus
               className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none transition"
               style={{
@@ -80,13 +101,14 @@ export default function TakeQuizInputClient() {
             />
             <button
               type="submit"
-              className="w-full px-6 py-3.5 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
+              disabled={resolving}
+              className="w-full px-6 py-3.5 rounded-xl font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50"
               style={{
                 backgroundColor: "var(--color-accent)",
                 color: "#0A0A0F",
               }}
             >
-              Start Quiz
+              {resolving ? "Looking up..." : "Start Quiz"}
             </button>
           </form>
 
