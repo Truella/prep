@@ -16,7 +16,16 @@ interface MetaEditorProps {
 	category: QuizCategory | null;
 	difficulty: QuizDifficulty | null;
 	saving: boolean;
-	onSave: (updates: Record<string, unknown>) => Promise<boolean>;
+	onSave: (
+		updates: Partial<{
+			title: string;
+			description: string;
+			time_limit: number | null;
+			visibility: QuizVisibility;
+			category: QuizCategory | null;
+			difficulty: QuizDifficulty | null;
+		}>
+	) => Promise<boolean>;
 }
 
 const VISIBILITY_OPTIONS: {
