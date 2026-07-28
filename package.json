@@ -8,10 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-"test": "vitest run",
-"test:watch": "vitest",
-"coverage": "vitest run --coverage",
-"typecheck": "tsc --noEmit"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^3.1.1",
@@ -19,6 +19,7 @@
     "@supabase/supabase-js": "^2.90.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/papaparse": "^5.5.2",
+    "framer-motion": "^12.42.2",
     "next": "^16.2.10",
     "papaparse": "^5.5.3",
     "react": "^19.2.0",

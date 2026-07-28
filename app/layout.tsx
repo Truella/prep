@@ -1,38 +1,80 @@
 import type { Metadata } from "next";
+import { DM_Serif_Display, Inter, JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "../src/lib/theme";
 import { AuthProvider } from "../src/context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "../src/components/ErrorBoundary";
 import "./globals.css";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-ui",
+  display: "swap",
+});
+
+const dmSerifDisplay = DM_Serif_Display({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-	title: {
-		default: "PREP — Quiz Builder & Study Tool",
-		template: "%s — PREP",
-	},
-	description:
-		"Create and share multiple-choice quizzes. Build manually or upload a CSV. Get AI-powered performance reviews.",
-	openGraph: {
-		type: "website",
-		siteName: "PREP",
-		title: "PREP — Quiz Builder & Study Tool",
-		description:
-			"Create and share multiple-choice quizzes. Build manually or upload a CSV.",
-	},
+  title: {
+    default: "PREP — CBT & MCQ Exam Practice",
+    template: "%s — PREP",
+  },
+  description:
+    "Build and share CBT practice tests. Upload your questions, set a timer, and get AI feedback on your weak areas.",
+  openGraph: {
+    type: "website",
+    siteName: "PREP",
+    title: "PREP — CBT & MCQ Exam Practice",
+    description:
+      "Build and share CBT practice tests. Upload your questions, set a timer, and get AI feedback on your weak areas.",
+  },
 };
 
 export default function RootLayout({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	return (
-		<html lang="en">
-			<body className="min-h-screen bg-gray-50">
-				<AuthProvider>
-					<Toaster position="top-right" reverseOrder={false} />
-					<ErrorBoundary>{children}</ErrorBoundary>
-				</AuthProvider>
-			</body>
-		</html>
-	);
+  return (
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${dmSerifDisplay.variable} ${jetbrainsMono.variable}`}
+    >
+      <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  var theme = localStorage.getItem("theme");
+                  if (theme !== "light" && theme !== "dark") theme = "dark";
+                  document.documentElement.classList.add(theme);
+                } catch (e) {
+                  document.documentElement.classList.add("dark");
+                }
+              })();
+            `,
+          }}
+        />
+        <ThemeProvider>
+          <AuthProvider>
+            <ErrorBoundary>{children}</ErrorBoundary>
+            <Toaster position="top-right" reverseOrder={false} />
+          </AuthProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }

@@ -1,5 +1,5 @@
-import AuthPageClient from "../../src/components/auth/AuthPageClient";
+import AuthView from "../../src/views/Auth/AuthView";
 
 export default function AuthPage() {
-	return <AuthPageClient />;
+  return <AuthView />;
 }
