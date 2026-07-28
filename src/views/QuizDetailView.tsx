@@ -100,18 +100,19 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 						style={{ color: "var(--color-text-secondary)" }}
 					>
 						{quiz.visibility} · Created{" "}
-						{new Date(quiz.created_at).toLocaleDateString()}
+						{new Date(quiz.created_at).toLocaleDateString("en-CA")}
 					</p>
 				</div>
 				<div className="flex gap-2 shrink-0">
-					<button
-						onClick={copyLink}
-						className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs transition"
-						style={{
-							borderColor: "var(--color-border)",
-							color: "var(--color-text-secondary)",
-						}}
-					>
+				<button
+					type="button"
+					onClick={copyLink}
+					className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs transition"
+					style={{
+						borderColor: "var(--color-border)",
+						color: "var(--color-text-secondary)",
+					}}
+				>
 						<HugeiconsIcon icon={Copy01Icon} size={14} />
 						Copy link
 					</button>
@@ -134,10 +135,11 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 				className="flex gap-1 border-b"
 				style={{ borderColor: "var(--color-border)" }}
 			>
-				{TABS.map((t) => (
-					<button
-						key={t.id}
-						onClick={() => setTab(t.id)}
+			{TABS.map((t) => (
+				<button
+					type="button"
+					key={t.id}
+					onClick={() => setTab(t.id)}
 						className="px-4 py-2 text-sm font-medium transition border-b-2 -mb-px"
 						style={{
 							borderColor: tab === t.id ? "var(--color-accent)" : "transparent",
@@ -205,6 +207,7 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 							will be removed.
 						</p>
 						<button
+							type="button"
 							onClick={handleDeleteQuiz}
 							className="px-4 py-2 rounded-lg text-xs font-semibold transition"
 							style={{
@@ -218,6 +221,7 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 						</button>
 						{confirmDelete && (
 							<button
+								type="button"
 								onClick={() => setConfirmDelete(false)}
 								className="ml-2 text-xs"
 								style={{ color: "var(--color-text-secondary)" }}

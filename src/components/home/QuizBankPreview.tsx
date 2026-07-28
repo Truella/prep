@@ -27,7 +27,12 @@ export default function QuizBankPreview() {
 			}
 
 			const ids = data.map((q) => q.id);
-			const counts = await getAttemptCounts(ids);
+			let counts: Record<string, number>;
+			try {
+				counts = await getAttemptCounts(ids);
+			} catch {
+				counts = {};
+			}
 			const enriched = data.map((q) => ({
 				...q,
 				times_taken: counts[q.id] ?? 0,

@@ -60,10 +60,12 @@ export default function MetaEditor({
 				<label
 					className="block text-xs font-medium mb-1.5"
 					style={{ color: "var(--color-text-secondary)" }}
+					htmlFor="meta-title"
 				>
 					Title
 				</label>
 				<input
+					id="meta-title"
 					type="text"
 					value={localTitle}
 					onChange={(e) => setLocalTitle(e.target.value)}
@@ -79,10 +81,12 @@ export default function MetaEditor({
 				<label
 					className="block text-xs font-medium mb-1.5"
 					style={{ color: "var(--color-text-secondary)" }}
+					htmlFor="meta-description"
 				>
 					Description
 				</label>
 				<textarea
+					id="meta-description"
 					value={localDesc}
 					onChange={(e) => setLocalDesc(e.target.value)}
 					onBlur={() => {
@@ -95,8 +99,9 @@ export default function MetaEditor({
 
 			{/* Time limit */}
 			<div className="flex items-center gap-4">
-				<label className="flex items-center gap-2 cursor-pointer">
+				<label className="flex items-center gap-2 cursor-pointer" htmlFor="meta-timelimit">
 					<input
+						id="meta-timelimit"
 						type="checkbox"
 						checked={timeLimit !== null}
 						onChange={(e) =>
@@ -114,6 +119,7 @@ export default function MetaEditor({
 				{timeLimit !== null && (
 					<div className="flex items-center gap-2">
 						<input
+							id="meta-timelimit-minutes"
 							type="number"
 							min={1}
 							max={180}
@@ -165,6 +171,7 @@ export default function MetaEditor({
 							}}
 						>
 							<input
+								id={`meta-visibility-${opt.value}`}
 								type="radio"
 								name="visibility"
 								value={opt.value}
@@ -203,10 +210,12 @@ export default function MetaEditor({
 						<label
 							className="block text-xs font-medium mb-1.5"
 							style={{ color: "var(--color-text-secondary)" }}
+							htmlFor="meta-category"
 						>
 							Category
 						</label>
 						<select
+							id="meta-category"
 							value={category ?? ""}
 							onChange={(e) =>
 								onSave({ category: (e.target.value as QuizCategory) || null })
@@ -225,10 +234,12 @@ export default function MetaEditor({
 						<label
 							className="block text-xs font-medium mb-1.5"
 							style={{ color: "var(--color-text-secondary)" }}
+							htmlFor="meta-difficulty"
 						>
 							Difficulty
 						</label>
 						<select
+							id="meta-difficulty"
 							value={difficulty ?? ""}
 							onChange={(e) =>
 								onSave({

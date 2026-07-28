@@ -5,11 +5,12 @@ export async function getAttemptCounts(
 ): Promise<Record<string, number>> {
 	if (quizIds.length === 0) return {};
 
-	const { data } = await supabase
+	const { data, error } = await supabase
 		.from("quiz_attempts")
 		.select("quiz_id")
 		.in("quiz_id", quizIds);
 
+	if (error) throw error;
 	if (!data) return {};
 
 	return data.reduce<Record<string, number>>((acc, row) => {

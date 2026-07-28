@@ -86,11 +86,12 @@ export default function QuestionEditor({
 					</p>
 				</div>
 				<div className="flex gap-2 shrink-0">
-					<button
-						onClick={() => {
-							setExpanded(!expanded);
-							setConfirmDelete(false);
-						}}
+			<button
+				type="button"
+				onClick={() => {
+					setExpanded(!expanded);
+					setConfirmDelete(false);
+				}}
 						className="text-xs px-3 py-1.5 rounded-lg border transition"
 						style={{
 							borderColor: "var(--color-border)",
@@ -99,8 +100,9 @@ export default function QuestionEditor({
 					>
 						{expanded ? "Cancel" : "Edit"}
 					</button>
-					<button
-						onClick={handleDelete}
+				<button
+					type="button"
+					onClick={handleDelete}
 						className="text-xs px-3 py-1.5 rounded-lg border transition"
 						style={{
 							borderColor: confirmDelete
@@ -139,6 +141,7 @@ export default function QuestionEditor({
 						{OPTION_KEYS.map((key, i) => (
 							<div key={key} className="flex items-center gap-2">
 								<button
+									type="button"
 								onClick={() =>
 									setDraft((d) => ({ ...d, correctIndex: i as 0 | 1 | 2 | 3 }))
 								}
@@ -191,9 +194,10 @@ export default function QuestionEditor({
 					</div>
 
 					<div className="flex gap-2 pt-1">
-						<button
-							onClick={handleSave}
-							disabled={saving}
+			<button
+				type="button"
+				onClick={handleSave}
+				disabled={saving}
 							className="px-4 py-2 rounded-lg text-xs font-semibold transition"
 							style={{
 								backgroundColor: "var(--color-text-primary)",
@@ -203,8 +207,9 @@ export default function QuestionEditor({
 						>
 							{saving ? "Saving..." : "Save question"}
 						</button>
-						<button
-							onClick={handleCancel}
+			<button
+				type="button"
+				onClick={handleCancel}
 							className="px-4 py-2 rounded-lg text-xs border transition"
 							style={{
 								borderColor: "var(--color-border)",

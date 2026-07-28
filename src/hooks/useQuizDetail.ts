@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 import { dbToAppQuestion, appToDBQuestion } from "../utils/transforms";
@@ -24,13 +24,14 @@ interface QuizDetailState {
 	questions: AppQuestion[];
 	attempts: Pick<
 		QuizAttempt,
-		"score" | "total_points" | "elapsed_seconds" | "completed_at"
+		"id" | "score" | "total_points" | "elapsed_seconds" | "completed_at"
 	>[];
 	loading: boolean;
 	error: string | null;
 }
 
 export function useQuizDetail(quizId: string) {
+	const requestGenRef = useRef(0);
 	const [state, setState] = useState<QuizDetailState>({
 		quiz: null,
 		questions: [],
@@ -41,6 +42,7 @@ export function useQuizDetail(quizId: string) {
 	const [saving, setSaving] = useState(false);
 
 	const fetchQuizDetail = useCallback(async () => {
+		const currentGen = ++requestGenRef.current;
 		setState((prev) => ({ ...prev, loading: true, error: null }));
 
 		const { data: quizData, error: quizError } = await supabase
@@ -48,6 +50,8 @@ export function useQuizDetail(quizId: string) {
 			.select("*")
 			.eq("id", quizId)
 			.single();
+
+		if (currentGen !== requestGenRef.current) return;
 
 		if (quizError || !quizData) {
 			setState((prev) => ({
@@ -66,9 +70,11 @@ export function useQuizDetail(quizId: string) {
 
 		const { data: attemptsData } = await supabase
 			.from("quiz_attempts")
-			.select("score, total_points, elapsed_seconds, completed_at")
+			.select("id, score, total_points, elapsed_seconds, completed_at")
 			.eq("quiz_id", quizId)
 			.order("completed_at", { ascending: false });
+
+		if (currentGen !== requestGenRef.current) return;
 
 		setState({
 			quiz: quizData,
@@ -86,7 +92,7 @@ export function useQuizDetail(quizId: string) {
 
 	// Update quiz metadata
 	const updateQuizMeta = async (updates: Partial<Pick<
-		QuizDetailState["quiz"] & object,
+		NonNullable<QuizDetailState["quiz"]>,
 		"title" | "description" | "time_limit" | "visibility" | "category" | "difficulty"
 	>>) => {
 		setSaving(true);

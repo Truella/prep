@@ -4,7 +4,7 @@ import type { QuizAttempt } from "../../lib/types";
 
 type AttemptRow = Pick<
 	QuizAttempt,
-	"score" | "total_points" | "elapsed_seconds" | "completed_at"
+	"id" | "score" | "total_points" | "elapsed_seconds" | "completed_at"
 >;
 
 interface AttemptStatsProps {
@@ -21,7 +21,7 @@ export default function AttemptStats({ attempts }: AttemptStatsProps) {
 	}
 
 	const avgScore =
-		attempts.reduce((sum, a) => sum + (a.score / a.total_points) * 100, 0) /
+		attempts.reduce((sum, a) => sum + (a.total_points > 0 ? (a.score / a.total_points) * 100 : 0), 0) /
 		attempts.length;
 
 	const avgElapsed =
@@ -74,11 +74,11 @@ export default function AttemptStats({ attempts }: AttemptStatsProps) {
 				>
 					Recent attempts
 				</p>
-				{attempts.slice(0, 10).map((a, i) => {
-					const pct = Math.round((a.score / a.total_points) * 100);
+				{attempts.slice(0, 10).map((a) => {
+					const pct = a.total_points > 0 ? Math.round((a.score / a.total_points) * 100) : 0;
 					return (
 						<div
-							key={i}
+							key={a.id}
 							className="flex items-center justify-between px-3 py-2 rounded-lg"
 							style={{ backgroundColor: "var(--color-surface-raised)" }}
 						>
@@ -86,7 +86,7 @@ export default function AttemptStats({ attempts }: AttemptStatsProps) {
 								className="text-xs"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
-								{new Date(a.completed_at).toLocaleDateString()}
+								{new Date(a.completed_at).toLocaleDateString("en-CA")}
 							</span>
 							<span
 								className="text-xs font-mono font-semibold"

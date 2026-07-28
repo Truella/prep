@@ -67,7 +67,12 @@ export function useQuizBank() {
 
 		const quizzes = data ?? [];
 		const ids = quizzes.map((q) => q.id);
-		const counts = await getAttemptCounts(ids);
+		let counts: Record<string, number>;
+		try {
+			counts = await getAttemptCounts(ids);
+		} catch {
+			counts = {};
+		}
 		for (const q of quizzes) {
 			q.times_taken = counts[q.id] ?? 0;
 		}
