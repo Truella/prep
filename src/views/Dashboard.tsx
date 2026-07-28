@@ -1,39 +1,127 @@
-export default function Dashboard() {
-	return (
-		<div>
-			<h2 className="text-3xl font-bold mb-6" style={{ color: "var(--color-text-primary)" }}>Dashboard Overview</h2>
+"use client";
 
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				<div className="backdrop-blur-xl border p-6 rounded-2xl"
-					style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}>
-					<div className="flex items-start gap-4">
-						<div className="p-3 rounded-xl" style={{ backgroundColor: "var(--color-surface-raised)" }}>
-							<svg
-								className="w-6 h-6" style={{ color: "var(--color-text-primary)" }}
-								viewBox="0 0 24 24"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M7 10L12 15L17 10"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</div>
-						<div>
-							<h3 className="text-lg font-semibold mb-2" style={{ color: "var(--color-text-primary)" }}>
-								Welcome Back!
-							</h3>
-							<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-								Create a new quiz or view your existing quizzes from the
-								sidebar.
-							</p>
-						</div>
-					</div>
+import Link from "next/link";
+import { useQuizzes } from "../hooks/useQuizzes";
+import { useAnalyticsStats } from "../hooks/useStats";
+import QuizCard from "../components/QuizCard";
+
+export default function Dashboard() {
+	const { quizzes, loading, copyQuizLink, refetch } = useQuizzes();
+	const { stats } = useAnalyticsStats();
+
+	const recentQuizzes = quizzes.slice(0, 3);
+
+	return (
+		<div className="space-y-10">
+			<div className="flex items-start justify-between">
+				<div>
+					<h2
+						className="text-2xl font-bold mb-1"
+						style={{ color: "var(--color-text-primary)" }}
+					>
+						Overview
+					</h2>
+					<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+						Manage your quizzes and track performance.
+					</p>
 				</div>
+				<Link
+					href="/dashboard/create"
+					className="px-5 py-2.5 rounded-xl text-sm font-semibold transition"
+					style={{
+						backgroundColor: "var(--color-text-primary)",
+						color: "var(--color-bg)",
+					}}
+				>
+					+ New Quiz
+				</Link>
+			</div>
+
+			<div className="grid grid-cols-3 gap-4">
+				{[
+					{ label: "Quizzes", value: stats.totalQuizzes },
+					{ label: "Questions", value: stats.totalQuestions },
+					{ label: "Attempts", value: stats.totalAttempts },
+				].map((s) => (
+					<div
+						key={s.label}
+						className="p-5 rounded-2xl border space-y-1"
+						style={{
+							backgroundColor: "var(--color-surface)",
+							borderColor: "var(--color-border)",
+						}}
+					>
+						<p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+							{s.label}
+						</p>
+						<p
+							className="text-3xl font-bold font-mono"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{s.value}
+						</p>
+					</div>
+				))}
+			</div>
+
+			<div>
+				<div className="flex items-center justify-between mb-4">
+					<h3
+						className="text-base font-semibold"
+						style={{ color: "var(--color-text-primary)" }}
+					>
+						Recent quizzes
+					</h3>
+					<Link
+						href="/dashboard/my-quizzes"
+						className="text-xs font-medium"
+						style={{ color: "var(--color-accent)" }}
+					>
+						View all →
+					</Link>
+				</div>
+
+				{loading && (
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+						{[1, 2, 3].map((i) => (
+							<div
+								key={i}
+								className="h-44 rounded-2xl animate-pulse"
+								style={{ backgroundColor: "var(--color-surface)" }}
+							/>
+						))}
+					</div>
+				)}
+
+				{!loading && recentQuizzes.length === 0 && (
+					<div
+						className="rounded-2xl border border-dashed p-10 text-center"
+						style={{ borderColor: "var(--color-border)" }}
+					>
+						<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+							No quizzes yet.{" "}
+							<Link
+								href="/dashboard/create"
+								style={{ color: "var(--color-accent)" }}
+							>
+								Create your first one.
+							</Link>
+						</p>
+					</div>
+				)}
+
+				{!loading && recentQuizzes.length > 0 && (
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+						{recentQuizzes.map((quiz) => (
+							<QuizCard
+								key={quiz.id}
+								quiz={quiz}
+								onCopyLink={copyQuizLink}
+								onRefetch={refetch}
+							/>
+						))}
+					</div>
+				)}
 			</div>
 		</div>
 	);

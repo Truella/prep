@@ -45,10 +45,21 @@ export function useAnalyticsStats() {
 				questionCount = count || 0;
 			}
 
+			let attemptCount = 0;
+
+			if (quizIds.length > 0) {
+				const { count } = await supabase
+					.from("quiz_attempts")
+					.select("*", { count: "exact", head: true })
+					.in("quiz_id", quizIds);
+
+				attemptCount = count || 0;
+			}
+
 			setStats({
 				totalQuizzes: quizCount || 0,
 				totalQuestions: questionCount,
-				totalAttempts: 0,
+				totalAttempts: attemptCount,
 			});
 
 			setLoading(false);
