@@ -100,7 +100,9 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 						style={{ color: "var(--color-text-secondary)" }}
 					>
 						{quiz.visibility} · Created{" "}
-						{new Date(quiz.created_at).toLocaleDateString()}
+						{new Date(quiz.created_at).toLocaleDateString("en-US", {
+							timeZone: "UTC",
+						})}
 					</p>
 				</div>
 				<div className="flex gap-2 shrink-0">
