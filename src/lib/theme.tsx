@@ -79,9 +79,7 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({
 	children,
-	attribute: _attribute,
 	defaultTheme = "dark",
-	enableSystem: _enableSystem = false,
 }: ThemeProviderProps) {
 	const snapshot = () => getSnapshot(defaultTheme);
 	const theme = useSyncExternalStore<Theme>(subscribe, snapshot, () => defaultTheme);

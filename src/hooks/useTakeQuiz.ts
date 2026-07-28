@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
-import { QuizDraft, DBQuestion, AppQuestion, QuizAttempt } from "../lib/types";
+import { QuizDraft, DBQuestion, AppQuestion } from "../lib/types";
 import { dbToAppQuestion } from "../utils/transforms";
 import useQuizProgress from "./useQuizProgress";
 
@@ -247,6 +247,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 	};
 
 	const confirmSubmit = () => {
+		// eslint-disable-next-line react-hooks/purity
 		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
 		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
@@ -275,6 +276,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 	const handleTimerExpire = () => {
 		setIsAutoSubmit(true);
+		// eslint-disable-next-line react-hooks/purity
 		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
 		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
