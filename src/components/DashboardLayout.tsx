@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-black">
+		<div className="min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
 			{/* Top Navigation */}
 			<TopBar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} />
 			<div className="flex">

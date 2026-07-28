@@ -12,9 +12,10 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 			{" "}
 			<aside
 				className={`
-              fixed lg:static inset-y-0 left-0 z-40 w-64 backdrop-blur-xl bg-white/5 border-r border-white/10 transform transition-transform duration-200 ease-in-out mt-16 lg:mt-0
+              fixed lg:static inset-y-0 left-0 z-40 w-64 backdrop-blur-xl border-r transform transition-transform duration-200 ease-in-out mt-16 lg:mt-0
               ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
             `}
+				style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}
 			>
 				<div className="h-full overflow-y-auto p-4">
 					{/* Navigation Links */}
@@ -25,8 +26,8 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 					</nav>
 
 					{/* Analytics Section */}
-					<div className="border-t border-white/10 pt-4">
-						<h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+					<div className="border-t pt-4" style={{ borderColor: "var(--color-border)" }}>
+						<h3 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--color-text-secondary)" }}>
 							Analytics
 						</h3>
 						<AnalyticsWidget />
@@ -36,7 +37,8 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 			{/* Overlay for mobile */}
 			{isSidebarOpen && (
 				<div
-					className="fixed inset-0 bg-black/80 backdrop-blur-sm z-30 lg:hidden"
+					className="fixed inset-0 backdrop-blur-sm z-30 lg:hidden"
+					style={{ backgroundColor: "color-mix(in srgb, var(--color-bg) 80%, transparent)" }}
 					onClick={() => setIsSidebarOpen(false)}
 				/>
 			)}

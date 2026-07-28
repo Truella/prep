@@ -18,7 +18,7 @@ export default function UploadQuestionsForm({
 	return (
 		<form className="space-y-4">
 			<div>
-				<label className="block text-sm font-medium text-gray-300 mb-2">
+				<label className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
 					Upload Questions (CSV)
 				</label>
 				<div className="relative">
@@ -30,12 +30,17 @@ export default function UploadQuestionsForm({
 							if (file) onFileChange(file);
 						}}
 						disabled={disabled}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-white file:text-black file:font-medium hover:file:bg-gray-100 file:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition"
+						className="w-full px-4 py-3 rounded-xl border file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:font-medium file:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition file:bg-(--color-text-primary) file:text-(--color-bg) hover:file:opacity-90"
+						style={{
+							backgroundColor: "var(--color-surface)",
+							borderColor: "var(--color-border)",
+							color: "var(--color-text-primary)",
+						}}
 					/>
 				</div>
-				<p className="mt-2 text-xs text-gray-400">
+				<p className="mt-2 text-xs" style={{ color: "var(--color-text-secondary)" }}>
 					Format: Question, Option_A, Option_B, Option_C, Option_D, Correct_Answer, Points.{" "}
-					<Link href="/docs/csv-guide" className="underline hover:text-white transition">
+					<Link href="/docs/csv-guide" className="underline transition" style={{ color: "var(--color-text-primary)" }}>
 						Need help?
 					</Link>
 				</p>
@@ -45,7 +50,8 @@ export default function UploadQuestionsForm({
 				onClick={onSubmit}
 				disabled={disabled || questionCount === 0 || isUploading}
 				type="button"
-				className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+				className="w-full px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+				style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
 			>
 				{isUploading ? "Publishing..." : "Publish Quiz"}
 			</button>

@@ -19,6 +19,7 @@ function createChain(resolveValue: object) {
 	chain.eq = vi.fn(() => chain);
 	chain.single = vi.fn(() => chain);
 	chain.order = vi.fn(() => chain);
+	chain.insert = vi.fn(() => chain);
 	chain.then = promise.then.bind(promise);
 	chain.catch = promise.catch.bind(promise);
 	chain.finally = promise.finally.bind(promise);
@@ -40,10 +41,12 @@ beforeEach(async () => {
 	localStorage.clear();
 
 	const { supabase } = await import("../lib/supabase");
-	// First call to from("quizzes") returns quiz data, second call from("questions") returns questions data
 	vi.mocked(supabase.from)
 		.mockReturnValueOnce(createChain({ data: mockQuizData, error: null }))
 		.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }));
+	// Mock quiz_attempts table for saveAttempt
+	vi.mocked(supabase.from)
+		.mockReturnValue(createChain({ data: null, error: null }));
 });
 
 describe("useTakeQuiz", () => {
@@ -137,7 +140,7 @@ describe("useTakeQuiz", () => {
 		act(() => result.current.initiateSubmit());
 		expect(result.current.showSubmitModal).toBe(true);
 
-		act(() => result.current.confirmSubmit());
+		await act(async () => result.current.confirmSubmit());
 		expect(result.current.showResults).toBe(true);
 	});
 
@@ -251,7 +254,7 @@ describe("useTakeQuiz", () => {
 		await waitFor(() => expect(result.current.loading).toBe(false));
 
 		act(() => result.current.handleAnswerSelect(3));
-		act(() => result.current.handleTimerExpire());
+		await act(async () => result.current.handleTimerExpire());
 
 		expect(result.current.showResults).toBe(true);
 		expect(result.current.isAutoSubmit).toBe(true);
@@ -268,14 +271,15 @@ describe("useTakeQuiz", () => {
 		vi.mocked(supabase.from).mockReset();
 		vi.mocked(supabase.from)
 			.mockReturnValueOnce(createChain({ data: quizWithTimer, error: null }))
-			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }));
+			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }))
+			.mockReturnValue(createChain({ data: null, error: null }));
 
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 		await waitFor(() => expect(result.current.loading).toBe(false));
 		expect(result.current.timerSeconds).toBeGreaterThan(0);
 
 		act(() => result.current.handleAnswerSelect(3));
-		act(() => result.current.handleTimerExpire());
+		await act(async () => result.current.handleTimerExpire());
 		expect(result.current.showResults).toBe(true);
 
 		act(() => result.current.resetQuiz());
@@ -331,7 +335,7 @@ describe("useTakeQuiz", () => {
 
 		act(() => result.current.handleAnswerSelect(3));
 		act(() => result.current.initiateSubmit());
-		act(() => result.current.confirmSubmit());
+		await act(async () => result.current.confirmSubmit());
 
 		expect(result.current.showResults).toBe(true);
 	});
@@ -345,7 +349,7 @@ describe("useTakeQuiz", () => {
 		await waitFor(() => expect(result.current.loading).toBe(false));
 
 		act(() => result.current.handleAnswerSelect(3));
-		act(() => result.current.handleTimerExpire());
+		await act(async () => result.current.handleTimerExpire());
 
 		expect(result.current.showResults).toBe(true);
 	});

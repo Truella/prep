@@ -6,6 +6,7 @@ import {
 	validateQuizForSubmit,
 } from "../../utils/questionValidation";
 import BuilderQuestionCard from "./BuilderQuestionCard";
+import BuilderToolbar from "./BuilderToolbar";
 import { useQuestionCollapse } from "../../hooks/useQuestionCollapse";
 import type { AppQuestion } from "../../lib/types";
 
@@ -84,7 +85,6 @@ export default function QuizBuilder({
 		} catch {}
 	};
 
-	/** Re-stamp every question's .order to match its array index. */
 	const reorder = (qs: AppQuestion[]): AppQuestion[] =>
 		qs.map((q, i) => ({ ...q, order: i }));
 
@@ -214,21 +214,12 @@ export default function QuizBuilder({
 				/>
 			))}
 
-			<div className="flex gap-3">
-				<button
-					onClick={addQuestion}
-					className="flex-1 px-4 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 transition font-medium text-sm"
-				>
-					+ Add Question
-				</button>
-				<button
-					onClick={handleSubmit}
-					disabled={isUploading || !quizId}
-					className="flex-1 px-4 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
-				>
-					{isUploading ? "Publishing..." : "Publish Quiz"}
-				</button>
-			</div>
+			<BuilderToolbar
+				onAdd={addQuestion}
+				onSubmit={handleSubmit}
+				isUploading={isUploading}
+				quizId={quizId}
+			/>
 		</div>
 	);
 }

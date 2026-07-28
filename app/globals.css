@@ -29,6 +29,20 @@
   --color-error: #DC2626;
 }
 
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) {
+    --color-bg: #F7F5F0;
+    --color-surface: #FFFFFF;
+    --color-surface-raised: #F0EDE6;
+    --color-border: #E2DDD4;
+    --color-text-primary: #0A0A0F;
+    --color-text-secondary: #6B6870;
+    --color-accent: #B8960A;
+    --color-accent-dim: #FBF3D0;
+    --color-error: #DC2626;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   * {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease;

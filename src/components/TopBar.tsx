@@ -10,14 +10,18 @@ export default function TopBar({
 	handleLogout,
 }: TopBarProps) {
 	return (
-		<nav className="backdrop-blur-xl bg-white/5 border-b border-white/10 sticky top-0 z-50">
+		<nav className="backdrop-blur-xl border-b sticky top-0 z-50"
+			style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}>
 			<div className="max-w-full px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between items-center h-16">
 					{/* Left - Logo & Menu Toggle */}
 					<div className="flex items-center gap-4">
 						<button
+							type="button"
 							onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-							className="lg:hidden p-2 rounded-lg hover:bg-white/5 transition text-white"
+							className="lg:hidden p-2 rounded-lg hover:bg-surface transition"
+							style={{ color: "var(--color-text-primary)" }}
+							aria-label={isSidebarOpen ? "Close sidebar menu" : "Open sidebar menu"}
 						>
 							<svg
 								className="w-6 h-6"
@@ -33,13 +37,15 @@ export default function TopBar({
 								/>
 							</svg>
 						</button>
-						<h1 className="text-xl font-bold text-white">Quiz Dashboard</h1>
+						<h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Quiz Dashboard</h1>
 					</div>
 
 					{/* Right - Logout Button */}
 					<button
+						type="button"
 						onClick={handleLogout}
-						className="px-4 py-2 text-sm font-medium text-white border border-white/20 hover:bg-white/5 rounded-lg transition"
+						className="px-4 py-2 text-sm font-medium border rounded-lg hover:bg-surface transition"
+						style={{ color: "var(--color-text-primary)", borderColor: "var(--color-border)" }}
 					>
 						Log Out
 					</button>

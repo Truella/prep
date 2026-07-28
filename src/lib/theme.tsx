@@ -10,7 +10,7 @@ import {
 
 const STORAGE_KEY = "theme";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "system";
 
 interface ThemeContextValue {
 	theme: Theme;
@@ -18,8 +18,15 @@ interface ThemeContextValue {
 	resolvedTheme: Theme;
 }
 
-function getSnapshot(): Theme {
+function getSystemTheme(): Theme {
 	if (typeof window === "undefined") return "dark";
+	return window.matchMedia("(prefers-color-scheme: light)").matches
+		? "light"
+		: "dark";
+}
+
+function getSnapshot(defaultTheme: Theme = "dark"): Theme {
+	if (typeof window === "undefined") return defaultTheme;
 
 	try {
 		const stored = localStorage.getItem(STORAGE_KEY);
@@ -29,16 +36,21 @@ function getSnapshot(): Theme {
 		}
 	} catch {}
 
-	return "dark";
+	return getSystemTheme();
 }
 
 function subscribe(callback: () => void) {
 	window.addEventListener("storage", callback);
 	window.addEventListener("theme-change", callback);
 
+	const mql = window.matchMedia("(prefers-color-scheme: light)");
+	const onOSChange = () => callback();
+	mql.addEventListener("change", onOSChange);
+
 	return () => {
 		window.removeEventListener("storage", callback);
 		window.removeEventListener("theme-change", callback);
+		mql.removeEventListener("change", onOSChange);
 	};
 }
 
@@ -63,8 +75,17 @@ export function useTheme() {
 	return useContext(ThemeContext);
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-	const theme = useSyncExternalStore<Theme>(subscribe, getSnapshot, () => "dark");
+interface ThemeProviderProps {
+	children: ReactNode;
+	defaultTheme?: Theme;
+}
+
+export function ThemeProvider({
+	children,
+	defaultTheme = "dark",
+}: ThemeProviderProps) {
+	const snapshot = () => getSnapshot(defaultTheme);
+	const theme = useSyncExternalStore<Theme>(subscribe, snapshot, () => defaultTheme);
 
 	useEffect(() => {
 		applyTheme(theme);
