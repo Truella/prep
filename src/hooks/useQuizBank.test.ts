@@ -1,4 +1,14 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook as originalRenderHook, act, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+
+function createWrapper() {
+	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+	return ({ children }: { children: React.ReactNode }) =>
+		React.createElement(QueryClientProvider, { client: queryClient }, children);
+}
+
+const renderHook = <T, P>(hook: (props: P) => T) => originalRenderHook(hook, { wrapper: createWrapper() });
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { useQuizBank } from "./useQuizBank";
 import { createChain } from "../test-utils/chain";
@@ -126,8 +136,7 @@ describe("useQuizBank", () => {
 			createChain({ data: null, error: { message: "Network error" } })
 		);
 		const { result } = renderHook(() => useQuizBank());
-		await act(async () => {});
-		expect(result.current.error).toBe("Network error");
+		await waitFor(() => expect(result.current.error).toBe("Network error"));
 	});
 
 	it("client-side search returns only quizzes matching the query substring", async () => {

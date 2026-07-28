@@ -66,6 +66,7 @@ export function useRating(quizId: string) {
     loading,
     error: mutation.error ? (mutation.error as Error).message : null,
     submitRating: async (rating: number) => {
+      if (!user) return undefined;
       try {
         await mutation.mutateAsync(rating);
         return true;

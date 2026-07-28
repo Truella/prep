@@ -68,15 +68,15 @@ export function useTakeQuiz(quizId: string | undefined) {
 				.select("*")
 				.eq("id", quizId)
 				.single();
-			if (error || !data) throw new Error("Quiz not found");
+			if (error) throw error;
+			if (!data) throw new Error("Quiz not found");
 			return data;
 		},
 		enabled: !!quizId,
 		staleTime: 5 * 60 * 1000,
-		retry: 1,
 	});
 
-	const { data: questions = [], isLoading: questionsLoading } = useQuery({
+	const { data: questions = [], isLoading: questionsLoading, error: questionsError } = useQuery({
 		queryKey: ["quiz-take-questions", quizId],
 		queryFn: async () => {
 			const { data, error } = await supabase
@@ -85,19 +85,32 @@ export function useTakeQuiz(quizId: string | undefined) {
 				.eq("quiz_id", quizId!)
 				.order("created_at", { ascending: true });
 			if (error) throw error;
-			return (data ?? []).map((q: DBQuestion, i: number) => dbToAppQuestion(q, i));
+			if (!data || data.length === 0) throw new Error("This quiz has no questions");
+			return data.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i));
 		},
 		enabled: !!quizId && !!quiz,
 		staleTime: 5 * 60 * 1000,
 	});
 
-	const loading = quizLoading || questionsLoading;
-	const error = quizError ? (quizError as Error).message : null;
+	const loading = quizLoading || (!!quizId && !!quiz && questionsLoading);
+	const error = !quizId
+		? "No quiz ID provided"
+		: quizError
+		? (quizError as Error).message
+		: questionsError
+		? (questionsError as Error).message
+		: null;
 
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 	const [selectedAnswers, setSelectedAnswers] = useState<
 		Record<number, number>
 	>({});
+
+	useEffect(() => {
+		if (error) {
+			toast.error(error);
+		}
+	}, [error]);
 
 	const [showResults, setShowResults] = useState(false);
 

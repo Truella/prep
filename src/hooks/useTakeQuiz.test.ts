@@ -1,4 +1,14 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook as originalRenderHook, act, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+
+function createWrapper() {
+	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+	return ({ children }: { children: React.ReactNode }) =>
+		React.createElement(QueryClientProvider, { client: queryClient }, children);
+}
+
+const renderHook = <T, P>(hook: (props: P) => T) => originalRenderHook(hook, { wrapper: createWrapper() });
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { useTakeQuiz } from "./useTakeQuiz";
 import toast from "react-hot-toast";
@@ -182,9 +192,9 @@ describe("useTakeQuiz", () => {
 	it("handles fetch error from supabase", async () => {
 		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReset();
-		vi.mocked(supabase.from)
-			.mockReturnValueOnce(createChain({ data: null, error: new Error("DB error") }))
-			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }));
+		vi.mocked(supabase.from).mockReturnValue(
+			createChain({ data: null, error: new Error("DB error") })
+		);
 
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 		await waitFor(() => expect(result.current.loading).toBe(false));
