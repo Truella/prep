@@ -173,8 +173,10 @@ export function useQuizDetail(quizId: string) {
 	// Copy shareable link
 	const copyLink = () => {
 		const link = `${window.location.origin}/quiz/${quizId}`;
-		navigator.clipboard.writeText(link);
-		toast.success("Link copied!");
+		navigator.clipboard
+			.writeText(link)
+			.then(() => toast.success("Link copied!"))
+			.catch(() => toast.error("Failed to copy link"));
 	};
 
 	return {
