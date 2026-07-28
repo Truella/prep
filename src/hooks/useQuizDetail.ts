@@ -58,17 +58,21 @@ export function useQuizDetail(quizId: string) {
 			return;
 		}
 
-		const { data: questionsData } = await supabase
+		const { data: questionsData, error: questionsError } = await supabase
 			.from("questions")
 			.select("*")
 			.eq("quiz_id", quizId)
 			.order("created_at", { ascending: true });
 
-		const { data: attemptsData } = await supabase
+		const { data: attemptsData, error: attemptsError } = await supabase
 			.from("quiz_attempts")
 			.select("score, total_points, elapsed_seconds, completed_at")
 			.eq("quiz_id", quizId)
 			.order("completed_at", { ascending: false });
+
+		if (questionsError || attemptsError) {
+			toast.error("Some quiz data failed to load");
+		}
 
 		setState({
 			quiz: quizData,
