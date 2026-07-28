@@ -80,6 +80,7 @@ export function useQuizDetail(quizId: string) {
 	}, [quizId]);
 
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		fetchQuizDetail();
 	}, [fetchQuizDetail]);
 

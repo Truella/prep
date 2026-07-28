@@ -7,6 +7,7 @@ export function createChain(resolveValue: object): any {
 	const chain: any = {};
 	chain.select = vi.fn(() => chain);
 	chain.eq = vi.fn(() => chain);
+	chain.in = vi.fn(() => chain);
 	chain.single = vi.fn(() => chain);
 	chain.order = vi.fn(() => chain);
 	chain.update = vi.fn(() => chain);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "../lib/supabase";
+import { getAttemptCounts } from "../utils/attempts";
 import type { PublicQuiz, QuizCategory, QuizDifficulty } from "../lib/types";
 
 type SortOption = "popular" | "rated" | "newest" | "alphabetical";
@@ -63,7 +64,14 @@ export function useQuizBank() {
 			setError(fetchError.message);
 			return;
 		}
-		setAllQuizzes(data ?? []);
+
+		const quizzes = data ?? [];
+		const ids = quizzes.map((q) => q.id);
+		const counts = await getAttemptCounts(ids);
+		for (const q of quizzes) {
+			q.times_taken = counts[q.id] ?? 0;
+		}
+		setAllQuizzes(quizzes);
 	}, [filters.category, filters.difficulty, filters.sort]);
 
 	useEffect(() => {
