@@ -64,20 +64,20 @@ export default function QuestionCardBody({
       </div>
 
       <div className="flex items-center gap-3">
-        <label className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <label htmlFor="question-points" className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
           Points:
         </label>
+        <input
         <input
           type="number"
           min={1}
           max={100}
           value={question.points}
-          onChange={(e) =>
-            onChange({
-              ...question,
-              points: parseInt(e.target.value) || 1,
-            })
-          }
+          onChange={(e) => {
+            const parsed = parseInt(e.target.value, 10);
+            const clamped = Number.isNaN(parsed) ? 1 : Math.min(100, Math.max(1, parsed));
+            onChange({ ...question, points: clamped });
+          }}
           className="w-20 px-3 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-1 transition"
           style={inputBaseStyle}
         />
