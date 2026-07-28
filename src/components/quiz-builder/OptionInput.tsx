@@ -1,6 +1,6 @@
 "use client";
 
-const OPTION_LABELS = ["A", "B", "C", "D"] as const;
+import { OPTION_LABELS } from "./constants";
 
 interface OptionInputProps {
   value: string;

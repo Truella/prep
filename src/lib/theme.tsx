@@ -43,9 +43,14 @@ function subscribe(callback: () => void) {
 	window.addEventListener("storage", callback);
 	window.addEventListener("theme-change", callback);
 
+	const mql = window.matchMedia("(prefers-color-scheme: light)");
+	const onOSChange = () => callback();
+	mql.addEventListener("change", onOSChange);
+
 	return () => {
 		window.removeEventListener("storage", callback);
 		window.removeEventListener("theme-change", callback);
+		mql.removeEventListener("change", onOSChange);
 	};
 }
 
@@ -72,9 +77,7 @@ export function useTheme() {
 
 interface ThemeProviderProps {
 	children: ReactNode;
-	attribute?: string;
 	defaultTheme?: Theme;
-	enableSystem?: boolean;
 }
 
 export function ThemeProvider({

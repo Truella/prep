@@ -72,7 +72,7 @@ export default function RootLayout({
             `,
           }}
         />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
+        <ThemeProvider defaultTheme="system">
           <AuthProvider>
             <ErrorBoundary>{children}</ErrorBoundary>
             <Toaster position="top-right" reverseOrder={false} />

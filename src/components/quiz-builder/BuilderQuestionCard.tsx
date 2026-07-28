@@ -6,6 +6,7 @@ import { isComplete } from "../../hooks/useQuestionCollapse";
 import QuestionStatusBadge from "./QuestionStatusBadge";
 import QuestionActionButtons from "./QuestionActionButtons";
 import QuestionCardBody from "./QuestionCardBody";
+import { OPTION_LABELS } from "./constants";
 
 interface BuilderQuestionCardProps {
 	question: AppQuestion;
@@ -19,8 +20,6 @@ interface BuilderQuestionCardProps {
 	onMoveDown: () => void;
 	errors: string[];
 }
-
-const OPTION_LABELS = ["A", "B", "C", "D"] as const;
 
 function truncate(str: string, max: number) {
 	return str.length > max ? str.slice(0, max) + "…" : str;
@@ -140,6 +139,7 @@ export default function BuilderQuestionCard({
 						question={question}
 						onChange={onChange}
 						errors={errors}
+						pointsInputId={`points-${question.id}`}
 					/>
 				</div>
 			</div>

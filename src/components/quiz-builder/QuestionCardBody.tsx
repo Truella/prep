@@ -9,12 +9,14 @@ interface QuestionCardBodyProps {
   question: AppQuestion;
   onChange: (updated: AppQuestion) => void;
   errors: string[];
+  pointsInputId?: string;
 }
 
 export default function QuestionCardBody({
   question,
   onChange,
   errors,
+  pointsInputId,
 }: QuestionCardBodyProps) {
   const options = [
     question.optionA,
@@ -64,11 +66,11 @@ export default function QuestionCardBody({
       </div>
 
       <div className="flex items-center gap-3">
-        <label htmlFor="question-points" className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <label htmlFor={pointsInputId} className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
           Points:
         </label>
         <input
-        <input
+          id={pointsInputId}
           type="number"
           min={1}
           max={100}

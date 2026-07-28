@@ -112,6 +112,14 @@ export interface QuizAttempt {
   completed_at: string;
 }
 
+export interface QuizAttemptInsert {
+  quiz_id: string;
+  score: number;
+  total_points: number;
+  elapsed_seconds: number | null;
+  answers: Record<string, number>;
+}
+
 export interface AIReviewPayload {
 	questions: AppQuestion[];
 	selectedAnswers: Record<number, number>;
