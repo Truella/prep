@@ -120,17 +120,24 @@ export default function MetaEditor({
 						Time limit
 					</span>
 				</label>
+const [localTimeLimit, setLocalTimeLimit] = useState(timeLimit);
+
 				{timeLimit !== null && (
 					<div className="flex items-center gap-2">
 						<input
 							type="number"
 							min={1}
 							max={180}
-							value={timeLimit}
-							onChange={(e) => {
-								const v = parseInt(e.target.value);
-								if (!isNaN(v) && v >= 1 && v <= 180)
-									onSave({ time_limit: v });
+							value={localTimeLimit ?? ""}
+							onChange={(e) => setLocalTimeLimit(parseInt(e.target.value) || null)}
+							onBlur={() => {
+								if (
+									localTimeLimit !== timeLimit &&
+									localTimeLimit !== null &&
+									localTimeLimit >= 1 &&
+									localTimeLimit <= 180
+								)
+									onSave({ time_limit: localTimeLimit });
 							}}
 							style={{
 								...inputStyle,
