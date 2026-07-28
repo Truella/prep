@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar02Icon, Copy01Icon, EyeIcon } from "@hugeicons/core-free-icons";
+import { Calendar02Icon, Copy01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import PublishModal from "./quiz-bank/PublishModal";
@@ -76,15 +76,16 @@ export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps)
 					<HugeiconsIcon icon={Copy01Icon} />
 					Copy Link
 				</button>
-				<Link
-					href={`/quiz/${quiz.id}`}
-					className="flex-1 px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 text-sm font-medium"
-					style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
-				>
-					{" "}
-					<HugeiconsIcon icon={EyeIcon} />
-					View
-				</Link>
+			<Link
+				href={`/dashboard/quiz/${quiz.id}`}
+				className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2"
+				style={{
+					backgroundColor: "var(--color-text-primary)",
+					color: "var(--color-bg)",
+				}}
+			>
+				Manage
+			</Link>
 				<button
 					onClick={() => setIsPublishOpen(true)}
 					className="px-4 py-2 rounded-lg border text-sm font-medium transition"
