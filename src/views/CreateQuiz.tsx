@@ -164,7 +164,10 @@ export default function CreateQuizCSV() {
 																	<span className="font-mono font-bold shrink-0">
 																		{optionLabels[j]}
 																	</span>
-																	<span className="truncate">{opt}</span>
+																	<span className="min-w-0 flex-1 truncate">{opt}</span>
+																	{j === q.correctIndex && (
+																		<span className="shrink-0 font-semibold">Correct</span>
+																	)}
 																</div>
 															))}
 														</div>
