@@ -11,17 +11,13 @@ async function fetchStats(): Promise<Stats> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { totalQuizzes: 0, totalQuestions: 0, totalAttempts: 0 };
 
-  const { count: quizCount } = await supabase
-    .from("quizzes")
-    .select("*", { count: "exact", head: true })
-    .eq("created_by", user.id);
-
   const { data: userQuizzes } = await supabase
     .from("quizzes")
     .select("id")
     .eq("created_by", user.id);
 
   const quizIds = userQuizzes?.map((q) => q.id) ?? [];
+  const quizCount = quizIds.length;
 
   let questionCount = 0;
   let attemptCount = 0;
@@ -42,7 +38,7 @@ async function fetchStats(): Promise<Stats> {
   }
 
   return {
-    totalQuizzes: quizCount ?? 0,
+    totalQuizzes: quizCount,
     totalQuestions: questionCount,
     totalAttempts: attemptCount,
   };
