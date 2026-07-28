@@ -64,10 +64,11 @@ export default function QuestionCardBody({
       </div>
 
       <div className="flex items-center gap-3">
-        <label className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <label htmlFor="question-points" className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
           Points:
         </label>
         <input
+          id="question-points"
           type="number"
           min={1}
           max={100}
