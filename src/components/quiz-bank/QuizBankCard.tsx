@@ -65,7 +65,7 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
       >
         <span>
           {"★".repeat(stars)}{"☆".repeat(5 - stars)}{" "}
-          {quiz.average_rating ? quiz.average_rating.toFixed(1) : "—"}
+          {quiz.average_rating !== null ? quiz.average_rating.toFixed(1) : "—"}
         </span>
         <span>{quiz.times_taken.toLocaleString("en-US")} taken</span>
       </div>
