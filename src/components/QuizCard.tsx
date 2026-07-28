@@ -53,14 +53,12 @@ export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps)
 				{quiz.description || "No description provided"}
 			</p>
 
-			{visibility === "public" && (
-				<div className="flex items-center gap-4 text-xs mb-2" style={{ color: "var(--color-text-secondary)" }}>
-					<span>{quiz.times_taken ?? 0} taken</span>
-					{quiz.average_rating != null && (
-						<span>★ {quiz.average_rating.toFixed(1)}</span>
-					)}
-				</div>
-			)}
+			<div className="flex items-center gap-4 text-xs mb-2" style={{ color: "var(--color-text-secondary)" }}>
+				<span>{quiz.times_taken ?? 0} taken</span>
+				{visibility === "public" && quiz.average_rating != null && (
+					<span>★ {quiz.average_rating.toFixed(1)}</span>
+				)}
+			</div>
 
 			<div className="flex items-center gap-2 mb-4 text-xs" style={{ color: "var(--color-text-secondary)" }}>
 				<HugeiconsIcon icon={Calendar02Icon} />

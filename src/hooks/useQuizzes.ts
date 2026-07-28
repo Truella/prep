@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { getAttemptCounts } from "../utils/attempts";
 import toast from "react-hot-toast";
 
 import type { QuizVisibility, QuizCategory, QuizDifficulty } from "../lib/types";
@@ -49,7 +50,13 @@ export function useQuizzes() {
 				return;
 			}
 
-			setQuizzes(data || []);
+			const quizzes = data || [];
+			const ids = quizzes.map((q) => q.id);
+			const counts = await getAttemptCounts(ids);
+			for (const q of quizzes) {
+				q.times_taken = counts[q.id] ?? 0;
+			}
+			setQuizzes(quizzes);
 		} catch (err) {
 			const message = err instanceof Error ? err.message : "Unknown error";
 			setError(message);
