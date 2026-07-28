@@ -34,28 +34,31 @@ export default function CreateQuizCSV() {
 	};
 
 	return (
-		<div className="min-h-screen bg-black">
+		<div className="min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
 			<div className="container mx-auto px-4 py-8 space-y-8 max-w-3xl">
 				{/* Stats */}
 				<div className="grid grid-cols-2 gap-4 max-w-md">
-					<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-						<p className="text-gray-400 text-sm mb-1">Quiz Status</p>
-						<p className="text-xl font-bold text-white">
+					<div className="backdrop-blur-sm border rounded-xl p-4 text-center"
+					style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+						<p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>Quiz Status</p>
+						<p className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>
 							{quiz.id ? "Draft Created" : "Not Created"}
 						</p>
 					</div>
-					<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-						<p className="text-gray-400 text-sm mb-1">Total Questions</p>
-						<p className="text-2xl font-bold text-white">{questions.length}</p>
+					<div className="backdrop-blur-sm border rounded-xl p-4 text-center"
+					style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+						<p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>Total Questions</p>
+						<p className="text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>{questions.length}</p>
 					</div>
 				</div>
 
 				{/* Main card */}
-				<div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl space-y-6">
+				<div className="backdrop-blur-xl border rounded-2xl p-8 shadow-2xl space-y-6"
+				style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}>
 					{/* Metadata — disabled after quiz created */}
 					<div className="space-y-4">
 						<div>
-							<label className="block text-sm font-medium text-gray-300 mb-2">
+							<label className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
 								Quiz Title
 							</label>
 							<input
@@ -64,11 +67,12 @@ export default function CreateQuizCSV() {
 								value={quiz.title}
 								onChange={(e) => setTitle(e.target.value)}
 								disabled={!!quiz.id}
-								className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
+								className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+								style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-gray-300 mb-2">
+							<label className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
 								Description
 							</label>
 							<textarea
@@ -77,7 +81,8 @@ export default function CreateQuizCSV() {
 								onChange={(e) => setDescription(e.target.value)}
 								disabled={!!quiz.id}
 								rows={3}
-								className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+								className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+								style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
 							/>
 						</div>
 						<TimeLimitInput value={timeLimit} onChange={setTimeLimit} disabled={!!quiz.id} />
@@ -85,7 +90,8 @@ export default function CreateQuizCSV() {
 							<button
 								onClick={createQuiz}
 								disabled={isCreatingQuiz}
-								className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+								className="w-full px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+								style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
 							>
 								{isCreatingQuiz ? "Creating..." : "Create Quiz"}
 							</button>
@@ -95,16 +101,19 @@ export default function CreateQuizCSV() {
 					{/* Tabs — only shown after quiz is created */}
 					{quiz.id && (
 						<>
-							<div className="flex gap-2 border-b border-white/10">
+							<div className="flex gap-2 border-b" style={{ borderColor: "var(--color-border)" }}>
 								{(["build", "csv"] as Tab[]).map((t) => (
 									<button
 										key={t}
 										onClick={() => handleTabSwitch(t)}
 										className={`px-4 py-2 text-sm font-medium transition border-b-2 -mb-px ${
 											tab === t
-												? "text-white border-white"
-												: "text-gray-400 border-transparent hover:text-white"
+												? "border-white"
+												: "border-transparent"
 										}`}
+										style={{ color: tab === t ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}
+										onMouseEnter={(e) => { if (tab !== t) e.currentTarget.style.color = "var(--color-text-primary)"; }}
+										onMouseLeave={(e) => { if (tab !== t) e.currentTarget.style.color = "var(--color-text-secondary)"; }}
 									>
 										{t === "build" ? "Build manually" : "Upload CSV"}
 									</button>
@@ -135,7 +144,8 @@ export default function CreateQuizCSV() {
 						<div className="pt-2">
 							<button
 								onClick={() => setIsPublishOpen(true)}
-								className="w-full px-4 py-3 rounded-xl border border-white/20 text-gray-400 hover:text-white hover:bg-white/5 transition font-medium text-sm"
+								className="w-full px-4 py-3 rounded-xl border transition font-medium text-sm"
+								style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}
 							>
 								Publish Settings
 							</button>

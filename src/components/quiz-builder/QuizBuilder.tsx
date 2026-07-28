@@ -217,14 +217,16 @@ export default function QuizBuilder({
 			<div className="flex gap-3">
 				<button
 					onClick={addQuestion}
-					className="flex-1 px-4 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 transition font-medium text-sm"
+					className="flex-1 px-4 py-3 rounded-xl border transition font-medium text-sm"
+					style={{ borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
 				>
 					+ Add Question
 				</button>
 				<button
 					onClick={handleSubmit}
 					disabled={isUploading || !quizId}
-					className="flex-1 px-4 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+					className="flex-1 px-4 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
+					style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
 				>
 					{isUploading ? "Publishing..." : "Publish Quiz"}
 				</button>

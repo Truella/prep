@@ -80,11 +80,12 @@ export default function BuilderQuestionCard({
 
 	const borderClass = hasErrors
 		? "border-red-500/50"
-		: "border-white/10";
+		: "";
 
 	return (
 		<div
-			className={`backdrop-blur-sm bg-white/5 border rounded-xl overflow-hidden ${borderClass}`}
+			className={`backdrop-blur-sm border rounded-xl overflow-hidden ${borderClass}`}
+			style={{ backgroundColor: "var(--color-surface)", borderColor: hasErrors ? undefined : "var(--color-border)" }}
 		>
 			{/* ── Header row — always visible, click to toggle ── */}
 			<div
@@ -97,7 +98,8 @@ export default function BuilderQuestionCard({
 			>
 				{/* Chevron */}
 				<svg
-					className={`shrink-0 w-4 h-4 text-gray-400 transition-transform duration-150 ${isExpanded ? "rotate-180" : ""}`}
+					className={`shrink-0 w-4 h-4 transition-transform duration-150 ${isExpanded ? "rotate-180" : ""}`}
+					style={{ color: "var(--color-text-secondary)" }}
 					viewBox="0 0 20 20"
 					fill="currentColor"
 					aria-hidden="true"
@@ -110,15 +112,15 @@ export default function BuilderQuestionCard({
 				</svg>
 
 				{/* Q-number */}
-				<span className="shrink-0 text-xs font-semibold text-gray-400 w-6">
+				<span className="shrink-0 text-xs font-semibold w-6" style={{ color: "var(--color-text-secondary)" }}>
 					Q{index + 1}
 				</span>
 
 				{/* Question text preview */}
-				<span className="flex-1 text-sm text-white truncate">
+				<span className="flex-1 text-sm truncate" style={{ color: "var(--color-text-primary)" }}>
 					{question.questionText
 						? truncate(question.questionText, 55)
-						: <span className="text-gray-500 italic">Untitled question</span>}
+						: <span className="italic" style={{ color: "var(--color-text-secondary)" }}>Untitled question</span>}
 				</span>
 
 				{/* Badge: answer or incomplete */}
@@ -135,7 +137,7 @@ export default function BuilderQuestionCard({
 				)}
 
 				{/* Points */}
-				<span className="shrink-0 text-xs text-gray-500 ml-1">
+				<span className="shrink-0 text-xs ml-1" style={{ color: "var(--color-text-secondary)" }}>
 					{question.points}pt
 				</span>
 
@@ -148,20 +150,23 @@ export default function BuilderQuestionCard({
 					<button
 						onClick={onMoveUp}
 						disabled={index === 0}
-						className="text-gray-400 hover:text-white disabled:opacity-30 transition text-xs px-2 py-1 rounded border border-white/10"
+						className="disabled:opacity-30 transition text-xs px-2 py-1 rounded border"
+						style={{ color: "var(--color-text-secondary)", borderColor: "var(--color-border)" }}
 					>
 						↑
 					</button>
 					<button
 						onClick={onMoveDown}
 						disabled={index === total - 1}
-						className="text-gray-400 hover:text-white disabled:opacity-30 transition text-xs px-2 py-1 rounded border border-white/10"
+						className="disabled:opacity-30 transition text-xs px-2 py-1 rounded border"
+						style={{ color: "var(--color-text-secondary)", borderColor: "var(--color-border)" }}
 					>
 						↓
 					</button>
 					<button
 						onClick={onDelete}
-						className="text-red-400 hover:text-red-300 transition text-xs px-2 py-1 rounded border border-red-500/20"
+						className="transition text-xs px-2 py-1 rounded border border-red-500/20"
+						style={{ color: "rgb(248 113 113)" }}
 					>
 						Delete
 					</button>
@@ -174,7 +179,7 @@ export default function BuilderQuestionCard({
 				style={{ maxHeight: isExpanded ? "none" : "0px", overflow: "hidden" }}
 				className="transition-[max-height] duration-[170ms] ease-in-out"
 			>
-				<div className="px-6 pb-6 space-y-4 border-t border-white/5 pt-4">
+				<div className="px-6 pb-6 space-y-4 border-t pt-4" style={{ borderColor: "var(--color-border)" }}>
 					{/* Question text */}
 					<textarea
 						value={question.questionText}
@@ -183,7 +188,8 @@ export default function BuilderQuestionCard({
 						}
 						placeholder="Enter question text"
 						rows={2}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition resize-none"
+						className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition resize-none"
+						style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
 					/>
 
 					{/* Options */}
@@ -195,10 +201,13 @@ export default function BuilderQuestionCard({
 										onChange({ ...question, correctIndex: i as 0 | 1 | 2 | 3 })
 									}
 									className={`shrink-0 w-7 h-7 rounded-full border text-xs font-bold transition ${
-										question.correctIndex === i
-											? "bg-white text-black border-white"
-											: "border-white/30 text-gray-400 hover:border-white/60"
+										question.correctIndex === i ? "" : ""
 									}`}
+									style={{
+										backgroundColor: question.correctIndex === i ? "var(--color-text-primary)" : "transparent",
+										color: question.correctIndex === i ? "var(--color-bg)" : "var(--color-text-secondary)",
+										borderColor: question.correctIndex === i ? "var(--color-text-primary)" : "var(--color-border)",
+									}}
 								>
 									{OPTION_LABELS[i]}
 								</button>
@@ -206,7 +215,8 @@ export default function BuilderQuestionCard({
 									value={opt}
 									onChange={(e) => handleOptionChange(i, e.target.value)}
 									placeholder={`Option ${OPTION_LABELS[i]}`}
-									className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white/20 transition text-sm"
+									className="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:ring-1 transition text-sm"
+									style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
 								/>
 							</div>
 						))}
@@ -214,7 +224,7 @@ export default function BuilderQuestionCard({
 
 					{/* Points */}
 					<div className="flex items-center gap-3">
-						<label className="text-sm text-gray-400">Points:</label>
+						<label className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Points:</label>
 						<input
 							type="number"
 							min={1}
@@ -226,9 +236,10 @@ export default function BuilderQuestionCard({
 									points: parseInt(e.target.value) || 1,
 								})
 							}
-							className="w-20 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition"
+							className="w-20 px-3 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-1 transition"
+							style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
 						/>
-						<span className="text-xs text-gray-500">
+						<span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
 							Click a letter to mark the correct answer
 						</span>
 					</div>
@@ -237,7 +248,7 @@ export default function BuilderQuestionCard({
 					{hasErrors && (
 						<ul className="space-y-1">
 							{errors.map((e, i) => (
-								<li key={i} className="text-xs text-red-400">
+								<li key={i} className="text-xs" style={{ color: "rgb(248 113 113)" }}>
 									{e}
 								</li>
 							))}

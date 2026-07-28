@@ -10,7 +10,7 @@ import {
 
 const STORAGE_KEY = "theme";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "system";
 
 interface ThemeContextValue {
 	theme: Theme;

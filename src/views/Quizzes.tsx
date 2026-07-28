@@ -16,12 +16,13 @@ export default function Quizzes() {
 			{/* Header */}
 			<div className="flex justify-between items-center mb-8">
 				<div>
-					<h2 className="text-3xl font-bold text-white mb-1">My Quizzes</h2>
-					<p className="text-gray-400">Manage and share your quizzes</p>
+					<h2 className="text-3xl font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>My Quizzes</h2>
+					<p style={{ color: "var(--color-text-secondary)" }}>Manage and share your quizzes</p>
 				</div>
 				<Link
 					href="/dashboard/create"
-					className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-100 transition font-semibold"
+					className="flex items-center gap-2 px-6 py-3 rounded-lg transition font-semibold"
+					style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
 				>
 					<HugeiconsIcon icon={PlusSignIcon}/>
 					Create New Quiz

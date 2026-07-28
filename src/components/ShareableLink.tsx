@@ -34,10 +34,10 @@ export default function ShareableLink({
 					</svg>
 				</div>
 				<div>
-					<h3 className="text-lg font-semibold text-white mb-1">
+					<h3 className="text-lg font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
 						Quiz Published Successfully!
 					</h3>
-					<p className="text-sm text-gray-400">
+					<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
 						Share this link with students to take the quiz
 					</p>
 				</div>
@@ -48,13 +48,15 @@ export default function ShareableLink({
 					type="text"
 					value={shareableLink}
 					readOnly
-					className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 transition cursor-pointer"
+					className="flex-1 px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 transition cursor-pointer"
+					style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
 					onClick={(e) => e.currentTarget.select()}
 				/>
 
 				<button
 					onClick={handleCopy}
-					className="px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all shadow-lg flex items-center gap-2"
+					className="px-6 py-3 rounded-xl font-semibold transition-all shadow-lg flex items-center gap-2"
+					style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
 				>
 					{copied ? (
 						<>

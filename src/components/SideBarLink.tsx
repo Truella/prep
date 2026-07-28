@@ -13,10 +13,14 @@ export function SidebarLink({ label, path, icon }: NavItem) {
 		<Link
 			href={path}
 			className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition ${
-				isActive
-					? "bg-white text-black"
-					: "text-gray-300 hover:bg-white/5 hover:text-white"
+				isActive ? "" : "hover:bg-surface"
 			}`}
+			style={{
+				backgroundColor: isActive ? "var(--color-text-primary)" : "transparent",
+				color: isActive ? "var(--color-bg)" : "var(--color-text-secondary)",
+			}}
+			onMouseEnter={(e) => { if (!isActive) { e.currentTarget.style.color = "var(--color-text-primary)"; } }}
+			onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.color = "var(--color-text-secondary)"; } }}
 		>
 			<HugeiconsIcon icon={icon} />
 			{label}
