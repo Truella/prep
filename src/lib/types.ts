@@ -102,6 +102,16 @@ export interface PublicQuiz {
 	question_count?: number;
 }
 
+export interface QuizAttempt {
+  id: string;
+  quiz_id: string;
+  score: number;
+  total_points: number;
+  elapsed_seconds: number | null;
+  answers: Record<string, number>;
+  completed_at: string;
+}
+
 export interface AIReviewPayload {
 	questions: AppQuestion[];
 	selectedAnswers: Record<number, number>;
