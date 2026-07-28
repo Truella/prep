@@ -50,6 +50,7 @@ export default function MetaEditor({
 }: MetaEditorProps) {
 	const [localTitle, setLocalTitle] = useState(title);
 	const [localDesc, setLocalDesc] = useState(description);
+	const [localTimeLimit, setLocalTimeLimit] = useState(timeLimit);
 
 	const inputStyle = {
 		backgroundColor: "var(--color-surface-raised)",
@@ -125,8 +126,6 @@ export default function MetaEditor({
 						Time limit
 					</span>
 				</label>
-const [localTimeLimit, setLocalTimeLimit] = useState(timeLimit);
-
 				{timeLimit !== null && (
 					<div className="flex items-center gap-2">
 						<input
