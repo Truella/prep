@@ -17,9 +17,11 @@ export default function TopBar({
 					{/* Left - Logo & Menu Toggle */}
 					<div className="flex items-center gap-4">
 						<button
+							type="button"
 							onClick={() => setIsSidebarOpen(!isSidebarOpen)}
 							className="lg:hidden p-2 rounded-lg hover:bg-surface transition"
 							style={{ color: "var(--color-text-primary)" }}
+							aria-label={isSidebarOpen ? "Close sidebar menu" : "Open sidebar menu"}
 						>
 							<svg
 								className="w-6 h-6"
@@ -40,6 +42,7 @@ export default function TopBar({
 
 					{/* Right - Logout Button */}
 					<button
+						type="button"
 						onClick={handleLogout}
 						className="px-4 py-2 text-sm font-medium border rounded-lg hover:bg-surface transition"
 						style={{ color: "var(--color-text-primary)", borderColor: "var(--color-border)" }}

@@ -54,6 +54,7 @@ export default function ShareableLink({
 				/>
 
 				<button
+					type="button"
 					onClick={handleCopy}
 					className="px-6 py-3 rounded-xl font-semibold transition-all shadow-lg flex items-center gap-2"
 					style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}

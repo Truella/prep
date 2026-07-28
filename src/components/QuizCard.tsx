@@ -64,7 +64,7 @@ export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps)
 
 			<div className="flex items-center gap-2 mb-4 text-xs" style={{ color: "var(--color-text-secondary)" }}>
 				<HugeiconsIcon icon={Calendar02Icon} />
-				<span>{new Date(quiz.created_at).toLocaleDateString()}</span>
+				<span>{new Date(quiz.created_at).toLocaleDateString("en-CA")}</span>
 			</div>
 
 			<div className="flex gap-2">

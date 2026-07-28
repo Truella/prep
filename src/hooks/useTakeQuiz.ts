@@ -72,9 +72,15 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const [isSubmitted, setIsSubmitted] = useState(false);
 
 	const startTimeRef = useRef<number>(0);
+	const submittedRef = useRef(false);
 	const [elapsedSeconds, setElapsedSeconds] = useState(0);
 	const [isAutoSubmit, setIsAutoSubmit] = useState(false);
 	const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
+
+	const clearDeadline = () => {
+		if (!quizId) return;
+		try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
+	};
 
 	const { loadProgress, clearProgress, markHydrated } = useQuizProgress(
 		quizId,
@@ -145,7 +151,19 @@ export function useTakeQuiz(quizId: string | undefined) {
 				if (remaining <= 0) {
 					setTimerSeconds(0);
 					setIsAutoSubmit(true);
-					setElapsedSeconds(quizData.time_limit * 60);
+					const elapsedTotal = quizData.time_limit * 60;
+					setElapsedSeconds(elapsedTotal);
+					const totalPts = (questionsData ?? []).reduce((sum: number, q: DBQuestion) => sum + q.Points, 0);
+					try {
+						await supabase.from("quiz_attempts").insert({
+							quiz_id: quizData.id,
+							score: 0,
+							total_points: totalPts,
+							elapsed_seconds: elapsedTotal,
+							answers: selectedAnswers,
+						});
+					} catch {}
+					clearDeadline();
 					setShowResults(true);
 					setIsSubmitted(true);
 				} else {
@@ -163,6 +181,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		} finally {
 			setLoading(false);
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [quizId, markHydrated]);
 
 	useEffect(() => {
@@ -233,11 +252,6 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const answeredCount = Object.keys(selectedAnswers).length;
 	const unansweredCount = questions.length - answeredCount;
 
-	const clearDeadline = () => {
-		if (!quizId) return;
-		try { localStorage.removeItem(`quiz_deadline_${quizId}`); } catch {}
-	};
-
 	const initiateSubmit = () => {
 		if (answeredCount === 0) {
 			toast.error("Answer at least one question before submitting");
@@ -246,15 +260,24 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setShowSubmitModal(true);
 	};
 
-	const confirmSubmit = () => {
+	const confirmSubmit = async () => {
+		if (submittedRef.current) return;
+		submittedRef.current = true;
 		// eslint-disable-next-line react-hooks/purity
 		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
 		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
+
+		const saved = await saveAttempt(elapsed);
+		if (!saved) {
+			submittedRef.current = false;
+			toast.error("Failed to save attempt");
+			return;
+		}
+
+		clearDeadline();
 		setShowResults(true);
 		setIsSubmitted(true);
-		clearDeadline();
-		saveAttempt(elapsed);
 
 		try {
 			localStorage.setItem(
@@ -274,16 +297,24 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setShowSubmitModal(false);
 	};
 
-	const handleTimerExpire = () => {
+	const handleTimerExpire = async () => {
+		if (submittedRef.current) return;
+		submittedRef.current = true;
 		setIsAutoSubmit(true);
 		// eslint-disable-next-line react-hooks/purity
 		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
 		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
+
+		const saved = await saveAttempt(elapsed);
+		if (!saved) {
+			submittedRef.current = false;
+			return;
+		}
+
+		clearDeadline();
 		setShowResults(true);
 		setIsSubmitted(true);
-		clearDeadline();
-		saveAttempt(elapsed);
 
 		try {
 			localStorage.setItem(
@@ -341,8 +372,8 @@ export function useTakeQuiz(quizId: string | undefined) {
 		return { correctCount, earnedPoints, totalPoints };
 	};
 
-	const saveAttempt = async (elapsed: number) => {
-		if (!quiz?.id) return;
+	const saveAttempt = async (elapsed: number): Promise<boolean> => {
+		if (!quiz?.id) return false;
 		const { earnedPoints } = calculateScore();
 		const totalPts = questions.reduce((sum, q) => sum + q.points, 0);
 
@@ -354,7 +385,10 @@ export function useTakeQuiz(quizId: string | undefined) {
 				elapsed_seconds: elapsed,
 				answers: selectedAnswers,
 			});
-		} catch {}
+			return true;
+		} catch {
+			return false;
+		}
 	};
 
 	const currentQuestion = questions[currentQuestionIndex];
