@@ -3,6 +3,7 @@
 import {
 	createContext,
 	useContext,
+	useEffect,
 	useSyncExternalStore,
 	type ReactNode,
 } from "react";
@@ -64,6 +65,10 @@ export function useTheme() {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
 	const theme = useSyncExternalStore<Theme>(subscribe, getSnapshot, () => "dark");
+
+	useEffect(() => {
+		applyTheme(theme);
+	}, [theme]);
 
 	const setTheme = (t: Theme) => {
 		applyTheme(t);

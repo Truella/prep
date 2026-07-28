@@ -86,12 +86,14 @@ export default function AuthForm() {
       <div className="space-y-4">
         <div>
           <label
+            htmlFor="email"
             className="block text-sm font-medium mb-2"
             style={{ color: "var(--color-text-secondary)" }}
           >
             Email
           </label>
           <input
+            id="email"
             type="email"
             placeholder="you@example.com"
             value={email}
@@ -108,12 +110,14 @@ export default function AuthForm() {
 
         <div>
           <label
+            htmlFor="password"
             className="block text-sm font-medium mb-2"
             style={{ color: "var(--color-text-secondary)" }}
           >
             Password
           </label>
           <input
+            id="password"
             type="password"
             placeholder="••••••••"
             value={password}

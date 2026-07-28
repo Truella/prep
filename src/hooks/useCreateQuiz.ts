@@ -114,7 +114,7 @@ export function useCreateQuiz() {
 			try {
 				localStorage.setItem(QUIZ_META_KEY, JSON.stringify(updatedQuiz));
 			} catch {}
-			setState((prev) => ({ ...prev, quiz: updatedQuiz }));
+			setState((prev) => ({ ...prev, quiz: updatedQuiz, isCreatingQuiz: false }));
 			toast.success("Quiz created! Now upload questions.");
 			return;
 		}

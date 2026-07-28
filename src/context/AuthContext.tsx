@@ -91,7 +91,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 			if (signUpError) {
 				setError(handleAuthError(signUpError));
-				return;
+				throw signUpError;
 			}
 
 			if (data.user) {
@@ -100,6 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			}
 		} catch (err) {
 			setError(handleAuthError(err));
+			throw err;
 		} finally {
 			if (mountedRef.current) {
 				setLoading(false);
@@ -120,7 +121,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 			if (signInError) {
 				setError(handleAuthError(signInError));
-				return;
+				throw signInError;
 			}
 
 			if (data.user) {
@@ -129,6 +130,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			}
 		} catch (err) {
 			setError(handleAuthError(err));
+			throw err;
 		} finally {
 			if (mountedRef.current) {
 				setLoading(false);
