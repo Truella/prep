@@ -1545,7 +1545,6 @@ Do not change any logic, content, or interactive behaviour in any docs component
 ---
 
 ## PR Description
-
 **Summary**
 Full external pages UI overhaul. Token-based design system with dark/light theme switching via `next-themes`. DM Serif Display for display headings, JetBrains Mono for data/code, Inter for UI text. Homepage rebuilt with 6 content sections and an animated hero carousel cycling through 5 CBT-style demo questions across different categories and levels — correct answer highlights in amber then slides to the next question via Framer Motion. Quiz Bank gets a proper grid layout with skeleton loading, a redesigned empty state, and updated cards with amber CTAs. Take a Quiz entry page simplified and focused. Docs section gets ExternalNav and full token system pass with amber active states on the sidebar.
 
@@ -1573,12 +1572,12 @@ Full external pages UI overhaul. Token-based design system with dark/light theme
 - `src/components/docs/QuestionTips.tsx`
 
 **Checklist**
-- [ ] `npm install framer-motion next-themes` completed
-- [ ] `npx tsc --noEmit` passes
-- [ ] `npx next lint` passes
-- [ ] Hero card cycles through all 5 questions with amber highlight animation
-- [ ] Theme toggle switches dark/light on all external pages
-- [ ] All external page links navigate correctly
-- [ ] Light mode readable and consistent across all 4 pages
-- [ ] No `console.log` statements
-- [ ] Branch up to date with `main`
+- [] `npm install framer-motion next-themes` completed
+- [] `npx tsc --noEmit` passes
+- [] `npx next lint` passes
+- [] Hero card cycles through all 5 questions with amber highlight animation
+- [] Theme toggle switches dark/light on all external pages
+- [] All external page links navigate correctly
+- [] Light mode readable and consistent across all 4 pages
+- [] No `console.log` statements
+- [] Branch up to date with `main`

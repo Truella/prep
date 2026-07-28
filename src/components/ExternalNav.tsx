@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Sun01Icon, Moon01Icon } from "@hugeicons/core-free-icons";
 import { useTheme } from "../lib/theme";
 
 export default function ExternalNav() {
@@ -8,10 +10,10 @@ export default function ExternalNav() {
   const isDark = resolvedTheme === "dark";
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-border bg-bg/80 backdrop-blur-md">
       <Link
         href="/"
-        className="font-mono text-lg font-bold text-[var(--color-text-primary)] tracking-tight"
+        className="font-mono text-lg font-bold text-text-primary tracking-tight"
       >
         PREP
       </Link>
@@ -19,25 +21,25 @@ export default function ExternalNav() {
       <div className="flex items-center gap-6">
         <Link
           href="/take"
-          className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
+          className="text-sm text-text-secondary hover:text-text-primary transition"
         >
           Take a Quiz
         </Link>
         <Link
           href="/quiz-bank"
-          className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
+          className="text-sm text-text-secondary hover:text-text-primary transition"
         >
           Quiz Bank
         </Link>
         <Link
           href="/docs/getting-started"
-          className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
+          className="text-sm text-text-secondary hover:text-text-primary transition"
         >
           Docs
         </Link>
         <Link
           href="/auth"
-          className="text-sm px-4 py-1.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] transition"
+          className="text-sm px-4 py-1.5 rounded-lg border border-border text-text-primary hover:bg-surface transition"
         >
           Sign in
         </Link>
@@ -45,9 +47,13 @@ export default function ExternalNav() {
         <button
           onClick={() => setTheme(isDark ? "light" : "dark")}
           aria-label="Toggle theme"
-          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] transition text-sm"
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-text-secondary hover:text-text-primary hover:bg-surface transition"
         >
-          {resolvedTheme ? (isDark ? "☀" : "☾") : <span className="w-4" />}
+          {resolvedTheme ? (
+            <HugeiconsIcon icon={isDark ? Sun01Icon : Moon01Icon} size={16} />
+          ) : (
+            <span className="w-4" />
+          )}
         </button>
       </div>
     </nav>
