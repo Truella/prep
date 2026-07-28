@@ -4,7 +4,7 @@ import { useQuizBank } from "./useQuizBank";
 import { createChain } from "../test-utils/chain";
 
 vi.mock("../lib/supabase", () => ({
-	supabase: { from: vi.fn() },
+	supabase: { from: vi.fn(), rpc: vi.fn() },
 }));
 
 const MOCK_QUIZZES = [
@@ -34,6 +34,10 @@ beforeEach(async () => {
 	vi.clearAllMocks();
 	const { supabase } = await import("../lib/supabase");
 	vi.mocked(supabase.from).mockReset();
+	vi.mocked(supabase.rpc).mockReset();
+	vi.mocked(supabase.rpc).mockReturnValue(
+		createChain({ data: [], error: null })
+	);
 });
 
 describe("useQuizBank", () => {

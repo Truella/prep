@@ -6,15 +6,13 @@ export async function getAttemptCounts(
 	if (quizIds.length === 0) return {};
 
 	const { data, error } = await supabase
-		.from("quiz_attempts")
-		.select("quiz_id")
-		.in("quiz_id", quizIds);
+		.rpc("get_quiz_attempt_counts", { quiz_ids: quizIds });
 
 	if (error) throw error;
-	if (!data) return {};
 
-	return data.reduce<Record<string, number>>((acc, row) => {
-		acc[row.quiz_id] = (acc[row.quiz_id] ?? 0) + 1;
-		return acc;
-	}, {});
+	const map: Record<string, number> = {};
+	for (const row of data ?? []) {
+		map[row.quiz_id] = row.count;
+	}
+	return map;
 }
