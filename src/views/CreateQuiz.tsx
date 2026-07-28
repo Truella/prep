@@ -79,7 +79,8 @@ export default function CreateQuizCSV() {
 								/>
 							)}
 
-							{tab === "csv" && (
+						{tab === "csv" && (
+							<div className="space-y-4">
 								<UploadQuestionsForm
 									onFileChange={setQuestionsFromCSV}
 									onSubmit={() => uploadQuestions()}
@@ -87,7 +88,97 @@ export default function CreateQuizCSV() {
 									isUploading={isUploadingQuestions}
 									questionCount={questions.length}
 								/>
-							)}
+
+								{/* CSV preview — shown after successful parse */}
+								{questions.length > 0 && (
+									<div className="space-y-3">
+										<div className="flex items-center justify-between">
+											<p
+												className="text-sm font-medium"
+												style={{ color: "var(--color-text-primary)" }}
+											>
+												Preview — {questions.length} question
+												{questions.length !== 1 ? "s" : ""} parsed
+											</p>
+											<p
+												className="text-xs"
+												style={{ color: "var(--color-text-secondary)" }}
+											>
+												Review before publishing
+											</p>
+										</div>
+
+										<div
+											className="max-h-96 overflow-y-auto space-y-2 rounded-xl border p-3"
+											style={{ borderColor: "var(--color-border)" }}
+										>
+											{questions.map((q, i) => {
+												const optionLabels = ["A", "B", "C", "D"] as const;
+												const options = [
+													q.optionA,
+													q.optionB,
+													q.optionC,
+													q.optionD,
+												];
+												return (
+													<div
+														key={q.id}
+														className="p-3 rounded-lg space-y-2"
+														style={{
+															backgroundColor: "var(--color-surface-raised)",
+														}}
+													>
+														<p
+															className="text-xs font-mono"
+															style={{ color: "var(--color-accent)" }}
+														>
+															Q{i + 1} · {q.points}pt{q.points !== 1 ? "s" : ""}
+														</p>
+														<p
+															className="text-sm font-medium leading-snug"
+															style={{ color: "var(--color-text-primary)" }}
+														>
+															{q.questionText}
+														</p>
+														<div className="grid grid-cols-2 gap-1.5">
+															{options.map((opt, j) => (
+																<div
+																	key={j}
+																	className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs"
+																	style={{
+																		backgroundColor:
+																			j === q.correctIndex
+																				? "var(--color-accent-dim)"
+																				: "transparent",
+																		border: `1px solid ${
+																			j === q.correctIndex
+																				? "var(--color-accent)"
+																				: "var(--color-border)"
+																		}`,
+																		color:
+																			j === q.correctIndex
+																				? "var(--color-accent)"
+																				: "var(--color-text-secondary)",
+																	}}
+																>
+																	<span className="font-mono font-bold shrink-0">
+																		{optionLabels[j]}
+																	</span>
+																	<span className="min-w-0 flex-1 truncate">{opt}</span>
+																	{j === q.correctIndex && (
+																		<span className="shrink-0 font-semibold">Correct</span>
+																	)}
+																</div>
+															))}
+														</div>
+													</div>
+												);
+											})}
+										</div>
+									</div>
+								)}
+							</div>
+						)}
 						</>
 					)}
 

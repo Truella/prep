@@ -4,7 +4,7 @@ import { useQuizBank } from "./useQuizBank";
 import { createChain } from "../test-utils/chain";
 
 vi.mock("../lib/supabase", () => ({
-	supabase: { from: vi.fn() },
+	supabase: { from: vi.fn(), rpc: vi.fn() },
 }));
 
 const MOCK_QUIZZES = [
@@ -34,11 +34,15 @@ beforeEach(async () => {
 	vi.clearAllMocks();
 	const { supabase } = await import("../lib/supabase");
 	vi.mocked(supabase.from).mockReset();
+	vi.mocked(supabase.rpc).mockReset();
+	vi.mocked(supabase.rpc).mockReturnValue(
+		createChain({ data: [], error: null })
+	);
 });
 
 describe("useQuizBank", () => {
 	it("includes visibility = public filter in every query", async () => {
-		const supabase = (await import("../lib/supabase")).supabase;
+		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
 			createChain({ data: [], error: null })
 		);
@@ -49,7 +53,7 @@ describe("useQuizBank", () => {
 	});
 
 	it("adds category filter when category is set", async () => {
-		const supabase = (await import("../lib/supabase")).supabase;
+		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
 			createChain({ data: [], error: null })
 		);
@@ -64,7 +68,7 @@ describe("useQuizBank", () => {
 	});
 
 	it("orders by times_taken descending for popular sort", async () => {
-		const supabase = (await import("../lib/supabase")).supabase;
+		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
 			createChain({ data: [], error: null })
 		);
@@ -81,7 +85,7 @@ describe("useQuizBank", () => {
 	});
 
 	it("orders by title ascending for alphabetical sort", async () => {
-		const supabase = (await import("../lib/supabase")).supabase;
+		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
 			createChain({ data: [], error: null })
 		);
@@ -98,7 +102,7 @@ describe("useQuizBank", () => {
 	});
 
 	it("orders by average_rating descending for rated sort", async () => {
-		const supabase = (await import("../lib/supabase")).supabase;
+		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
 			createChain({ data: [], error: null })
 		);
@@ -117,7 +121,7 @@ describe("useQuizBank", () => {
 	});
 
 	it("sets error state when supabase query fails", async () => {
-		const supabase = (await import("../lib/supabase")).supabase;
+		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
 			createChain({ data: null, error: { message: "Network error" } })
 		);
@@ -127,7 +131,7 @@ describe("useQuizBank", () => {
 	});
 
 	it("client-side search returns only quizzes matching the query substring", async () => {
-		const supabase = (await import("../lib/supabase")).supabase;
+		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
 			createChain({ data: MOCK_QUIZZES, error: null })
 		);
