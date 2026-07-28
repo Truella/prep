@@ -4,6 +4,7 @@ import { ThemeProvider } from "../src/lib/theme";
 import { AuthProvider } from "../src/context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "../src/components/ErrorBoundary";
+import ReactQueryProvider from "../src/components/ReactQueryProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -73,10 +74,12 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider defaultTheme="system">
-          <AuthProvider>
-            <ErrorBoundary>{children}</ErrorBoundary>
-            <Toaster position="top-right" reverseOrder={false} />
-          </AuthProvider>
+          <ReactQueryProvider>
+            <AuthProvider>
+              <ErrorBoundary>{children}</ErrorBoundary>
+              <Toaster position="top-right" reverseOrder={false} />
+            </AuthProvider>
+          </ReactQueryProvider>
         </ThemeProvider>
       </body>
     </html>

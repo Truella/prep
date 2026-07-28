@@ -1,7 +1,8 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
-import { QuizDraft, DBQuestion, AppQuestion } from "../lib/types";
+import { DBQuestion } from "../lib/types";
 import { dbToAppQuestion } from "../utils/transforms";
 import useQuizProgress from "./useQuizProgress";
 
@@ -57,10 +58,41 @@ function readSavedResults(quizId: string | undefined): SavedQuizResults | null {
 
 export function useTakeQuiz(quizId: string | undefined) {
 	const [showSubmitModal, setShowSubmitModal] = useState(false);
-	const [quiz, setQuiz] = useState<QuizDraft | null>(null);
-	const [questions, setQuestions] = useState<AppQuestion[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+
+	const { data: quiz, isLoading: quizLoading, error: quizError } = useQuery({
+		queryKey: ["quiz-take", quizId],
+		queryFn: async () => {
+			if (!quizId) throw new Error("No quiz ID provided");
+			const { data, error } = await supabase
+				.from("quizzes")
+				.select("*")
+				.eq("id", quizId)
+				.single();
+			if (error || !data) throw new Error("Quiz not found");
+			return data;
+		},
+		enabled: !!quizId,
+		staleTime: 5 * 60 * 1000,
+		retry: 1,
+	});
+
+	const { data: questions = [], isLoading: questionsLoading } = useQuery({
+		queryKey: ["quiz-take-questions", quizId],
+		queryFn: async () => {
+			const { data, error } = await supabase
+				.from("questions")
+				.select("*")
+				.eq("quiz_id", quizId!)
+				.order("created_at", { ascending: true });
+			if (error) throw error;
+			return (data ?? []).map((q: DBQuestion, i: number) => dbToAppQuestion(q, i));
+		},
+		enabled: !!quizId && !!quiz,
+		staleTime: 5 * 60 * 1000,
+	});
+
+	const loading = quizLoading || questionsLoading;
+	const error = quizError ? (quizError as Error).message : null;
 
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 	const [selectedAnswers, setSelectedAnswers] = useState<
@@ -89,50 +121,13 @@ export function useTakeQuiz(quizId: string | undefined) {
 		isSubmitted,
 	);
 
-	const fetchQuizData = useCallback(async () => {
-		if (!quizId) return;
-
-		try {
-			setLoading(true);
-			setError(null);
-
-			const { data: quizData, error: quizError } = await supabase
-				.from("quizzes")
-				.select("*")
-				.eq("id", quizId)
-				.single();
-
-			if (quizError) throw quizError;
-
-			const { data: questionsData, error: questionsError } = await supabase
-				.from("questions")
-				.select("*")
-				.eq("quiz_id", quizId);
-
-			if (questionsError) throw questionsError;
-
-			if (!questionsData || questionsData.length === 0) {
-				throw new Error("This quiz has no questions");
-			}
-
-			setQuiz(quizData);
-			setQuestions(questionsData.map((q: DBQuestion, i: number) => dbToAppQuestion(q, i)));
-
-			// Check results right after questions are loaded, before configuring timer or ending loading!
-			const savedResults = readSavedResults(quizId);
-
-			if (savedResults) {
-				setSelectedAnswers(savedResults.answers);
-				setElapsedSeconds(savedResults.elapsedSeconds);
-				setIsAutoSubmit(savedResults.isAutoSubmit);
-				setShowResults(true);
-				setIsSubmitted(true);
-				markHydrated();
-				setLoading(false);
-				return;
-			}
-
-			if (quizData.time_limit) {
+	const questionsLoadedRef = useRef(false);
+	useEffect(() => {
+		/* eslint-disable react-hooks/set-state-in-effect */
+		if (questions.length > 0 && quiz && !questionsLoadedRef.current) {
+			questionsLoadedRef.current = true;
+			
+			if (quiz.time_limit) {
 				const storageKey = `quiz_deadline_${quizId}`;
 				let deadline: number;
 				try {
@@ -141,22 +136,22 @@ export function useTakeQuiz(quizId: string | undefined) {
 					deadline = 0;
 				}
 				if (!deadline || deadline <= Date.now()) {
-					deadline = Date.now() + quizData.time_limit * 60 * 1000;
+					deadline = Date.now() + quiz.time_limit * 60 * 1000;
 					try {
 						localStorage.setItem(storageKey, String(deadline));
 					} catch {}
 				}
-				startTimeRef.current = deadline - quizData.time_limit * 60 * 1000;
+				startTimeRef.current = deadline - quiz.time_limit * 60 * 1000;
 				const remaining = Math.ceil((deadline - Date.now()) / 1000);
 				if (remaining <= 0) {
 					setTimerSeconds(0);
 					setIsAutoSubmit(true);
-					const elapsedTotal = quizData.time_limit * 60;
+					const elapsedTotal = quiz.time_limit * 60;
 					setElapsedSeconds(elapsedTotal);
-					const totalPts = (questionsData ?? []).reduce((sum: number, q: DBQuestion) => sum + q.Points, 0);
+					const totalPts = questions.reduce((sum, q) => sum + q.points, 0);
 					try {
-						await supabase.from("quiz_attempts").insert({
-							quiz_id: quizData.id,
+						supabase.from("quiz_attempts").insert({
+							quiz_id: quiz.id,
 							score: 0,
 							total_points: totalPts,
 							elapsed_seconds: elapsedTotal,
@@ -173,27 +168,10 @@ export function useTakeQuiz(quizId: string | undefined) {
 				startTimeRef.current = Date.now();
 				setTimerSeconds(null);
 			}
-		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : "Failed to load quiz";
-			setError(message);
-			toast.error(message);
-		} finally {
-			setLoading(false);
 		}
+		/* eslint-enable react-hooks/set-state-in-effect */
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [quizId, markHydrated]);
-
-	useEffect(() => {
-		if (!quizId) {
-			// eslint-disable-next-line react-hooks/set-state-in-effect
-			setError("No quiz ID provided");
-			setLoading(false);
-			return;
-		}
-
-		fetchQuizData();
-	}, [quizId, fetchQuizData]);
+	}, [questions.length, quiz, quizId]);
 
 	useEffect(() => {
 		/* eslint-disable react-hooks/set-state-in-effect */

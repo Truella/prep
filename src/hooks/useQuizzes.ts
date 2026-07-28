@@ -1,105 +1,73 @@
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
-import { getAttemptCounts } from "../utils/attempts";
 import toast from "react-hot-toast";
-
 import type { QuizVisibility, QuizCategory, QuizDifficulty } from "../lib/types";
 
 interface Quiz {
-	id: string;
-	title: string;
-	description: string;
-	created_at: string;
-	visibility?: QuizVisibility;
-	category?: QuizCategory | null;
-	difficulty?: QuizDifficulty | null;
-	times_taken?: number;
-	average_rating?: number | null;
+  id: string;
+  title: string;
+  description: string;
+  created_at: string;
+  visibility?: QuizVisibility;
+  category?: QuizCategory | null;
+  difficulty?: QuizDifficulty | null;
+  times_taken?: number;
+  average_rating?: number | null;
+}
+
+async function fetchUserQuizzes(): Promise<Quiz[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select("*")
+    .eq("created_by", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data ?? [];
 }
 
 export function useQuizzes() {
-	const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-	const fetchQuizzes = async () => {
-		try {
-			setLoading(true);
-			setError(null);
+  const { data: quizzes = [], isLoading: loading, error: queryError } = useQuery({
+    queryKey: ["quizzes"],
+    queryFn: fetchUserQuizzes,
+  });
 
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
+  const error = queryError ? (queryError as Error).message : null;
 
-			if (!user) {
-				setError("Not authenticated");
-				setLoading(false);
-				return;
-			}
+  const copyQuizLink = (quizId: string) => {
+    const link = `${window.location.origin}/quiz/${quizId}`;
+    navigator.clipboard.writeText(link);
+    toast.success("Quiz link copied!");
+  };
 
-			const { data, error: fetchError } = await supabase
-				.from("quizzes")
-				.select("*")
-				.eq("created_by", user.id)
-				.order("created_at", { ascending: false });
+  const deleteQuiz = async (quizId: string) => {
+    try {
+      const { error } = await supabase.from("quizzes").delete().eq("id", quizId);
+      if (error) throw error;
+      // Optimistic update — remove from cache immediately
+      queryClient.setQueryData<Quiz[]>(["quizzes"], (prev) =>
+        prev ? prev.filter((q) => q.id !== quizId) : []
+      );
+      toast.success("Quiz deleted");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      toast.error(`Failed to delete quiz: ${message}`);
+      // Revert by invalidating
+      queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+    }
+  };
 
-			if (fetchError) {
-				setError(fetchError.message);
-				toast.error("Failed to fetch quizzes");
-				console.error(fetchError);
-				return;
-			}
-
-			const quizzes = data || [];
-			const ids = quizzes.map((q) => q.id);
-			const counts = await getAttemptCounts(ids);
-			for (const q of quizzes) {
-				q.times_taken = counts[q.id] ?? 0;
-			}
-			setQuizzes(quizzes);
-		} catch (err) {
-			const message = err instanceof Error ? err.message : "Unknown error";
-			setError(message);
-			toast.error("An unexpected error occurred");
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		fetchQuizzes();
-	}, []);
-
-	const copyQuizLink = (quizId: string) => {
-		const link = `${window.location.origin}/quiz/${quizId}`;
-		navigator.clipboard.writeText(link);
-		toast.success("Quiz link copied!");
-	};
-
-	const deleteQuiz = async (quizId: string) => {
-		try {
-			const { error } = await supabase
-				.from("quizzes")
-				.delete()
-				.eq("id", quizId);
-
-			if (error) throw error;
-
-			setQuizzes(quizzes.filter((q) => q.id !== quizId));
-			toast.success("Quiz deleted");
-		} catch (err) {
-			const message = err instanceof Error ? err.message : "Unknown error";
-			toast.error(`Failed to delete quiz: ${message}`);
-		}
-	};
-
-	return {
-		quizzes,
-		loading,
-		error,
-		copyQuizLink,
-		deleteQuiz,
-		refetch: fetchQuizzes,
-	};
+  return {
+    quizzes,
+    loading,
+    error,
+    copyQuizLink,
+    deleteQuiz,
+    refetch: () => queryClient.invalidateQueries({ queryKey: ["quizzes"] }),
+  };
 }
