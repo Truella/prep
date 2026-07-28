@@ -181,10 +181,13 @@ export default function QuestionEditor({
 							max={100}
 							value={draft.points}
 							onChange={(e) =>
-								setDraft((d) => ({
-									...d,
-									points: parseInt(e.target.value) || 1,
-								}))
+								setDraft((d) => {
+									const v = parseInt(e.target.value);
+									return {
+										...d,
+										points: isNaN(v) ? 1 : Math.min(100, Math.max(1, v)),
+									};
+								})
 							}
 							style={{ ...inputStyle, width: "64px", padding: "4px 8px" }}
 						/>
