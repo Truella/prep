@@ -41,6 +41,7 @@ export default function QuizBankFilters({
       />
 
       <select
+        aria-label="Filter by category"
         value={category ?? ""}
         onChange={(e) =>
           onCategoryChange((e.target.value as QuizCategory) || null)
@@ -66,6 +67,7 @@ export default function QuizBankFilters({
       </select>
 
       <select
+        aria-label="Filter by difficulty"
         value={difficulty ?? ""}
         onChange={(e) =>
           onDifficultyChange((e.target.value as QuizDifficulty) || null)
@@ -86,6 +88,7 @@ export default function QuizBankFilters({
       </select>
 
       <select
+        aria-label="Sort quizzes"
         value={sort}
         onChange={(e) => onSortChange(e.target.value as SortOption)}
         className="px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
