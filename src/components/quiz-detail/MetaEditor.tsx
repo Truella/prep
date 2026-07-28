@@ -16,7 +16,16 @@ interface MetaEditorProps {
 	category: QuizCategory | null;
 	difficulty: QuizDifficulty | null;
 	saving: boolean;
-	onSave: (updates: Record<string, unknown>) => Promise<boolean>;
+	onSave: (
+		updates: Partial<{
+			title: string;
+			description: string;
+			time_limit: number | null;
+			visibility: QuizVisibility;
+			category: QuizCategory | null;
+			difficulty: QuizDifficulty | null;
+		}>
+	) => Promise<boolean>;
 }
 
 const VISIBILITY_OPTIONS: {
@@ -116,6 +125,8 @@ export default function MetaEditor({
 						Time limit
 					</span>
 				</label>
+const [localTimeLimit, setLocalTimeLimit] = useState(timeLimit);
+
 				{timeLimit !== null && (
 					<div className="flex items-center gap-2">
 						<input
@@ -123,11 +134,16 @@ export default function MetaEditor({
 							type="number"
 							min={1}
 							max={180}
-							value={timeLimit}
-							onChange={(e) => {
-								const v = parseInt(e.target.value);
-								if (!isNaN(v) && v >= 1 && v <= 180)
-									onSave({ time_limit: v });
+							value={localTimeLimit ?? ""}
+							onChange={(e) => setLocalTimeLimit(parseInt(e.target.value) || null)}
+							onBlur={() => {
+								if (
+									localTimeLimit !== timeLimit &&
+									localTimeLimit !== null &&
+									localTimeLimit >= 1 &&
+									localTimeLimit <= 180
+								)
+									onSave({ time_limit: localTimeLimit });
 							}}
 							style={{
 								...inputStyle,

@@ -77,6 +77,7 @@ export function useQuizBank() {
 			q.times_taken = counts[q.id] ?? 0;
 		}
 		setAllQuizzes(quizzes);
+		setLoading(false);
 	}, [filters.category, filters.difficulty, filters.sort]);
 
 	useEffect(() => {

@@ -62,19 +62,22 @@ export function useQuizDetail(quizId: string) {
 			return;
 		}
 
-		const { data: questionsData } = await supabase
+		const { data: questionsData, error: questionsError } = await supabase
 			.from("questions")
 			.select("*")
 			.eq("quiz_id", quizId)
 			.order("created_at", { ascending: true });
 
-		const { data: attemptsData } = await supabase
+		const { data: attemptsData, error: attemptsError } = await supabase
 			.from("quiz_attempts")
 			.select("id, score, total_points, elapsed_seconds, completed_at")
 			.eq("quiz_id", quizId)
 			.order("completed_at", { ascending: false });
 
 		if (currentGen !== requestGenRef.current) return;
+		if (questionsError || attemptsError) {
+			toast.error("Some quiz data failed to load");
+		}
 
 		setState({
 			quiz: quizData,
@@ -179,8 +182,10 @@ export function useQuizDetail(quizId: string) {
 	// Copy shareable link
 	const copyLink = () => {
 		const link = `${window.location.origin}/quiz/${quizId}`;
-		navigator.clipboard.writeText(link);
-		toast.success("Link copied!");
+		navigator.clipboard
+			.writeText(link)
+			.then(() => toast.success("Link copied!"))
+			.catch(() => toast.error("Failed to copy link"));
 	};
 
 	return {
