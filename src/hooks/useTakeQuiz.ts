@@ -346,13 +346,15 @@ export function useTakeQuiz(quizId: string | undefined) {
 		const { earnedPoints } = calculateScore();
 		const totalPts = questions.reduce((sum, q) => sum + q.points, 0);
 
-		await supabase.from("quiz_attempts").insert({
-			quiz_id: quiz.id,
-			score: earnedPoints,
-			total_points: totalPts,
-			elapsed_seconds: elapsed,
-			answers: selectedAnswers,
-		});
+		try {
+			await supabase.from("quiz_attempts").insert({
+				quiz_id: quiz.id,
+				score: earnedPoints,
+				total_points: totalPts,
+				elapsed_seconds: elapsed,
+				answers: selectedAnswers,
+			});
+		} catch {}
 	};
 
 	const currentQuestion = questions[currentQuestionIndex];
