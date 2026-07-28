@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
-import { QuizDraft, DBQuestion, AppQuestion } from "../lib/types";
+import { QuizDraft, DBQuestion, AppQuestion, QuizAttempt } from "../lib/types";
 import { dbToAppQuestion } from "../utils/transforms";
 import useQuizProgress from "./useQuizProgress";
 
@@ -253,6 +253,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setShowResults(true);
 		setIsSubmitted(true);
 		clearDeadline();
+		saveAttempt(elapsed);
 
 		try {
 			localStorage.setItem(
@@ -280,6 +281,7 @@ export function useTakeQuiz(quizId: string | undefined) {
 		setShowResults(true);
 		setIsSubmitted(true);
 		clearDeadline();
+		saveAttempt(elapsed);
 
 		try {
 			localStorage.setItem(
@@ -335,6 +337,20 @@ export function useTakeQuiz(quizId: string | undefined) {
 		});
 
 		return { correctCount, earnedPoints, totalPoints };
+	};
+
+	const saveAttempt = async (elapsed: number) => {
+		if (!quiz?.id) return;
+		const { earned } = calculateScore();
+		const totalPts = questions.reduce((sum, q) => sum + q.points, 0);
+
+		await supabase.from("quiz_attempts").insert({
+			quiz_id: quiz.id,
+			score: earned,
+			total_points: totalPts,
+			elapsed_seconds: elapsed,
+			answers: selectedAnswers,
+		});
 	};
 
 	const currentQuestion = questions[currentQuestionIndex];
