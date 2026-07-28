@@ -68,10 +68,13 @@ export function useQuizBank() {
 		const quizzes = data ?? [];
 		const ids = quizzes.map((q) => q.id);
 		const counts = await getAttemptCounts(ids);
+		if (currentGen !== requestGenRef.current) return;
+
 		for (const q of quizzes) {
 			q.times_taken = counts[q.id] ?? 0;
 		}
 		setAllQuizzes(quizzes);
+		setLoading(false);
 	}, [filters.category, filters.difficulty, filters.sort]);
 
 	useEffect(() => {
