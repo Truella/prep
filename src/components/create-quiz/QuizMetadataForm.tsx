@@ -34,10 +34,11 @@ export default function QuizMetadataForm({
   return (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
+        <label htmlFor="quiz-title" className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
           Quiz Title
         </label>
         <input
+          id="quiz-title"
           type="text"
           placeholder="Enter quiz title"
           value={title}
@@ -48,10 +49,11 @@ export default function QuizMetadataForm({
         />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
+        <label htmlFor="quiz-description" className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
           Description
         </label>
         <textarea
+          id="quiz-description"
           placeholder="Enter quiz description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
