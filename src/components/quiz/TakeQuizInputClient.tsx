@@ -91,7 +91,6 @@ export default function TakeQuizInputClient() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="https://prep.app/quiz/... or code"
-              autoFocus
               className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none transition"
               style={{
                 backgroundColor: "var(--color-surface)",

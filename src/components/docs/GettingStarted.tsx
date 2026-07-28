@@ -37,9 +37,10 @@ export default function GettingStarted() {
             }}
           >
             <span
-              className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
+              className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
               style={{
                 backgroundColor: "var(--color-surface-raised)",
+                color: "var(--color-text-primary)",
               }}
             >
               {s.n}
