@@ -66,7 +66,7 @@ export default function Troubleshooting() {
               >
                 <p
                   className="font-mono text-sm"
-                  style={{ color: "#EF4444" }}
+                  style={{ color: "var(--color-error)" }}
                 >
                   {item.error}
                 </p>

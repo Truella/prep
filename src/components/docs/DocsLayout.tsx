@@ -37,7 +37,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
             aria-label="Documentation section"
             value={currentSlug}
             onChange={(e) => router.push(`/docs/${e.target.value}`)}
-            className="w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
+            className="w-full px-4 py-2.5 rounded-xl text-sm focus-visible:ring-2 focus-visible:ring-accent transition"
             style={{
               backgroundColor: "var(--color-surface)",
               border: "1px solid var(--color-border)",

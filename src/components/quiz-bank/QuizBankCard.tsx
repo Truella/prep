@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import type { PublicQuiz } from "../../lib/types";
-
-const DIFFICULTY_STYLES: Record<string, string> = {
-  Beginner: "text-green-500 border-green-500/20 bg-green-500/10",
-  Intermediate: "text-yellow-500 border-yellow-500/20 bg-yellow-500/10",
-  Advanced: "text-red-500 border-red-500/20 bg-red-500/10",
-};
+import { DIFFICULTY_STYLES } from "../../constants/quizBank";
 
 export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
   const stars = Math.round(quiz.average_rating ?? 0);
@@ -72,7 +67,7 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
           {"★".repeat(stars)}{"☆".repeat(5 - stars)}{" "}
           {quiz.average_rating ? quiz.average_rating.toFixed(1) : "—"}
         </span>
-        <span>{quiz.times_taken.toLocaleString()} taken</span>
+        <span>{quiz.times_taken.toLocaleString("en-US")} taken</span>
       </div>
 
       <Link
