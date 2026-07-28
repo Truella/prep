@@ -59,7 +59,11 @@ export default function RootLayout({
               (function () {
                 try {
                   var theme = localStorage.getItem("theme");
-                  if (theme !== "light" && theme !== "dark") theme = "dark";
+                  if (theme !== "light" && theme !== "dark") {
+                    theme = window.matchMedia("(prefers-color-scheme: light)").matches
+                      ? "light"
+                      : "dark";
+                  }
                   document.documentElement.classList.add(theme);
                 } catch (e) {
                   document.documentElement.classList.add("dark");
@@ -68,7 +72,7 @@ export default function RootLayout({
             `,
           }}
         />
-        <ThemeProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
           <AuthProvider>
             <ErrorBoundary>{children}</ErrorBoundary>
             <Toaster position="top-right" reverseOrder={false} />

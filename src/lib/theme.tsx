@@ -18,8 +18,15 @@ interface ThemeContextValue {
 	resolvedTheme: Theme;
 }
 
-function getSnapshot(): Theme {
+function getSystemTheme(): Theme {
 	if (typeof window === "undefined") return "dark";
+	return window.matchMedia("(prefers-color-scheme: light)").matches
+		? "light"
+		: "dark";
+}
+
+function getSnapshot(defaultTheme: Theme = "dark"): Theme {
+	if (typeof window === "undefined") return defaultTheme;
 
 	try {
 		const stored = localStorage.getItem(STORAGE_KEY);
@@ -29,7 +36,7 @@ function getSnapshot(): Theme {
 		}
 	} catch {}
 
-	return "dark";
+	return getSystemTheme();
 }
 
 function subscribe(callback: () => void) {
@@ -63,8 +70,21 @@ export function useTheme() {
 	return useContext(ThemeContext);
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-	const theme = useSyncExternalStore<Theme>(subscribe, getSnapshot, () => "dark");
+interface ThemeProviderProps {
+	children: ReactNode;
+	attribute?: string;
+	defaultTheme?: Theme;
+	enableSystem?: boolean;
+}
+
+export function ThemeProvider({
+	children,
+	attribute: _attribute,
+	defaultTheme = "dark",
+	enableSystem: _enableSystem = false,
+}: ThemeProviderProps) {
+	const snapshot = () => getSnapshot(defaultTheme);
+	const theme = useSyncExternalStore<Theme>(subscribe, snapshot, () => defaultTheme);
 
 	useEffect(() => {
 		applyTheme(theme);
