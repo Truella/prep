@@ -115,7 +115,9 @@ describe("useRating", () => {
 			expect(ok).toBe(false);
 		});
 
-		expect(result.current.error).toBe("DB error");
+		await waitFor(() => {
+			expect(result.current.error).toBe("DB error");
+		});
 	});
 
 	it("loads current rating on mount", async () => {
