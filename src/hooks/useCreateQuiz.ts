@@ -216,20 +216,37 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		toast.success(`${parsed.length} questions loaded`);
 	};
 
+	const isUnsavedQuestion = (question: AppQuestion) =>
+		question.id.startsWith("temp-") || question.id.startsWith("draft-");
+
 	const insertQuestions = async (
 		questions: AppQuestion[],
 		quizId: string,
-	): Promise<boolean> => {
-		const payload = questions.map((question) => ({
+	): Promise<AppQuestion[] | null> => {
+		const unsavedQuestions = questions.filter(isUnsavedQuestion);
+		if (unsavedQuestions.length === 0) return questions;
+
+		const payload = unsavedQuestions.map((question) => ({
 			...appToDBQuestion(question),
 			quiz_id: quizId,
 		}));
-		const { error: insertError } = await supabase.from("questions").insert(payload);
+		const { data, error: insertError } = await supabase
+			.from("questions")
+			.insert(payload)
+			.select();
 		if (insertError) {
 			toast.error(`Failed to save questions: ${insertError.message}`);
-			return false;
+			return null;
 		}
-		return true;
+
+		// Use the IDs assigned by Supabase so a later save does not insert them again.
+		const savedQuestions = (data ?? []).map((row, index) =>
+			dbToAppQuestion(row as DBQuestion, unsavedQuestions[index].order),
+		);
+		const savedByTempId = new Map(
+			unsavedQuestions.map((question, index) => [question.id, savedQuestions[index] ?? question]),
+		);
+		return questions.map((question) => savedByTempId.get(question.id) ?? question);
 	};
 
 	const saveAsDraft = async (
@@ -242,10 +259,11 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		}
 
 		setState((prev) => ({ ...prev, isUploadingQuestions: true }));
-		const ok = await insertQuestions(toSave, state.quiz.id);
+		const savedQuestions = await insertQuestions(toSave, state.quiz.id);
+		const ok = savedQuestions !== null;
 		setState((prev) => ({
 			...prev,
-			questions: ok ? toSave : prev.questions,
+			questions: savedQuestions ?? prev.questions,
 			isUploadingQuestions: false,
 		}));
 		if (ok) {
@@ -268,8 +286,8 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		}
 
 		setState((prev) => ({ ...prev, isUploadingQuestions: true }));
-		const questionsOk = await insertQuestions(toPublish, state.quiz.id);
-		if (!questionsOk) {
+		const savedQuestions = await insertQuestions(toPublish, state.quiz.id);
+		if (!savedQuestions) {
 			setState((prev) => ({ ...prev, isUploadingQuestions: false }));
 			return false;
 		}
@@ -307,7 +325,7 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		} catch {}
 		setState((prev) => ({
 			...prev,
-			questions: toPublish,
+			questions: savedQuestions,
 			shareableLink: quizLink,
 			quizCode: result.data.code,
 			quiz: {

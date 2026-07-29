@@ -88,10 +88,13 @@ describe("useCreateQuiz", () => {
 	it("saves questions while keeping the quiz as a draft", async () => {
 		const { supabase } = await import("../lib/supabase");
 		const quizSource = createQuizInsert();
-		const questionInsert = vi.fn().mockResolvedValue({ error: null });
+		const questionInsert = vi.fn().mockResolvedValue({
+			data: [{ id: "saved-question-1", quiz_id: "quiz-1", Question: "Question?", Option_A: "A", Option_B: "B", Option_C: "C", Option_D: "D", Correct_Answer: "A", Points: 1, created_at: "" }],
+			error: null,
+		});
 		vi.mocked(supabase.from)
 			.mockReturnValueOnce(quizSource as never)
-			.mockReturnValueOnce({ insert: questionInsert } as never);
+			.mockReturnValueOnce({ insert: () => ({ select: () => questionInsert() }) } as never);
 		const { result } = renderHook(() => useCreateQuiz());
 		act(() => result.current.setTitle("Draft Quiz"));
 		await act(() => result.current.createQuiz());
@@ -107,10 +110,75 @@ describe("useCreateQuiz", () => {
 		expect(result.current.quizCode).toBeNull();
 	});
 
+	it("does not reinsert resumed questions and inserts only new questions", async () => {
+		const { supabase } = await import("../lib/supabase");
+		const existingQuestion: AppQuestion = { ...question, id: "db-question-1" };
+		const newQuestion: AppQuestion = { ...question, id: "draft-new-1", questionText: "New question?", order: 1 };
+		const questionInsert = vi.fn().mockResolvedValue({
+			data: [{ id: "db-question-2", quiz_id: "quiz-1", Question: "New question?", Option_A: "A", Option_B: "B", Option_C: "C", Option_D: "D", Correct_Answer: "A", Points: 1, created_at: "" }],
+			error: null,
+		});
+		vi.mocked(supabase.from).mockReturnValueOnce(createQuizInsert() as never).mockReturnValueOnce({
+			insert: vi.fn(() => ({ select: questionInsert })),
+		} as never);
+
+		const { result } = renderHook(() => useCreateQuiz());
+		act(() => result.current.setTitle("Resumed Quiz"));
+		await act(() => result.current.createQuiz());
+		await act(async () => {
+			await result.current.saveAsDraft([existingQuestion, newQuestion]);
+		});
+
+		expect(questionInsert).toHaveBeenCalledOnce();
+		expect(questionInsert).toHaveBeenCalledWith();
+		expect(result.current.questions.map((item) => item.id)).toEqual([
+			"db-question-1",
+			"db-question-2",
+		]);
+	});
+
+	it("publishes unchanged resumed questions without inserting them again", async () => {
+		const { supabase } = await import("../lib/supabase");
+		const existingQuestion: AppQuestion = { ...question, id: "db-question-1" };
+		const update = vi.fn(() => ({
+			eq: vi.fn(() => ({
+				eq: vi.fn(() => ({
+					select: vi.fn(() => ({
+						single: vi.fn().mockResolvedValue({
+							data: { id: "quiz-1", code: "ABC234" },
+							error: null,
+						}),
+					})),
+				})),
+			})),
+		}));
+		vi.mocked(supabase.from)
+			.mockReturnValueOnce(createQuizInsert() as never)
+			.mockReturnValueOnce({ update } as never);
+		const { result } = renderHook(() => useCreateQuiz());
+		act(() => result.current.setTitle("Resumed Quiz"));
+		await act(() => result.current.createQuiz());
+
+		await act(async () => {
+			await result.current.publishQuiz([existingQuestion], {
+				visibility: "private",
+				category: null,
+				difficulty: null,
+			});
+		});
+
+		expect(supabase.from).toHaveBeenCalledTimes(2);
+		expect(supabase.from).not.toHaveBeenCalledWith("questions");
+		expect(update).toHaveBeenCalledOnce();
+	});
+
 	it("publishes with settings, a code, and a shareable link", async () => {
 		const { supabase } = await import("../lib/supabase");
 		const quizSource = createQuizInsert();
-		const questionInsert = vi.fn().mockResolvedValue({ error: null });
+		const questionInsert = vi.fn().mockResolvedValue({
+			data: [{ id: "saved-question-1", quiz_id: "quiz-1", Question: "Question?", Option_A: "A", Option_B: "B", Option_C: "C", Option_D: "D", Correct_Answer: "A", Points: 1, created_at: "" }],
+			error: null,
+		});
 		const update = vi.fn(() => ({
 			eq: vi.fn(() => ({
 				eq: vi.fn(() => ({
@@ -125,7 +193,7 @@ describe("useCreateQuiz", () => {
 		}));
 		vi.mocked(supabase.from)
 			.mockReturnValueOnce(quizSource as never)
-			.mockReturnValueOnce({ insert: questionInsert } as never)
+			.mockReturnValueOnce({ insert: vi.fn(() => ({ select: questionInsert })) } as never)
 			.mockReturnValueOnce({ update } as never);
 		const { result } = renderHook(() => useCreateQuiz());
 		act(() => result.current.setTitle("Published Quiz"));
