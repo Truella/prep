@@ -286,6 +286,11 @@ describe("useTakeQuiz", () => {
 		expect(result.current.timerSeconds).toBe(0);
 		expect(result.current.isAutoSubmit).toBe(true);
 		expect(result.current.selectedAnswers).toEqual({ 0: 3 });
+
+		const insertChain = vi.mocked(supabase.from).mock.results[2].value;
+		expect(insertChain.insert).toHaveBeenCalledWith(
+			expect.objectContaining({ answers: { 0: 3 } })
+		);
 	});
 
 	it("handleTimerExpire saves results and shows results screen", async () => {

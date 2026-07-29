@@ -8,11 +8,7 @@ interface Stats {
   totalAttempts: number;
 }
 
-async function fetchStats(): Promise<Stats> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!user) return { totalQuizzes: 0, totalQuestions: 0, totalAttempts: 0 };
-
+async function fetchStats(userId: string): Promise<Stats> {
   const [
     { count: quizCount, error: quizError },
     questionResult,
@@ -21,15 +17,15 @@ async function fetchStats(): Promise<Stats> {
     supabase
       .from("quizzes")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", user.id),
+      .eq("created_by", userId),
     supabase
       .from("questions")
       .select("*, quizzes!inner(created_by)", { count: "exact", head: true })
-      .eq("quizzes.created_by", user.id),
+      .eq("quizzes.created_by", userId),
     supabase
       .from("quiz_attempts")
       .select("*, quizzes!inner(created_by)", { count: "exact", head: true })
-      .eq("quizzes.created_by", user.id),
+      .eq("quizzes.created_by", userId),
   ]);
 
   if (quizError) throw quizError;
@@ -48,7 +44,8 @@ export function useAnalyticsStats() {
 
   const { data: stats = { totalQuizzes: 0, totalQuestions: 0, totalAttempts: 0 }, isLoading: loading } = useQuery({
     queryKey: ["stats", user?.id],
-    queryFn: fetchStats,
+    queryFn: () => fetchStats(user!.id),
+    enabled: !!user,
     refetchInterval: 30 * 1000,
     staleTime: 20 * 1000,
   });

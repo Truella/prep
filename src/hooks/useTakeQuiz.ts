@@ -210,31 +210,46 @@ export function useTakeQuiz(quizId: string | undefined) {
 					const elapsedTotal = quiz.time_limit * 60;
 					setElapsedSeconds(elapsedTotal);
 
-					// Restore saved answers before submitting
 					const savedResults = readSavedResults(quizId);
-					const answersForSubmit = savedResults?.answers ?? selectedAnswers;
-					setSelectedAnswers(answersForSubmit);
-
-					(async () => {
-						const saved = await saveAttempt(elapsedTotal, answersForSubmit);
-						if (!active) return;
-						if (!saved) return;
+					if (savedResults) {
+						setSelectedAnswers(savedResults.answers);
+						setElapsedSeconds(savedResults.elapsedSeconds);
+						setIsAutoSubmit(savedResults.isAutoSubmit);
 						clearDeadline();
 						setShowResults(true);
 						setIsSubmitted(true);
-						try {
-							localStorage.setItem(
-								`quiz_results_${quizId}`,
-								JSON.stringify({
-									answers: answersForSubmit,
-									elapsedSeconds: elapsedTotal,
-									isAutoSubmit: true,
-								})
-							);
-						} catch (err) {
-							console.error("Failed to save quiz results:", err);
+					} else {
+						const savedProgress = loadProgress();
+						const progressAnswers =
+							savedProgress?.answers && Object.keys(savedProgress.answers).length > 0
+								? savedProgress.answers
+								: undefined;
+						if (progressAnswers) {
+							setSelectedAnswers(progressAnswers);
 						}
-					})();
+						const answersForSubmit = progressAnswers ?? selectedAnswers;
+
+						(async () => {
+							const persisted = await saveAttempt(elapsedTotal, answersForSubmit);
+							if (!active) return;
+							if (!persisted) return;
+							clearDeadline();
+							setShowResults(true);
+							setIsSubmitted(true);
+							try {
+								localStorage.setItem(
+									`quiz_results_${quizId}`,
+									JSON.stringify({
+										answers: answersForSubmit,
+										elapsedSeconds: elapsedTotal,
+										isAutoSubmit: true,
+									})
+								);
+							} catch (err) {
+								console.error("Failed to save quiz results:", err);
+							}
+						})();
+					}
 				} else {
 					setTimerSeconds(remaining);
 				}
