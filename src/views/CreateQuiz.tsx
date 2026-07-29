@@ -1,39 +1,77 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useCreateQuiz } from "../hooks/useCreateQuiz";
 import QuizBuilder from "../components/quiz-builder/QuizBuilder";
 import UploadQuestionsForm from "../components/UploadQuestionsForm";
 import ShareableLink from "../components/ShareableLink";
-import PublishModal from "../components/quiz-bank/PublishModal";
 import QuizMetadataForm from "../components/create-quiz/QuizMetadataForm";
 import CreateQuizTabs from "../components/create-quiz/CreateQuizTabs";
+import PublishSettingsModal from "../components/quiz-bank/PublishSettingsModal";
+import type { AppQuestion } from "../lib/types";
+import type { PublishSettings } from "../hooks/useCreateQuiz";
 
 type Tab = "build" | "csv";
 
 export default function CreateQuizCSV() {
+	const searchParams = useSearchParams();
+	const resumeQuizId = searchParams.get("resume");
 	const [tab, setTab] = useState<Tab>("build");
-	const [isPublishOpen, setIsPublishOpen] = useState(false);
+	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+	const [pendingQuestions, setPendingQuestions] = useState<AppQuestion[] | undefined>();
 	const {
 		quiz,
 		questions,
 		shareableLink,
+		quizCode,
 		isCreatingQuiz,
 		isUploadingQuestions,
+		isLoadingDraft,
 		setTitle,
 		setDescription,
 		timeLimit,
 		setTimeLimit,
 		createQuiz,
 		setQuestionsFromCSV,
-		uploadQuestions,
-		updateQuizMeta,
-	} = useCreateQuiz();
+		saveAsDraft,
+		publishQuiz,
+	} = useCreateQuiz(resumeQuizId);
+
+	const handleTabSwitch = (next: Tab) => {
+		if (next === "csv") {
+			try {
+				localStorage.removeItem("quiz_builder_draft");
+			} catch {}
+		}
+		setTab(next);
+	};
+
+	const handlePublishClick = (questionsOverride?: AppQuestion[]) => {
+		setPendingQuestions(questionsOverride);
+		setIsPublishModalOpen(true);
+	};
+
+	const handlePublishConfirm = async (settings: PublishSettings) => {
+		const published = await publishQuiz(pendingQuestions, settings);
+		if (published) {
+			setIsPublishModalOpen(false);
+			setPendingQuestions(undefined);
+		}
+	};
 
 	const statCardStyle = {
 		backgroundColor: "var(--color-surface)",
 		borderColor: "var(--color-border)",
 	};
+
+	if (isLoadingDraft) {
+		return (
+			<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--color-bg)" }}>
+				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading draft...</p>
+			</div>
+		);
+	}
 
 	return (
 		<div className="min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
@@ -42,7 +80,7 @@ export default function CreateQuizCSV() {
 					<div className="backdrop-blur-sm border rounded-xl p-4 text-center" style={statCardStyle}>
 						<p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>Quiz Status</p>
 						<p className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>
-							{quiz.id ? "Draft Created" : "Not Created"}
+							{quiz.status === "published" ? "Published" : quiz.id ? "Draft" : "Not Created"}
 						</p>
 					</div>
 					<div className="backdrop-blur-sm border rounded-xl p-4 text-center" style={statCardStyle}>
@@ -67,145 +105,108 @@ export default function CreateQuizCSV() {
 						createQuiz={createQuiz}
 					/>
 
-					{quiz.id && (
+					{quiz.id && quiz.status !== "published" && (
 						<>
-							<CreateQuizTabs activeTab={tab} onTabSwitch={setTab} />
+							<CreateQuizTabs activeTab={tab} onTabSwitch={handleTabSwitch} />
 
 							{tab === "build" && (
 								<QuizBuilder
 									quizId={quiz.id}
-									onSubmit={uploadQuestions}
+									initialQuestions={questions}
+									onSaveAsDraft={saveAsDraft}
+									onPublish={handlePublishClick}
 									isUploading={isUploadingQuestions}
 								/>
 							)}
 
-						{tab === "csv" && (
-							<div className="space-y-4">
-								<UploadQuestionsForm
-									onFileChange={setQuestionsFromCSV}
-									onSubmit={() => uploadQuestions()}
-									disabled={!quiz.id}
-									isUploading={isUploadingQuestions}
-									questionCount={questions.length}
-								/>
+							{tab === "csv" && (
+								<div className="space-y-4">
+									<UploadQuestionsForm
+										onFileChange={setQuestionsFromCSV}
+										disabled={!quiz.id || isUploadingQuestions}
+									/>
 
-								{/* CSV preview — shown after successful parse */}
-								{questions.length > 0 && (
-									<div className="space-y-3">
-										<div className="flex items-center justify-between">
-											<p
-												className="text-sm font-medium"
-												style={{ color: "var(--color-text-primary)" }}
-											>
-												Preview — {questions.length} question
-												{questions.length !== 1 ? "s" : ""} parsed
-											</p>
-											<p
-												className="text-xs"
-												style={{ color: "var(--color-text-secondary)" }}
-											>
-												Review before publishing
-											</p>
-										</div>
+									{questions.length > 0 && (
+										<div className="space-y-3">
+											<div className="flex items-center justify-between gap-4">
+												<p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+													Preview: {questions.length} question{questions.length !== 1 ? "s" : ""} parsed
+												</p>
+												<p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Review before saving</p>
+											</div>
 
-										<div
-											className="max-h-96 overflow-y-auto space-y-2 rounded-xl border p-3"
-											style={{ borderColor: "var(--color-border)" }}
-										>
-											{questions.map((q, i) => {
-												const optionLabels = ["A", "B", "C", "D"] as const;
-												const options = [
-													q.optionA,
-													q.optionB,
-													q.optionC,
-													q.optionD,
-												];
-												return (
-													<div
-														key={q.id}
-														className="p-3 rounded-lg space-y-2"
-														style={{
-															backgroundColor: "var(--color-surface-raised)",
-														}}
-													>
-														<p
-															className="text-xs font-mono"
-															style={{ color: "var(--color-accent)" }}
-														>
-															Q{i + 1} · {q.points}pt{q.points !== 1 ? "s" : ""}
-														</p>
-														<p
-															className="text-sm font-medium leading-snug"
-															style={{ color: "var(--color-text-primary)" }}
-														>
-															{q.questionText}
-														</p>
-														<div className="grid grid-cols-2 gap-1.5">
-															{options.map((opt, j) => (
-																<div
-																	key={j}
-																	className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs"
-																	style={{
-																		backgroundColor:
-																			j === q.correctIndex
-																				? "var(--color-accent-dim)"
-																				: "transparent",
-																		border: `1px solid ${
-																			j === q.correctIndex
-																				? "var(--color-accent)"
-																				: "var(--color-border)"
-																		}`,
-																		color:
-																			j === q.correctIndex
-																				? "var(--color-accent)"
-																				: "var(--color-text-secondary)",
-																	}}
-																>
-																	<span className="font-mono font-bold shrink-0">
-																		{optionLabels[j]}
-																	</span>
-																	<span className="min-w-0 flex-1 truncate">{opt}</span>
-																	{j === q.correctIndex && (
-																		<span className="shrink-0 font-semibold">Correct</span>
-																	)}
-																</div>
-															))}
+											<div className="max-h-96 overflow-y-auto space-y-2 rounded-xl border p-3" style={{ borderColor: "var(--color-border)" }}>
+												{questions.map((question, index) => {
+													const optionLabels = ["A", "B", "C", "D"] as const;
+													const options = [question.optionA, question.optionB, question.optionC, question.optionD];
+													return (
+														<div key={question.id} className="p-3 rounded-lg space-y-2" style={{ backgroundColor: "var(--color-surface-raised)" }}>
+															<p className="text-xs font-mono" style={{ color: "var(--color-accent)" }}>
+																Q{index + 1} - {question.points}pt{question.points !== 1 ? "s" : ""}
+															</p>
+															<p className="text-sm font-medium leading-snug" style={{ color: "var(--color-text-primary)" }}>{question.questionText}</p>
+															<div className="grid grid-cols-2 gap-1.5">
+																{options.map((option, optionIndex) => (
+																	<div
+																		key={optionLabels[optionIndex]}
+																		className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs"
+																		style={{
+																			backgroundColor: optionIndex === question.correctIndex ? "var(--color-accent-dim)" : "transparent",
+																			border: `1px solid ${optionIndex === question.correctIndex ? "var(--color-accent)" : "var(--color-border)"}`,
+																			color: optionIndex === question.correctIndex ? "var(--color-accent)" : "var(--color-text-secondary)",
+																		}}
+																	>
+																		<span className="font-mono font-bold shrink-0">{optionLabels[optionIndex]}</span>
+																		<span className="min-w-0 flex-1 truncate">{option}</span>
+																		{optionIndex === question.correctIndex && <span className="shrink-0 font-semibold">Correct</span>}
+																	</div>
+																))}
+															</div>
 														</div>
-													</div>
-												);
-											})}
+													);
+												})}
+											</div>
+
+											<div className="flex gap-3 pt-2">
+												<button
+													type="button"
+													onClick={() => void saveAsDraft()}
+													disabled={isUploadingQuestions}
+													className="flex-1 px-4 py-3 rounded-xl border text-sm font-medium transition disabled:opacity-50"
+													style={{ borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
+												>
+													{isUploadingQuestions ? "Saving..." : "Save as Draft"}
+												</button>
+												<button
+													type="button"
+													onClick={() => handlePublishClick()}
+													disabled={isUploadingQuestions}
+													className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition disabled:opacity-50"
+													style={{ backgroundColor: "var(--color-accent)", color: "#0A0A0F" }}
+												>
+													Publish
+												</button>
+											</div>
 										</div>
-									</div>
-								)}
-							</div>
-						)}
+									)}
+								</div>
+							)}
 						</>
 					)}
 
-					{quiz.id && (
-						<div className="pt-2">
-							<button
-								onClick={() => setIsPublishOpen(true)}
-								className="w-full px-4 py-3 rounded-xl border transition font-medium text-sm"
-								style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}
-							>
-								Publish Settings
-							</button>
-						</div>
+					{shareableLink && quizCode && (
+						<ShareableLink shareableLink={shareableLink} quizCode={quizCode} />
 					)}
-
-					{shareableLink && <ShareableLink shareableLink={shareableLink} />}
 				</div>
 			</div>
 
-			<PublishModal
-				quizId={quiz.id ?? ""}
-				currentVisibility={quiz.visibility ?? "private"}
-				currentCategory={quiz.category}
-				currentDifficulty={quiz.difficulty}
-				isOpen={isPublishOpen}
-				onClose={() => setIsPublishOpen(false)}
-				onSuccess={(updates) => updateQuizMeta(updates)}
+			<PublishSettingsModal
+				isOpen={isPublishModalOpen}
+				onClose={() => {
+					if (!isUploadingQuestions) setIsPublishModalOpen(false);
+				}}
+				onConfirm={(settings) => void handlePublishConfirm(settings)}
+				isLoading={isUploadingQuestions}
 			/>
 		</div>
 	);

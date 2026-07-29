@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Calendar02Icon, Copy01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
-import PublishModal from "./quiz-bank/PublishModal";
+import { supabase } from "../lib/supabase";
+import toast from "react-hot-toast";
 import type { QuizVisibility, QuizCategory, QuizDifficulty } from "../lib/types";
 
 interface QuizCardProps {
@@ -13,11 +14,13 @@ interface QuizCardProps {
 		title: string;
 		description: string;
 		created_at: string;
+		status?: "draft" | "published";
 		visibility?: QuizVisibility;
 		category?: QuizCategory | null;
 		difficulty?: QuizDifficulty | null;
 		times_taken?: number;
 		average_rating?: number | null;
+		code?: string | null;
 	};
 	onCopyLink: (id: string) => void;
 	onRefetch?: () => void;
@@ -25,13 +28,33 @@ interface QuizCardProps {
 
 const VISIBILITY_COLORS: Record<string, string> = {
 	private: "text-gray-400 bg-gray-400/10 border-gray-400/20",
-	unlisted: "text-blue-400 bg-blue-400/10 border-blue-400/20",
 	public: "text-green-400 bg-green-400/10 border-green-400/20",
 };
 
 export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps) {
-	const [isPublishOpen, setIsPublishOpen] = useState(false);
+	const [unpublishing, setUnpublishing] = useState(false);
+	const [confirmUnpublish, setConfirmUnpublish] = useState(false);
 	const visibility = quiz.visibility ?? "private";
+
+	const handleUnpublish = async () => {
+		if (!confirmUnpublish) {
+			setConfirmUnpublish(true);
+			return;
+		}
+		setUnpublishing(true);
+		const { error } = await supabase
+			.from("quizzes")
+			.update({ status: "draft", code: null, visibility: "private" })
+			.eq("id", quiz.id);
+		setUnpublishing(false);
+		if (error) {
+			toast.error("Failed to unpublish");
+			setConfirmUnpublish(false);
+			return;
+		}
+		toast.success("Quiz unpublished and moved to drafts");
+		onRefetch?.();
+	};
 
 	return (
 		<div className="backdrop-blur-xl border rounded-2xl p-6 hover:bg-surface-raised transition-all group"
@@ -49,6 +72,23 @@ export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps)
 					{visibility}
 				</span>
 			</div>
+			{quiz.code && (
+				<div className="flex items-center gap-2 mt-1">
+					<span className="text-xs font-mono font-bold" style={{ color: "var(--color-accent)" }}>
+						{quiz.code}
+					</span>
+					<button
+						onClick={() => {
+							navigator.clipboard.writeText(quiz.code!);
+							toast.success("Code copied!");
+						}}
+						className="text-xs transition"
+						style={{ color: "var(--color-text-secondary)" }}
+					>
+						Copy code
+					</button>
+				</div>
+			)}
 			<p className="text-sm line-clamp-2 mb-2" style={{ color: "var(--color-text-secondary)" }}>
 				{quiz.description || "No description provided"}
 			</p>
@@ -85,23 +125,18 @@ export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps)
 				Manage
 			</Link>
 				<button
-					onClick={() => setIsPublishOpen(true)}
+					onClick={handleUnpublish}
+					disabled={unpublishing}
 					className="px-4 py-2 rounded-lg border text-sm font-medium transition"
-					style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}
+					style={{
+						borderColor: confirmUnpublish ? "rgb(239 68 68 / 0.5)" : "var(--color-border)",
+						color: confirmUnpublish ? "rgb(248 113 113)" : "var(--color-text-secondary)",
+						backgroundColor: confirmUnpublish ? "rgb(239 68 68 / 0.1)" : "transparent",
+					}}
 				>
-					Publish
+					{unpublishing ? "..." : confirmUnpublish ? "Confirm unpublish" : "Unpublish"}
 				</button>
 			</div>
-
-			<PublishModal
-				quizId={quiz.id}
-				currentVisibility={visibility}
-				currentCategory={quiz.category}
-				currentDifficulty={quiz.difficulty}
-				isOpen={isPublishOpen}
-				onClose={() => setIsPublishOpen(false)}
-				onSuccess={() => onRefetch?.()}
-			/>
 		</div>
 	);
 }

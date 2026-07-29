@@ -30,11 +30,6 @@ const VISIBILITY_OPTIONS: {
 		desc: "Only accessible via direct link",
 	},
 	{
-		value: "unlisted",
-		label: "Unlisted",
-		desc: "Shareable but not listed in the Quiz Bank",
-	},
-	{
 		value: "public",
 		label: "Public",
 		desc: "Listed in the Quiz Bank for anyone to discover",

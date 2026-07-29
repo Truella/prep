@@ -73,32 +73,27 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 
 	if (error || !quiz) {
 		return (
-			<div className="min-h-screen bg-black flex items-center justify-center px-4">
-				<div className="text-center">
-					<div className="mx-auto w-16 h-16 rounded-2xl bg-red-500/20 flex items-center justify-center mb-4">
-						<svg
-							className="w-8 h-8 text-red-400"
-							viewBox="0 0 24 24"
-							fill="none"
-						>
-							<path
-								d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
-					</div>
-					<h2 className="text-2xl font-bold text-white mb-2">Quiz Not Found</h2>
-					<p className="text-gray-400 mb-6">
-						{error || "This quiz doesn't exist or has been deleted"}
+			<div
+				className="min-h-screen flex items-center justify-center px-6"
+				style={{ backgroundColor: "var(--color-bg)" }}
+			>
+				<div className="text-center space-y-4 max-w-sm">
+					<p className="text-4xl">◎</p>
+					<h2
+						className="text-xl font-semibold"
+						style={{ color: "var(--color-text-primary)" }}
+					>
+						Quiz unavailable
+					</h2>
+					<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+						This quiz may have been unpublished by its creator, or the link is no longer valid.
 					</p>
 					<Link
-						href="/"
-						className="inline-block px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-gray-100 transition"
+						href="/quiz-bank"
+						className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold transition"
+						style={{ backgroundColor: "var(--color-accent)", color: "#0A0A0F" }}
 					>
-						Go Home
+						Browse Quiz Bank
 					</Link>
 				</div>
 			</div>
@@ -129,6 +124,17 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 
 	return (
 		<div className="min-h-screen bg-black py-8 px-4">
+			{quiz.status === "draft" && (
+				<div
+					className="px-4 py-2 text-center text-xs font-medium mb-6"
+					style={{
+						backgroundColor: "var(--color-accent-dim)",
+						color: "var(--color-accent)",
+					}}
+				>
+					Preview mode - this quiz is a draft and not publicly accessible
+				</div>
+			)}
 			<div className="max-w-5xl mx-auto">
 				{/* Header */}
 				<div className="mb-8">

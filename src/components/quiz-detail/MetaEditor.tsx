@@ -34,7 +34,6 @@ const VISIBILITY_OPTIONS: {
 	desc: string;
 }[] = [
 	{ value: "private", label: "Private", desc: "Direct link only" },
-	{ value: "unlisted", label: "Unlisted", desc: "Shareable, not in Quiz Bank" },
 	{ value: "public", label: "Public", desc: "Listed in Quiz Bank" },
 ];
 

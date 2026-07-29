@@ -2,18 +2,12 @@ import Link from "next/link";
 
 interface UploadQuestionsFormProps {
 	onFileChange: (file: File) => void;
-	onSubmit: () => void;
 	disabled: boolean;
-	isUploading: boolean;
-	questionCount: number;
 }
 
 export default function UploadQuestionsForm({
 	onFileChange,
-	onSubmit,
 	disabled,
-	isUploading,
-	questionCount,
 }: UploadQuestionsFormProps) {
 	return (
 		<form className="space-y-4">
@@ -45,16 +39,6 @@ export default function UploadQuestionsForm({
 					</Link>
 				</p>
 			</div>
-
-			<button
-				onClick={onSubmit}
-				disabled={disabled || questionCount === 0 || isUploading}
-				type="button"
-				className="w-full px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
-				style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
-			>
-				{isUploading ? "Publishing..." : "Publish Quiz"}
-			</button>
 		</form>
 	);
 }

@@ -1,7 +1,8 @@
 import type { ParseError } from "papaparse";
 import { PostgrestError } from "@supabase/supabase-js";
 
-export type QuizVisibility = "private" | "public" | "unlisted";
+export type QuizStatus = "draft" | "published";
+export type QuizVisibility = "private" | "public";
 export type QuizDifficulty = "Beginner" | "Intermediate" | "Advanced";
 
 export const QUIZ_CATEGORIES = [
@@ -29,7 +30,8 @@ export interface QuizDraft {
 	difficulty?: QuizDifficulty | null;
 	times_taken?: number;
 	average_rating?: number | null;
-	code?: string;
+	status?: QuizStatus;
+	code?: string | null;
 }
 
 export interface PreviewQuestion {

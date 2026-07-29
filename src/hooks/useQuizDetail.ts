@@ -7,6 +7,7 @@ import type {
   QuizVisibility,
   QuizCategory,
   QuizDifficulty,
+  QuizStatus,
   QuizAttempt,
   QuizDraft,
 } from "../lib/types";
@@ -19,6 +20,8 @@ type QuizMeta = QuizDraft & {
   difficulty: QuizDifficulty | null;
   times_taken: number;
   average_rating: number | null;
+  status: QuizStatus;
+  code: string | null;
 };
 
 type AttemptRow = Pick<
@@ -149,6 +152,49 @@ export function useQuizDetail(quizId: string) {
     onError: () => toast.error("Failed to delete quiz"),
   });
 
+  const unpublishMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("quizzes")
+        .update({ status: "draft", code: null, visibility: "private" })
+        .eq("id", quizId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
+      queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+      toast.success("Quiz unpublished and moved to drafts");
+    },
+    onError: () => toast.error("Failed to unpublish quiz"),
+  });
+
+  const republishMutation = useMutation({
+    mutationFn: async (settings: {
+      visibility: "private" | "public";
+      category: QuizCategory | null;
+      difficulty: QuizDifficulty | null;
+    }) => {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let code = "";
+      for (let i = 0; i < 6; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+      }
+
+      const { error } = await supabase
+        .from("quizzes")
+        .update({ status: "published", code, ...settings })
+        .eq("id", quizId);
+      if (error) throw error;
+      return code;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
+      queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+      toast.success("Quiz republished with a new link and code");
+    },
+    onError: () => toast.error("Failed to republish quiz"),
+  });
+
   const copyLink = () => {
     const link = `${window.location.origin}/quiz/${quizId}`;
     navigator.clipboard
@@ -178,7 +224,9 @@ export function useQuizDetail(quizId: string) {
       updateMetaMutation.isPending ||
       updateQuestionMutation.isPending ||
       deleteQuestionMutation.isPending ||
-      deleteQuizMutation.isPending,
+      deleteQuizMutation.isPending ||
+      unpublishMutation.isPending ||
+      republishMutation.isPending,
     refetch: () => {
       queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
       queryClient.invalidateQueries({ queryKey: ["quiz-questions", quizId] });
@@ -214,6 +262,23 @@ export function useQuizDetail(quizId: string) {
         return true;
       } catch {
         return false;
+      }
+    },
+    unpublish: async () => {
+      try {
+        await unpublishMutation.mutateAsync();
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    republish: async (
+      settings: Parameters<typeof republishMutation.mutateAsync>[0]
+    ) => {
+      try {
+        return await republishMutation.mutateAsync(settings);
+      } catch {
+        return null;
       }
     },
     copyLink,

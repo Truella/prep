@@ -8,11 +8,14 @@ interface Quiz {
   title: string;
   description: string;
   created_at: string;
+  status: "draft" | "published";
   visibility?: QuizVisibility;
   category?: QuizCategory | null;
   difficulty?: QuizDifficulty | null;
   times_taken?: number;
   average_rating?: number | null;
+  code?: string | null;
+  question_count?: number;
 }
 
 async function fetchUserQuizzes(): Promise<Quiz[]> {
@@ -21,22 +24,27 @@ async function fetchUserQuizzes(): Promise<Quiz[]> {
 
   const { data, error } = await supabase
     .from("quizzes")
-    .select("*")
+    .select("*, questions(count)")
     .eq("created_by", user.id)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).map(({ questions, ...quiz }) => ({
+    ...quiz,
+    question_count: questions?.[0]?.count ?? 0,
+  })) as Quiz[];
 }
 
 export function useQuizzes() {
   const queryClient = useQueryClient();
 
-  const { data: quizzes = [], isLoading: loading, error: queryError } = useQuery({
+  const { data: allQuizzes = [], isLoading: loading, error: queryError } = useQuery({
     queryKey: ["quizzes"],
     queryFn: fetchUserQuizzes,
   });
 
+  const drafts = allQuizzes.filter((q) => q.status === "draft");
+  const published = allQuizzes.filter((q) => q.status === "published");
   const error = queryError ? (queryError as Error).message : null;
 
   const copyQuizLink = (quizId: string) => {
@@ -64,7 +72,9 @@ export function useQuizzes() {
   };
 
   return {
-    quizzes,
+    quizzes: allQuizzes,
+    drafts,
+    published,
     loading,
     error,
     copyQuizLink,
