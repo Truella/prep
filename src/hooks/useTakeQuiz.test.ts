@@ -1,4 +1,16 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook as originalRenderHook, act, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+
+function createWrapper() {
+	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+	function Wrapper({ children }: { children: React.ReactNode }) {
+		return React.createElement(QueryClientProvider, { client: queryClient }, children);
+	}
+	return Wrapper;
+}
+
+const renderHook = <T, P>(hook: (props: P) => T) => originalRenderHook(hook, { wrapper: createWrapper() });
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { useTakeQuiz } from "./useTakeQuiz";
 import toast from "react-hot-toast";
@@ -182,9 +194,9 @@ describe("useTakeQuiz", () => {
 	it("handles fetch error from supabase", async () => {
 		const { supabase } = await import("../lib/supabase");
 		vi.mocked(supabase.from).mockReset();
-		vi.mocked(supabase.from)
-			.mockReturnValueOnce(createChain({ data: null, error: new Error("DB error") }))
-			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }));
+		vi.mocked(supabase.from).mockReturnValue(
+			createChain({ data: null, error: new Error("DB error") })
+		);
 
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 		await waitFor(() => expect(result.current.loading).toBe(false));
@@ -232,7 +244,7 @@ describe("useTakeQuiz", () => {
 		expect(result.current.timerSeconds).toBeGreaterThan(0);
 	});
 
-	it("resets deadline when stored deadline is in the past", async () => {
+	it("auto-submits when stored deadline is in the past", async () => {
 		const quizWithTimer = { ...mockQuizData, time_limit: 10 };
 
 		localStorage.setItem("quiz_deadline_quiz1", "1");
@@ -241,12 +253,44 @@ describe("useTakeQuiz", () => {
 		vi.mocked(supabase.from).mockReset();
 		vi.mocked(supabase.from)
 			.mockReturnValueOnce(createChain({ data: quizWithTimer, error: null }))
-			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }));
+			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }))
+			.mockReturnValue(createChain({ data: null, error: null }));
 
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 		await waitFor(() => expect(result.current.loading).toBe(false));
-		expect(result.current.timerSeconds).toBeGreaterThan(0);
-		expect(result.current.showResults).toBe(false);
+		await waitFor(() => expect(result.current.showResults).toBe(true));
+		expect(result.current.timerSeconds).toBe(0);
+		expect(result.current.isAutoSubmit).toBe(true);
+	});
+
+	it("auto-submits with saved answers when stored deadline is in the past", async () => {
+		const quizWithTimer = { ...mockQuizData, time_limit: 10 };
+
+		localStorage.setItem(
+			"quiz_progress_quiz1",
+			JSON.stringify({ answers: { 0: 3 }, currentIndex: 0, timestamp: Date.now() })
+		);
+
+		localStorage.setItem("quiz_deadline_quiz1", "1");
+
+		const { supabase } = await import("../lib/supabase");
+		vi.mocked(supabase.from).mockReset();
+		vi.mocked(supabase.from)
+			.mockReturnValueOnce(createChain({ data: quizWithTimer, error: null }))
+			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }))
+			.mockReturnValue(createChain({ data: null, error: null }));
+
+		const { result } = renderHook(() => useTakeQuiz("quiz1"));
+		await waitFor(() => expect(result.current.loading).toBe(false));
+		await waitFor(() => expect(result.current.showResults).toBe(true));
+		expect(result.current.timerSeconds).toBe(0);
+		expect(result.current.isAutoSubmit).toBe(true);
+		expect(result.current.selectedAnswers).toEqual({ 0: 3 });
+
+		const insertChain = vi.mocked(supabase.from).mock.results[2].value;
+		expect(insertChain.insert).toHaveBeenCalledWith(
+			expect.objectContaining({ answers: { 0: 3 } })
+		);
 	});
 
 	it("handleTimerExpire saves results and shows results screen", async () => {

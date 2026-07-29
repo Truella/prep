@@ -1,201 +1,221 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 import { dbToAppQuestion, appToDBQuestion } from "../utils/transforms";
 import type {
-	QuizDraft,
-	AppQuestion,
-	QuizVisibility,
-	QuizCategory,
-	QuizDifficulty,
-	QuizAttempt,
+  AppQuestion,
+  QuizVisibility,
+  QuizCategory,
+  QuizDifficulty,
+  QuizAttempt,
+  QuizDraft,
 } from "../lib/types";
 
-interface QuizDetailState {
-	quiz: (QuizDraft & {
-		id: string;
-		created_at: string;
-		visibility: QuizVisibility;
-		category: QuizCategory | null;
-		difficulty: QuizDifficulty | null;
-		times_taken: number;
-		average_rating: number | null;
-	}) | null;
-	questions: AppQuestion[];
-	attempts: Pick<
-		QuizAttempt,
-		"id" | "score" | "total_points" | "elapsed_seconds" | "completed_at"
-	>[];
-	loading: boolean;
-	error: string | null;
+type QuizMeta = QuizDraft & {
+  id: string;
+  created_at: string;
+  visibility: QuizVisibility;
+  category: QuizCategory | null;
+  difficulty: QuizDifficulty | null;
+  times_taken: number;
+  average_rating: number | null;
+};
+
+type AttemptRow = Pick<
+  QuizAttempt,
+  "id" | "score" | "total_points" | "elapsed_seconds" | "completed_at"
+>;
+
+async function fetchQuiz(quizId: string): Promise<QuizMeta> {
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select("*")
+    .eq("id", quizId)
+    .single();
+  if (error || !data) throw new Error("Quiz not found");
+  return data;
+}
+
+async function fetchQuestions(quizId: string): Promise<AppQuestion[]> {
+  const { data, error } = await supabase
+    .from("questions")
+    .select("*")
+    .eq("quiz_id", quizId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((q, i) => dbToAppQuestion(q, i));
+}
+
+async function fetchAttempts(quizId: string): Promise<AttemptRow[]> {
+  const { data, error } = await supabase
+    .from("quiz_attempts")
+    .select("id, score, total_points, elapsed_seconds, completed_at")
+    .eq("quiz_id", quizId)
+    .order("completed_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
 }
 
 export function useQuizDetail(quizId: string) {
-	const requestGenRef = useRef(0);
-	const [state, setState] = useState<QuizDetailState>({
-		quiz: null,
-		questions: [],
-		attempts: [],
-		loading: true,
-		error: null,
-	});
-	const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
 
-	const fetchQuizDetail = useCallback(async () => {
-		const currentGen = ++requestGenRef.current;
-		setState((prev) => ({ ...prev, loading: true, error: null }));
+  const quizQuery = useQuery({
+    queryKey: ["quiz", quizId],
+    queryFn: () => fetchQuiz(quizId),
+    enabled: !!quizId,
+  });
 
-		const { data: quizData, error: quizError } = await supabase
-			.from("quizzes")
-			.select("*")
-			.eq("id", quizId)
-			.single();
+  const questionsQuery = useQuery({
+    queryKey: ["quiz-questions", quizId],
+    queryFn: () => fetchQuestions(quizId),
+    enabled: !!quizId,
+  });
 
-		if (currentGen !== requestGenRef.current) return;
+  const attemptsQuery = useQuery({
+    queryKey: ["quiz-attempts", quizId],
+    queryFn: () => fetchAttempts(quizId),
+    enabled: !!quizId,
+    refetchInterval: 30 * 1000, // Poll attempts every 30 seconds
+    staleTime: 20 * 1000,
+  });
 
-		if (quizError || !quizData) {
-			setState((prev) => ({
-				...prev,
-				loading: false,
-				error: "Quiz not found",
-			}));
-			return;
-		}
+  const updateMetaMutation = useMutation({
+    mutationFn: async (
+      updates: Partial<
+        Pick<
+          QuizMeta,
+          "title" | "description" | "time_limit" | "visibility" | "category" | "difficulty"
+        >
+      >
+    ) => {
+      const { error } = await supabase
+        .from("quizzes")
+        .update(updates)
+        .eq("id", quizId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
+      queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+      toast.success("Saved");
+    },
+    onError: () => toast.error("Failed to save changes"),
+  });
 
-		const { data: questionsData, error: questionsError } = await supabase
-			.from("questions")
-			.select("*")
-			.eq("quiz_id", quizId)
-			.order("created_at", { ascending: true });
+  const updateQuestionMutation = useMutation({
+    mutationFn: async (question: AppQuestion) => {
+      const payload = appToDBQuestion(question);
+      const { error } = await supabase
+        .from("questions")
+        .update(payload)
+        .eq("id", question.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quiz-questions", quizId] });
+      toast.success("Question updated");
+    },
+    onError: () => toast.error("Failed to update question"),
+  });
 
-		const { data: attemptsData, error: attemptsError } = await supabase
-			.from("quiz_attempts")
-			.select("id, score, total_points, elapsed_seconds, completed_at")
-			.eq("quiz_id", quizId)
-			.order("completed_at", { ascending: false });
+  const deleteQuestionMutation = useMutation({
+    mutationFn: async (questionId: string) => {
+      const { error } = await supabase
+        .from("questions")
+        .delete()
+        .eq("id", questionId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quiz-questions", quizId] });
+      toast.success("Question deleted");
+    },
+    onError: () => toast.error("Failed to delete question"),
+  });
 
-		if (currentGen !== requestGenRef.current) return;
-		if (questionsError || attemptsError) {
-			toast.error("Some quiz data failed to load");
-		}
+  const deleteQuizMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("quizzes")
+        .delete()
+        .eq("id", quizId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+      toast.success("Quiz deleted");
+    },
+    onError: () => toast.error("Failed to delete quiz"),
+  });
 
-		setState({
-			quiz: quizData,
-			questions: (questionsData ?? []).map((q, i) => dbToAppQuestion(q, i)),
-			attempts: attemptsData ?? [],
-			loading: false,
-			error: null,
-		});
-	}, [quizId]);
+  const copyLink = () => {
+    const link = `${window.location.origin}/quiz/${quizId}`;
+    navigator.clipboard
+      .writeText(link)
+      .then(() => toast.success("Link copied!"))
+      .catch(() => toast.error("Failed to copy link"));
+  };
 
-	useEffect(() => {
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		fetchQuizDetail();
-	}, [fetchQuizDetail]);
+  const loading =
+    quizQuery.isLoading || questionsQuery.isLoading || attemptsQuery.isLoading;
+  const error =
+    quizQuery.error
+      ? (quizQuery.error as Error).message
+      : questionsQuery.error
+        ? (questionsQuery.error as Error).message
+        : attemptsQuery.error
+          ? (attemptsQuery.error as Error).message
+          : null;
 
-	// Update quiz metadata
-	const updateQuizMeta = async (updates: Partial<Pick<
-		NonNullable<QuizDetailState["quiz"]>,
-		"title" | "description" | "time_limit" | "visibility" | "category" | "difficulty"
-	>>) => {
-		setSaving(true);
-		const { error } = await supabase
-			.from("quizzes")
-			.update(updates)
-			.eq("id", quizId);
-		setSaving(false);
-
-		if (error) {
-			toast.error("Failed to save changes");
-			return false;
-		}
-
-		setState((prev) => ({
-			...prev,
-			quiz: prev.quiz ? { ...prev.quiz, ...updates } : prev.quiz,
-		}));
-		toast.success("Saved");
-		return true;
-	};
-
-	// Update a single question
-	const updateQuestion = async (question: AppQuestion) => {
-		setSaving(true);
-		const payload = appToDBQuestion(question);
-		const { error } = await supabase
-			.from("questions")
-			.update(payload)
-			.eq("id", question.id);
-		setSaving(false);
-
-		if (error) {
-			toast.error("Failed to update question");
-			return false;
-		}
-
-		setState((prev) => ({
-			...prev,
-			questions: prev.questions.map((q) =>
-				q.id === question.id ? question : q
-			),
-		}));
-		toast.success("Question updated");
-		return true;
-	};
-
-	// Delete a single question
-	const deleteQuestion = async (questionId: string) => {
-		const { error } = await supabase
-			.from("questions")
-			.delete()
-			.eq("id", questionId);
-
-		if (error) {
-			toast.error("Failed to delete question");
-			return false;
-		}
-
-		setState((prev) => ({
-			...prev,
-			questions: prev.questions.filter((q) => q.id !== questionId),
-		}));
-		toast.success("Question deleted");
-		return true;
-	};
-
-	// Delete the entire quiz
-	const deleteQuiz = async () => {
-		const { error } = await supabase
-			.from("quizzes")
-			.delete()
-			.eq("id", quizId);
-
-		if (error) {
-			toast.error("Failed to delete quiz");
-			return false;
-		}
-
-		toast.success("Quiz deleted");
-		return true;
-	};
-
-	// Copy shareable link
-	const copyLink = () => {
-		const link = `${window.location.origin}/quiz/${quizId}`;
-		navigator.clipboard
-			.writeText(link)
-			.then(() => toast.success("Link copied!"))
-			.catch(() => toast.error("Failed to copy link"));
-	};
-
-	return {
-		...state,
-		saving,
-		refetch: fetchQuizDetail,
-		updateQuizMeta,
-		updateQuestion,
-		deleteQuestion,
-		deleteQuiz,
-		copyLink,
-	};
+  return {
+    quiz: quizQuery.data ?? null,
+    questions: questionsQuery.data ?? [],
+    attempts: attemptsQuery.data ?? [],
+    loading,
+    error,
+    saving:
+      updateMetaMutation.isPending ||
+      updateQuestionMutation.isPending ||
+      deleteQuestionMutation.isPending ||
+      deleteQuizMutation.isPending,
+    refetch: () => {
+      queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
+      queryClient.invalidateQueries({ queryKey: ["quiz-questions", quizId] });
+      queryClient.invalidateQueries({ queryKey: ["quiz-attempts", quizId] });
+    },
+    updateQuizMeta: async (updates: Parameters<typeof updateMetaMutation.mutateAsync>[0]) => {
+      try {
+        await updateMetaMutation.mutateAsync(updates);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    updateQuestion: async (question: AppQuestion) => {
+      try {
+        await updateQuestionMutation.mutateAsync(question);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    deleteQuestion: async (questionId: string) => {
+      try {
+        await deleteQuestionMutation.mutateAsync(questionId);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    deleteQuiz: async () => {
+      try {
+        await deleteQuizMutation.mutateAsync();
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    copyLink,
+  };
 }

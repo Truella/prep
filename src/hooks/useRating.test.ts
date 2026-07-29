@@ -1,4 +1,16 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook as originalRenderHook, act, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+
+function createWrapper() {
+	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+	function Wrapper({ children }: { children: React.ReactNode }) {
+		return React.createElement(QueryClientProvider, { client: queryClient }, children);
+	}
+	return Wrapper;
+}
+
+const renderHook = <T, P>(hook: (props: P) => T) => originalRenderHook(hook, { wrapper: createWrapper() });
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { useRating } from "./useRating";
 import toast from "react-hot-toast";
@@ -71,7 +83,7 @@ describe("useRating", () => {
 			expect(ok).toBe(true);
 		});
 
-		expect(result.current.currentRating).toBe(4);
+		await waitFor(() => expect(result.current.currentRating).toBe(4));
 		expect(toast.success).toHaveBeenCalledWith("Rating submitted!");
 	});
 
