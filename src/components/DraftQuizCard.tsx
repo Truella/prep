@@ -16,9 +16,10 @@ interface DraftQuizCardProps {
 		question_count?: number;
 	};
 	onRefetch?: () => void;
+	onDelete?: (quizId: string) => Promise<void>;
 }
 
-export default function DraftQuizCard({ quiz, onRefetch }: DraftQuizCardProps) {
+export default function DraftQuizCard({ quiz, onRefetch, onDelete }: DraftQuizCardProps) {
 	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [deleting, setDeleting] = useState(false);
 
@@ -28,14 +29,20 @@ export default function DraftQuizCard({ quiz, onRefetch }: DraftQuizCardProps) {
 			return;
 		}
 		setDeleting(true);
-		const { error } = await supabase.from("quizzes").delete().eq("id", quiz.id);
-		setDeleting(false);
-		if (error) {
+		try {
+			if (onDelete) {
+				await onDelete(quiz.id);
+			} else {
+				const { error } = await supabase.from("quizzes").delete().eq("id", quiz.id);
+				if (error) throw error;
+				toast.success("Draft deleted");
+			}
+			onRefetch?.();
+		} catch {
 			toast.error("Failed to delete draft");
-			return;
+		} finally {
+			setDeleting(false);
 		}
-		toast.success("Draft deleted");
-		onRefetch?.();
 	};
 
 	return (
@@ -75,7 +82,7 @@ export default function DraftQuizCard({ quiz, onRefetch }: DraftQuizCardProps) {
 			<div className="flex items-center gap-4 text-xs" style={{ color: "var(--color-text-secondary)" }}>
 				<span className="flex items-center gap-2">
 					<HugeiconsIcon icon={Calendar02Icon} size={14} />
-					{new Date(quiz.created_at).toLocaleDateString("en-CA")}
+					{new Date(quiz.created_at).toLocaleDateString("en-CA", { timeZone: "UTC" })}
 				</span>
 				<span>{quiz.question_count ?? 0} questions</span>
 			</div>

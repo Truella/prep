@@ -68,7 +68,8 @@ export function useTakeQuiz(quizId: string | undefined) {
 				.select("*")
 				.eq("id", quizId)
 				.single();
-			if (error || !data) throw new Error("Quiz not found");
+			if (error) throw error;
+			if (!data) throw new Error("Quiz not found");
 			return data;
 		},
 		enabled: !!quizId,

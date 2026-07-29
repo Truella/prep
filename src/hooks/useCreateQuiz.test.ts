@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import toast from "react-hot-toast";
 import { useCreateQuiz } from "./useCreateQuiz";
@@ -228,5 +228,79 @@ describe("useCreateQuiz", () => {
 		expect(result.current.quiz).toEqual({ title: "", description: "" });
 		expect(localStorage.getItem("quiz_meta_draft")).toBeNull();
 		expect(localStorage.getItem("quiz_builder_draft")).toBeNull();
+	});
+
+	describe("resume", () => {
+		it("shows loading state when resumeQuizId is provided", async () => {
+			const { supabase } = await import("../lib/supabase");
+			const single = vi.fn().mockResolvedValue({ data: null, error: null });
+			const eq3 = vi.fn(() => ({ single }));
+			const eq2 = vi.fn(() => ({ eq: eq3 }));
+			const eq1 = vi.fn(() => ({ eq: eq2 }));
+			vi.mocked(supabase.from).mockReturnValue({
+				select: vi.fn(() => ({ eq: eq1 })),
+			} as never);
+			const { result } = renderHook(() => useCreateQuiz("draft-1"));
+			expect(result.current.isLoadingDraft).toBe(true);
+		});
+
+		it("loads draft quiz metadata and questions", async () => {
+			const { supabase } = await import("../lib/supabase");
+			const draftData = { id: "draft-1", title: "Resumed", description: "", time_limit: null, visibility: "private", category: null, difficulty: null, status: "draft", code: null };
+			const quizSingle = vi.fn().mockResolvedValue({ data: draftData, error: null });
+			const quizEq3 = vi.fn(() => ({ single: quizSingle }));
+			const quizEq2 = vi.fn(() => ({ eq: quizEq3 }));
+			const quizEq1 = vi.fn(() => ({ eq: quizEq2 }));
+			const quizSelect = vi.fn(() => ({ eq: quizEq1 }));
+			const questionsResult = { data: [], error: null };
+			const questionsOrder = vi.fn(() => (questionsResult));
+			const questionsEq = vi.fn(() => ({ order: questionsOrder }));
+			const questionsSelect = vi.fn(() => ({ eq: questionsEq }));
+			vi.mocked(supabase.from)
+				.mockReturnValueOnce({ select: quizSelect } as never)
+				.mockReturnValueOnce({ select: questionsSelect } as never);
+
+			vi.mocked(supabase.auth.getUser).mockResolvedValue({
+				data: { user: { id: "user-1" } },
+				error: null,
+			} as never);
+
+			const { result } = renderHook(() => useCreateQuiz("draft-1"));
+
+			await waitFor(() => expect(result.current.isLoadingDraft).toBe(false));
+			expect(result.current.quiz.title).toBe("Resumed");
+			expect(result.current.questions).toEqual([]);
+		});
+
+		it("shows error toast on auth failure", async () => {
+			const { supabase } = await import("../lib/supabase");
+			vi.mocked(supabase.auth.getUser).mockResolvedValue({
+				data: { user: null },
+				error: { message: "Not authenticated" },
+			} as never);
+
+			const { result } = renderHook(() => useCreateQuiz("draft-1"));
+
+			await waitFor(() => expect(result.current.isLoadingDraft).toBe(false));
+			expect(toast.error).toHaveBeenCalledWith("You must be logged in to resume a draft");
+		});
+
+		it("shows error toast when draft not found", async () => {
+			const { supabase } = await import("../lib/supabase");
+			vi.mocked(supabase.auth.getUser).mockResolvedValue({
+				data: { user: { id: "user-1" } },
+				error: null,
+			} as never);
+			const single = vi.fn().mockResolvedValue({ data: null, error: { message: "Not found" } });
+			const quizEq = vi.fn(() => ({ eq: vi.fn(() => ({ eq: vi.fn(() => ({ single })) })) }));
+			vi.mocked(supabase.from).mockReturnValueOnce({
+				select: vi.fn(() => ({ eq: quizEq })),
+			} as never);
+
+			const { result } = renderHook(() => useCreateQuiz("draft-1"));
+
+			await waitFor(() => expect(result.current.isLoadingDraft).toBe(false));
+			expect(toast.error).toHaveBeenCalledWith("Draft not found or you do not have access");
+		});
 	});
 });

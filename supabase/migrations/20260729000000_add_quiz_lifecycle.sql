@@ -33,3 +33,16 @@ create policy "Anyone can read published quizzes"
     status = 'published'
     or auth.uid() = created_by
   );
+
+-- Questions inherit the quiz's visibility: only published quizzes' questions are publicly readable.
+drop policy if exists "Anyone can read questions" on public.questions;
+
+create policy "Anyone can read published questions"
+  on public.questions for select
+  using (
+    exists (
+      select 1 from public.quizzes
+      where id = quiz_id
+        and (status = 'published' or created_by = auth.uid())
+    )
+  );

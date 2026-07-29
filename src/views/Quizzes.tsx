@@ -9,7 +9,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 
 export default function Quizzes() {
-	const { drafts, published, loading, copyQuizLink, refetch } = useQuizzes();
+	const { drafts, published, loading, copyQuizLink, deleteQuiz, unpublishQuiz, refetch } = useQuizzes();
 
 	return (
 		<div className="space-y-10">
@@ -42,7 +42,7 @@ export default function Quizzes() {
 							</h3>
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 								{drafts.map((quiz) => (
-									<DraftQuizCard key={quiz.id} quiz={quiz} onRefetch={refetch} />
+									<DraftQuizCard key={quiz.id} quiz={quiz} onRefetch={refetch} onDelete={deleteQuiz} />
 								))}
 							</div>
 						</div>
@@ -70,7 +70,7 @@ export default function Quizzes() {
 						) : (
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 								{published.map((quiz) => (
-									<QuizCard key={quiz.id} quiz={quiz} onCopyLink={copyQuizLink} onRefetch={refetch} />
+									<QuizCard key={quiz.id} quiz={quiz} onCopyLink={copyQuizLink} onRefetch={refetch} onUnpublish={unpublishQuiz} />
 								))}
 							</div>
 						)}

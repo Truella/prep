@@ -24,6 +24,7 @@ interface QuizCardProps {
 	};
 	onCopyLink: (id: string) => void;
 	onRefetch?: () => void;
+	onUnpublish?: (quizId: string) => Promise<void>;
 }
 
 const VISIBILITY_COLORS: Record<string, string> = {
@@ -31,7 +32,7 @@ const VISIBILITY_COLORS: Record<string, string> = {
 	public: "text-green-400 bg-green-400/10 border-green-400/20",
 };
 
-export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps) {
+export default function QuizCard({ quiz, onCopyLink, onRefetch, onUnpublish }: QuizCardProps) {
 	const [unpublishing, setUnpublishing] = useState(false);
 	const [confirmUnpublish, setConfirmUnpublish] = useState(false);
 	const visibility = quiz.visibility ?? "private";
@@ -42,18 +43,24 @@ export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps)
 			return;
 		}
 		setUnpublishing(true);
-		const { error } = await supabase
-			.from("quizzes")
-			.update({ status: "draft", code: null, visibility: "private" })
-			.eq("id", quiz.id);
-		setUnpublishing(false);
-		if (error) {
+		try {
+			if (onUnpublish) {
+				await onUnpublish(quiz.id);
+			} else {
+				const { error } = await supabase
+					.from("quizzes")
+					.update({ status: "draft", code: null, visibility: "private" })
+					.eq("id", quiz.id);
+				if (error) throw error;
+				toast.success("Quiz unpublished and moved to drafts");
+			}
+			onRefetch?.();
+		} catch {
 			toast.error("Failed to unpublish");
 			setConfirmUnpublish(false);
-			return;
+		} finally {
+			setUnpublishing(false);
 		}
-		toast.success("Quiz unpublished and moved to drafts");
-		onRefetch?.();
 	};
 
 	return (
@@ -78,9 +85,13 @@ export default function QuizCard({ quiz, onCopyLink, onRefetch }: QuizCardProps)
 						{quiz.code}
 					</span>
 					<button
-						onClick={() => {
-							navigator.clipboard.writeText(quiz.code!);
-							toast.success("Code copied!");
+						onClick={async () => {
+							try {
+								await navigator.clipboard.writeText(quiz.code!);
+								toast.success("Code copied!");
+							} catch {
+								toast.error("Failed to copy code");
+							}
 						}}
 						className="text-xs transition"
 						style={{ color: "var(--color-text-secondary)" }}

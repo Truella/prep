@@ -200,8 +200,8 @@ describe("useTakeQuiz", () => {
 
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 		await waitFor(() => expect(result.current.loading).toBe(false));
-		expect(result.current.error).toBe("Quiz not found");
-		expect(toast.error).toHaveBeenCalledWith("Quiz not found");
+		expect(result.current.error).toBe("DB error");
+		expect(toast.error).toHaveBeenCalledWith("DB error");
 	});
 
 	it("handles quiz with no questions", async () => {

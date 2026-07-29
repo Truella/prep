@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { supabase } from "../lib/supabase";
 import { parseAndValidateCSV } from "../utils/csvParser";
 import { appToDBQuestion, dbToAppQuestion } from "../utils/transforms";
+import { generateCode } from "../utils/codeGenerator";
 import type {
 	AppQuestion,
 	DBQuestion,
@@ -17,15 +18,6 @@ import type {
 
 const QUIZ_META_KEY = "quiz_meta_draft";
 const BUILDER_DRAFT_KEY = "quiz_builder_draft";
-
-function generateCode(): string {
-	const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-	let code = "";
-	for (let i = 0; i < 6; i++) {
-		code += chars[Math.floor(Math.random() * chars.length)];
-	}
-	return code;
-}
 
 export interface PublishSettings {
 	visibility: QuizVisibility;
@@ -239,14 +231,16 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 			return null;
 		}
 
-		// Use the IDs assigned by Supabase so a later save does not insert them again.
-		const savedQuestions = (data ?? []).map((row, index) =>
-			dbToAppQuestion(row as DBQuestion, unsavedQuestions[index].order),
-		);
-		const savedByTempId = new Map(
-			unsavedQuestions.map((question, index) => [question.id, savedQuestions[index] ?? question]),
-		);
-		return questions.map((question) => savedByTempId.get(question.id) ?? question);
+		// Map returned rows back to unsaved questions using order as stable key.
+		const savedByTempId = new Map<string, AppQuestion>();
+		for (let i = 0; i < (data ?? []).length; i++) {
+			const original = unsavedQuestions[i];
+			if (!original) continue;
+			const saved = dbToAppQuestion(data![i] as DBQuestion, original.order);
+			savedByTempId.set(original.id, saved);
+		}
+		const getSaved = (id: string) => savedByTempId.get(id) ?? undefined;
+		return questions.map((question) => getSaved(question.id) ?? question);
 	};
 
 	const saveAsDraft = async (

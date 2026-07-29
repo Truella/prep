@@ -37,13 +37,13 @@ interface QuizBuilderProps {
 
 export default function QuizBuilder({
 	quizId,
-	initialQuestions = [],
+	initialQuestions,
 	onSaveAsDraft,
 	onPublish,
 	isUploading,
 }: QuizBuilderProps) {
 	const [questions, setQuestions] = useState<AppQuestion[]>(() =>
-		initialQuestions.length > 0 ? initialQuestions : [blankQuestion(0)],
+		initialQuestions && initialQuestions.length > 0 ? initialQuestions : [blankQuestion(0)],
 	);
 	const [errors, setErrors] = useState<Map<number, string[]>>(new Map());
 
@@ -51,7 +51,7 @@ export default function QuizBuilder({
 		useQuestionCollapse(1);
 
 	useEffect(() => {
-		if (initialQuestions.length > 0) {
+		if (initialQuestions && initialQuestions.length > 0) {
 			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setQuestions(initialQuestions);
 			return;

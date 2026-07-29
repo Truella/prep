@@ -11,19 +11,27 @@ export default function ShareableLink({
 	const [copied, setCopied] = useState(false);
 	const [codeCopied, setCodeCopied] = useState(false);
 
-	const handleCopy = () => {
-		navigator.clipboard.writeText(shareableLink);
-		setCopied(true);
-		toast.success("Link copied!");
-		setTimeout(() => setCopied(false), 2000);
+	const handleCopy = async () => {
+		try {
+			await navigator.clipboard.writeText(shareableLink);
+			setCopied(true);
+			toast.success("Link copied!");
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy link");
+		}
 	};
 
-	const handleCodeCopy = () => {
+	const handleCodeCopy = async () => {
 		if (!quizCode) return;
-		navigator.clipboard.writeText(quizCode);
-		setCodeCopied(true);
-		toast.success("Code copied!");
-		setTimeout(() => setCodeCopied(false), 2000);
+		try {
+			await navigator.clipboard.writeText(quizCode);
+			setCodeCopied(true);
+			toast.success("Code copied!");
+			setTimeout(() => setCodeCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy code");
+		}
 	};
 
 	return (

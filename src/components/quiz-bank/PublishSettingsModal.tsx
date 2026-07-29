@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QUIZ_CATEGORIES } from "../../lib/types";
 import type {
 	QuizCategory,
@@ -19,45 +19,71 @@ interface PublishSettingsModalProps {
 	isLoading: boolean;
 }
 
+const INITIAL_VISIBILITY: QuizVisibility = "private";
+const INITIAL_CATEGORY: QuizCategory | null = null;
+const INITIAL_DIFFICULTY: QuizDifficulty | null = null;
+
 export default function PublishSettingsModal({
 	isOpen,
 	onClose,
 	onConfirm,
 	isLoading,
 }: PublishSettingsModalProps) {
-	const [visibility, setVisibility] = useState<QuizVisibility>("private");
-	const [category, setCategory] = useState<QuizCategory | null>(null);
-	const [difficulty, setDifficulty] = useState<QuizDifficulty | null>(null);
+	const [visibility, setVisibility] = useState<QuizVisibility>(INITIAL_VISIBILITY);
+	const [category, setCategory] = useState<QuizCategory | null>(INITIAL_CATEGORY);
+	const [difficulty, setDifficulty] = useState<QuizDifficulty | null>(INITIAL_DIFFICULTY);
+	const dialogRef = useRef<HTMLDialogElement>(null);
+	const prevOpenRef = useRef(false);
 
-	if (!isOpen) return null;
+	useEffect(() => {
+		if (isOpen && !prevOpenRef.current) {
+			setVisibility(INITIAL_VISIBILITY);
+			setCategory(INITIAL_CATEGORY);
+			setDifficulty(INITIAL_DIFFICULTY);
+		}
+		prevOpenRef.current = isOpen;
+	}, [isOpen]);
+
+	const handleVisibilityChange = (next: QuizVisibility) => {
+		setVisibility(next);
+		if (next !== "public") {
+			setCategory(null);
+		}
+	};
+
+	useEffect(() => {
+		const el = dialogRef.current;
+		if (!el) return;
+		if (isOpen && !el.open) {
+			el.showModal();
+		} else if (!isOpen && el.open) {
+			el.close();
+		}
+	}, [isOpen]);
+
+	useEffect(() => {
+		const el = dialogRef.current;
+		if (!el) return;
+		const handler = () => {
+			if (!isLoading) onClose();
+		};
+		el.addEventListener("close", handler);
+		return () => el.removeEventListener("close", handler);
+	}, [onClose, isLoading]);
 
 	return (
-		<div
-			className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-			onClick={(event) => {
-				if (!isLoading && event.target === event.currentTarget) onClose();
+		<dialog
+			ref={dialogRef}
+			className="rounded-2xl max-w-md w-full shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
+			style={{
+				backgroundColor: "var(--color-surface)",
+				border: "1px solid var(--color-border)",
+				padding: 0,
 			}}
 		>
-			<div
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="publish-settings-title"
-				className="relative rounded-lg p-8 max-w-md w-full shadow-2xl space-y-6"
-				style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-			>
-				<button
-					type="button"
-					onClick={onClose}
-					disabled={isLoading}
-					aria-label="Close"
-					className="absolute top-4 right-4 p-2 text-xl leading-none transition disabled:opacity-50"
-					style={{ color: "var(--color-text-secondary)" }}
-				>
-					&times;
-				</button>
-
+			<div className="p-8 space-y-6">
 				<div>
-					<h3 id="publish-settings-title" className="text-xl font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
+					<h3 className="text-xl font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
 						Publish Quiz
 					</h3>
 					<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
@@ -67,8 +93,8 @@ export default function PublishSettingsModal({
 
 				<div className="space-y-2">
 					{([
-						{ value: "private", label: "Private", description: "Accessible via link only. Not in Quiz Bank." },
-						{ value: "public", label: "Public", description: "Listed in the Quiz Bank for anyone to discover." },
+						{ value: "private" as QuizVisibility, label: "Private", description: "Accessible via link only. Not in Quiz Bank." },
+						{ value: "public" as QuizVisibility, label: "Public", description: "Listed in the Quiz Bank for anyone to discover." },
 					] as const).map((option) => (
 						<label
 							key={option.value}
@@ -82,7 +108,7 @@ export default function PublishSettingsModal({
 								type="radio"
 								name="publish-visibility"
 								checked={visibility === option.value}
-								onChange={() => setVisibility(option.value)}
+								onChange={() => handleVisibilityChange(option.value)}
 								disabled={isLoading}
 								className="mt-0.5"
 							/>
@@ -148,6 +174,6 @@ export default function PublishSettingsModal({
 					</button>
 				</div>
 			</div>
-		</div>
+		</dialog>
 	);
 }

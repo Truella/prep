@@ -6,8 +6,7 @@ git checkout main && git pull
 git checkout -b feat/quiz-lifecycle
 ```
 
-> Schema migration must run before any code changes.
-> Run the SQL block in COMMIT LC-1 in the Supabase dashboard first.
+> Apply the migration `supabase/migrations/20260729000000_add_quiz_lifecycle.sql` in the Supabase dashboard first.
 
 ---
 

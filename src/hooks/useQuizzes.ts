@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "./useAuth";
 import toast from "react-hot-toast";
 import type { QuizVisibility, QuizCategory, QuizDifficulty } from "../lib/types";
 
@@ -18,14 +19,11 @@ interface Quiz {
   question_count?: number;
 }
 
-async function fetchUserQuizzes(): Promise<Quiz[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
+async function fetchUserQuizzes(userId: string): Promise<Quiz[]> {
   const { data, error } = await supabase
     .from("quizzes")
     .select("*, questions(count)")
-    .eq("created_by", user.id)
+    .eq("created_by", userId)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -37,10 +35,12 @@ async function fetchUserQuizzes(): Promise<Quiz[]> {
 
 export function useQuizzes() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: allQuizzes = [], isLoading: loading, error: queryError } = useQuery({
-    queryKey: ["quizzes"],
-    queryFn: fetchUserQuizzes,
+    queryKey: ["quizzes", user?.id],
+    queryFn: () => fetchUserQuizzes(user!.id),
+    enabled: !!user,
   });
 
   const drafts = allQuizzes.filter((q) => q.status === "draft");
@@ -53,7 +53,22 @@ export function useQuizzes() {
     toast.success("Quiz link copied!");
   };
 
-  const deleteQuiz = async (quizId: string) => {
+	const unpublishQuiz = async (quizId: string) => {
+		try {
+			const { error } = await supabase
+				.from("quizzes")
+				.update({ status: "draft", code: null, visibility: "private" })
+				.eq("id", quizId);
+			if (error) throw error;
+			queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+			toast.success("Quiz unpublished and moved to drafts");
+		} catch (err) {
+			const message = err instanceof Error ? err.message : "Unknown error";
+			toast.error(`Failed to unpublish: ${message}`);
+		}
+	};
+
+	const deleteQuiz = async (quizId: string) => {
     try {
       const { error } = await supabase.from("quizzes").delete().eq("id", quizId);
       if (error) throw error;
@@ -71,14 +86,15 @@ export function useQuizzes() {
     }
   };
 
-  return {
-    quizzes: allQuizzes,
-    drafts,
-    published,
-    loading,
-    error,
-    copyQuizLink,
-    deleteQuiz,
-    refetch: () => queryClient.invalidateQueries({ queryKey: ["quizzes"] }),
-  };
+	return {
+		quizzes: allQuizzes,
+		drafts,
+		published,
+		loading,
+		error,
+		copyQuizLink,
+		deleteQuiz,
+		unpublishQuiz,
+		refetch: () => queryClient.invalidateQueries({ queryKey: ["quizzes"] }),
+	};
 }

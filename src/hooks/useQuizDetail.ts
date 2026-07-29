@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 import { dbToAppQuestion, appToDBQuestion } from "../utils/transforms";
+import { generateCode } from "../utils/codeGenerator";
 import type {
   AppQuestion,
   QuizVisibility,
@@ -174,12 +175,7 @@ export function useQuizDetail(quizId: string) {
       category: QuizCategory | null;
       difficulty: QuizDifficulty | null;
     }) => {
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      let code = "";
-      for (let i = 0; i < 6; i++) {
-        code += chars[Math.floor(Math.random() * chars.length)];
-      }
-
+      const code = generateCode();
       const { error } = await supabase
         .from("quizzes")
         .update({ status: "published", code, ...settings })
