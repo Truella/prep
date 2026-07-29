@@ -4,12 +4,13 @@ import toast from "react-hot-toast";
 import { useAuth } from "./useAuth";
 
 async function fetchRating(quizId: string, userId: string): Promise<number | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("quiz_ratings")
     .select("rating")
     .eq("quiz_id", quizId)
     .eq("user_id", userId)
     .maybeSingle();
+  if (error) throw error;
   return data ? data.rating : null;
 }
 
@@ -25,27 +26,13 @@ async function upsertRating(
       { onConflict: "quiz_id,user_id" }
     );
   if (error) throw error;
-
-  // Recalculate average_rating
-  const { data: ratings } = await supabase
-    .from("quiz_ratings")
-    .select("rating")
-    .eq("quiz_id", quizId);
-
-  if (ratings && ratings.length > 0) {
-    const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
-    await supabase
-      .from("quizzes")
-      .update({ average_rating: avg })
-      .eq("id", quizId);
-  }
 }
 
 export function useRating(quizId: string) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: currentRating = null, isLoading: loading } = useQuery({
+  const { data: currentRating = null, isLoading: loading, error: queryError } = useQuery({
     queryKey: ["rating", quizId, user?.id],
     queryFn: () => fetchRating(quizId, user!.id),
     enabled: !!user && !!quizId,
@@ -56,6 +43,7 @@ export function useRating(quizId: string) {
     onSuccess: (_, rating) => {
       queryClient.setQueryData(["rating", quizId, user?.id], rating);
       queryClient.invalidateQueries({ queryKey: ["quizBank"] });
+      queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
       toast.success("Rating submitted!");
     },
     onError: () => toast.error("Failed to submit rating"),
@@ -64,7 +52,11 @@ export function useRating(quizId: string) {
   return {
     currentRating,
     loading,
-    error: mutation.error ? (mutation.error as Error).message : null,
+    error: queryError
+      ? (queryError as Error).message
+      : mutation.error
+        ? (mutation.error as Error).message
+        : null,
     submitRating: async (rating: number) => {
       if (!user) return undefined;
       try {

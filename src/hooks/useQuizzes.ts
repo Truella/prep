@@ -53,6 +53,7 @@ export function useQuizzes() {
       queryClient.setQueryData<Quiz[]>(["quizzes"], (prev) =>
         prev ? prev.filter((q) => q.id !== quizId) : []
       );
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
       toast.success("Quiz deleted");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";

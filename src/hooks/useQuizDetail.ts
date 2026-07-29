@@ -62,6 +62,7 @@ export function useQuizDetail(quizId: string) {
   const quizQuery = useQuery({
     queryKey: ["quiz", quizId],
     queryFn: () => fetchQuiz(quizId),
+    enabled: !!quizId,
   });
 
   const questionsQuery = useQuery({
@@ -158,9 +159,14 @@ export function useQuizDetail(quizId: string) {
 
   const loading =
     quizQuery.isLoading || questionsQuery.isLoading || attemptsQuery.isLoading;
-  const error = quizQuery.error
-    ? (quizQuery.error as Error).message
-    : null;
+  const error =
+    quizQuery.error
+      ? (quizQuery.error as Error).message
+      : questionsQuery.error
+        ? (questionsQuery.error as Error).message
+        : attemptsQuery.error
+          ? (attemptsQuery.error as Error).message
+          : null;
 
   return {
     quiz: quizQuery.data ?? null,
@@ -171,7 +177,8 @@ export function useQuizDetail(quizId: string) {
     saving:
       updateMetaMutation.isPending ||
       updateQuestionMutation.isPending ||
-      deleteQuestionMutation.isPending,
+      deleteQuestionMutation.isPending ||
+      deleteQuizMutation.isPending,
     refetch: () => {
       queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
       queryClient.invalidateQueries({ queryKey: ["quiz-questions", quizId] });

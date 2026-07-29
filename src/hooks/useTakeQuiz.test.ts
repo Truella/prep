@@ -4,8 +4,10 @@ import React from "react";
 
 function createWrapper() {
 	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-	return ({ children }: { children: React.ReactNode }) =>
-		React.createElement(QueryClientProvider, { client: queryClient }, children);
+	function Wrapper({ children }: { children: React.ReactNode }) {
+		return React.createElement(QueryClientProvider, { client: queryClient }, children);
+	}
+	return Wrapper;
 }
 
 const renderHook = <T, P>(hook: (props: P) => T) => originalRenderHook(hook, { wrapper: createWrapper() });
@@ -242,7 +244,7 @@ describe("useTakeQuiz", () => {
 		expect(result.current.timerSeconds).toBeGreaterThan(0);
 	});
 
-	it("resets deadline when stored deadline is in the past", async () => {
+	it("auto-submits when stored deadline is in the past", async () => {
 		const quizWithTimer = { ...mockQuizData, time_limit: 10 };
 
 		localStorage.setItem("quiz_deadline_quiz1", "1");
@@ -251,12 +253,14 @@ describe("useTakeQuiz", () => {
 		vi.mocked(supabase.from).mockReset();
 		vi.mocked(supabase.from)
 			.mockReturnValueOnce(createChain({ data: quizWithTimer, error: null }))
-			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }));
+			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }))
+			.mockReturnValue(createChain({ data: null, error: null }));
 
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 		await waitFor(() => expect(result.current.loading).toBe(false));
-		expect(result.current.timerSeconds).toBeGreaterThan(0);
-		expect(result.current.showResults).toBe(false);
+		await waitFor(() => expect(result.current.showResults).toBe(true));
+		expect(result.current.timerSeconds).toBe(0);
+		expect(result.current.isAutoSubmit).toBe(true);
 	});
 
 	it("handleTimerExpire saves results and shows results screen", async () => {

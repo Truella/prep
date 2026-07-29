@@ -134,25 +134,69 @@ export function useTakeQuiz(quizId: string | undefined) {
 		isSubmitted,
 	);
 
-	const questionsLoadedRef = useRef(false);
+	const calculateScore = () => {
+		let correctCount = 0;
+		let totalPoints = 0;
+		let earnedPoints = 0;
+
+		questions.forEach((q, index) => {
+			totalPoints += q.points;
+
+			if (selectedAnswers[index] === q.correctIndex) {
+				correctCount++;
+				earnedPoints += q.points;
+			}
+		});
+
+		return { correctCount, earnedPoints, totalPoints };
+	};
+
+	const saveAttempt = async (elapsed: number): Promise<boolean> => {
+		if (!quiz?.id) return false;
+		const { earnedPoints } = calculateScore();
+		const totalPts = questions.reduce((sum, q) => sum + q.points, 0);
+
+		try {
+			await supabase.from("quiz_attempts").insert({
+				quiz_id: quiz.id,
+				score: earnedPoints,
+				total_points: totalPts,
+				elapsed_seconds: elapsed,
+				answers: selectedAnswers,
+			});
+			return true;
+		} catch {
+			return false;
+		}
+	};
+
+	const initializedQuizIdRef = useRef<string | null>(null);
 	useEffect(() => {
 		/* eslint-disable react-hooks/set-state-in-effect */
-		if (questions.length > 0 && quiz && !questionsLoadedRef.current) {
-			questionsLoadedRef.current = true;
+		if (questions.length > 0 && quiz && initializedQuizIdRef.current !== quizId) {
+			initializedQuizIdRef.current = quizId ?? null;
 			
 			if (quiz.time_limit) {
 				const storageKey = `quiz_deadline_${quizId}`;
 				let deadline: number;
 				try {
-					deadline = Number(localStorage.getItem(storageKey));
+					const stored = localStorage.getItem(storageKey);
+					if (stored === null) {
+						deadline = Date.now() + quiz.time_limit * 60 * 1000;
+						try {
+							localStorage.setItem(storageKey, String(deadline));
+						} catch {}
+					} else {
+						deadline = Number(stored);
+						if (isNaN(deadline)) {
+							deadline = Date.now() + quiz.time_limit * 60 * 1000;
+							try {
+								localStorage.setItem(storageKey, String(deadline));
+							} catch {}
+						}
+					}
 				} catch {
-					deadline = 0;
-				}
-				if (!deadline || deadline <= Date.now()) {
 					deadline = Date.now() + quiz.time_limit * 60 * 1000;
-					try {
-						localStorage.setItem(storageKey, String(deadline));
-					} catch {}
 				}
 				startTimeRef.current = deadline - quiz.time_limit * 60 * 1000;
 				const remaining = Math.ceil((deadline - Date.now()) / 1000);
@@ -161,19 +205,25 @@ export function useTakeQuiz(quizId: string | undefined) {
 					setIsAutoSubmit(true);
 					const elapsedTotal = quiz.time_limit * 60;
 					setElapsedSeconds(elapsedTotal);
-					const totalPts = questions.reduce((sum, q) => sum + q.points, 0);
-					try {
-						supabase.from("quiz_attempts").insert({
-							quiz_id: quiz.id,
-							score: 0,
-							total_points: totalPts,
-							elapsed_seconds: elapsedTotal,
-							answers: selectedAnswers,
-						});
-					} catch {}
-					clearDeadline();
-					setShowResults(true);
-					setIsSubmitted(true);
+					(async () => {
+						const saved = await saveAttempt(elapsedTotal);
+						if (!saved) return;
+						clearDeadline();
+						setShowResults(true);
+						setIsSubmitted(true);
+						try {
+							localStorage.setItem(
+								`quiz_results_${quizId}`,
+								JSON.stringify({
+									answers: selectedAnswers,
+									elapsedSeconds: elapsedTotal,
+									isAutoSubmit: true,
+								})
+							);
+						} catch (err) {
+							console.error("Failed to save quiz results:", err);
+						}
+					})();
 				} else {
 					setTimerSeconds(remaining);
 				}
@@ -254,7 +304,6 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const confirmSubmit = async () => {
 		if (submittedRef.current) return;
 		submittedRef.current = true;
-		// eslint-disable-next-line react-hooks/purity
 		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
 		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
@@ -292,7 +341,6 @@ export function useTakeQuiz(quizId: string | undefined) {
 		if (submittedRef.current) return;
 		submittedRef.current = true;
 		setIsAutoSubmit(true);
-		// eslint-disable-next-line react-hooks/purity
 		const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
 		setElapsedSeconds(elapsed);
 		setShowSubmitModal(false);
@@ -343,42 +391,6 @@ export function useTakeQuiz(quizId: string | undefined) {
 			setTimerSeconds(fullSeconds);
 		} else {
 			setTimerSeconds(null);
-		}
-	};
-
-	const calculateScore = () => {
-		let correctCount = 0;
-		let totalPoints = 0;
-		let earnedPoints = 0;
-
-		questions.forEach((q, index) => {
-			totalPoints += q.points;
-
-			if (selectedAnswers[index] === q.correctIndex) {
-				correctCount++;
-				earnedPoints += q.points;
-			}
-		});
-
-		return { correctCount, earnedPoints, totalPoints };
-	};
-
-	const saveAttempt = async (elapsed: number): Promise<boolean> => {
-		if (!quiz?.id) return false;
-		const { earnedPoints } = calculateScore();
-		const totalPts = questions.reduce((sum, q) => sum + q.points, 0);
-
-		try {
-			await supabase.from("quiz_attempts").insert({
-				quiz_id: quiz.id,
-				score: earnedPoints,
-				total_points: totalPts,
-				elapsed_seconds: elapsed,
-				answers: selectedAnswers,
-			});
-			return true;
-		} catch {
-			return false;
 		}
 	};
 
