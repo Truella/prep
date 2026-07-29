@@ -263,6 +263,31 @@ describe("useTakeQuiz", () => {
 		expect(result.current.isAutoSubmit).toBe(true);
 	});
 
+	it("auto-submits with saved answers when stored deadline is in the past", async () => {
+		const quizWithTimer = { ...mockQuizData, time_limit: 10 };
+
+		localStorage.setItem(
+			"quiz_progress_quiz1",
+			JSON.stringify({ answers: { 0: 3 }, currentIndex: 0, timestamp: Date.now() })
+		);
+
+		localStorage.setItem("quiz_deadline_quiz1", "1");
+
+		const { supabase } = await import("../lib/supabase");
+		vi.mocked(supabase.from).mockReset();
+		vi.mocked(supabase.from)
+			.mockReturnValueOnce(createChain({ data: quizWithTimer, error: null }))
+			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }))
+			.mockReturnValue(createChain({ data: null, error: null }));
+
+		const { result } = renderHook(() => useTakeQuiz("quiz1"));
+		await waitFor(() => expect(result.current.loading).toBe(false));
+		await waitFor(() => expect(result.current.showResults).toBe(true));
+		expect(result.current.timerSeconds).toBe(0);
+		expect(result.current.isAutoSubmit).toBe(true);
+		expect(result.current.selectedAnswers).toEqual({ 0: 3 });
+	});
+
 	it("handleTimerExpire saves results and shows results screen", async () => {
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
 		await waitFor(() => expect(result.current.loading).toBe(false));

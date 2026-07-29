@@ -8,54 +8,36 @@ interface Stats {
   totalAttempts: number;
 }
 
-async function fetchAllQuizIds(userId: string): Promise<string[]> {
-  const allIds: string[] = [];
-  const pageSize = 1000;
-  let from = 0;
-
-  while (true) {
-    const { data, error } = await supabase
-      .from("quizzes")
-      .select("id")
-      .eq("created_by", userId)
-      .range(from, from + pageSize - 1);
-    if (error) throw error;
-    if (!data || data.length === 0) break;
-    allIds.push(...data.map((q) => q.id));
-    if (data.length < pageSize) break;
-    from += pageSize;
-  }
-
-  return allIds;
-}
-
 async function fetchStats(): Promise<Stats> {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
   if (!user) return { totalQuizzes: 0, totalQuestions: 0, totalAttempts: 0 };
 
-  const quizIds = await fetchAllQuizIds(user.id);
-
-  if (quizIds.length === 0) {
-    return { totalQuizzes: 0, totalQuestions: 0, totalAttempts: 0 };
-  }
-
-  const [questionResult, attemptResult] = await Promise.all([
+  const [
+    { count: quizCount, error: quizError },
+    questionResult,
+    attemptResult,
+  ] = await Promise.all([
+    supabase
+      .from("quizzes")
+      .select("*", { count: "exact", head: true })
+      .eq("created_by", user.id),
     supabase
       .from("questions")
-      .select("*", { count: "exact", head: true })
-      .in("quiz_id", quizIds),
+      .select("*, quizzes!inner(created_by)", { count: "exact", head: true })
+      .eq("quizzes.created_by", user.id),
     supabase
       .from("quiz_attempts")
-      .select("*", { count: "exact", head: true })
-      .in("quiz_id", quizIds),
+      .select("*, quizzes!inner(created_by)", { count: "exact", head: true })
+      .eq("quizzes.created_by", user.id),
   ]);
 
+  if (quizError) throw quizError;
   if (questionResult.error) throw questionResult.error;
   if (attemptResult.error) throw attemptResult.error;
 
   return {
-    totalQuizzes: quizIds.length,
+    totalQuizzes: quizCount ?? 0,
     totalQuestions: questionResult.count ?? 0,
     totalAttempts: attemptResult.count ?? 0,
   };
@@ -67,8 +49,8 @@ export function useAnalyticsStats() {
   const { data: stats = { totalQuizzes: 0, totalQuestions: 0, totalAttempts: 0 }, isLoading: loading } = useQuery({
     queryKey: ["stats", user?.id],
     queryFn: fetchStats,
-    refetchInterval: 30 * 1000, // Poll every 30 seconds
-    staleTime: 20 * 1000,       // Consider stale after 20 seconds
+    refetchInterval: 30 * 1000,
+    staleTime: 20 * 1000,
   });
 
   return { stats, loading };
