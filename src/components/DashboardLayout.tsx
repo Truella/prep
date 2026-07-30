@@ -25,15 +25,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	};
 
 	return (
-		<div className="min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
+		<div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--color-bg)" }}>
 			{/* Top Navigation */}
 			<TopBar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} />
-			<div className="flex">
-				{/* Sidebar - Analytics & Navigation */}
+			<div className="flex min-w-0">
+				{/* Sidebar navigation */}
 				<SideBar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
 				{/* Main Content Area */}
-				<main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+				<main className="min-w-0 flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
 					{children}
 				</main>
 			</div>
