@@ -37,10 +37,9 @@ export function useQuizzes() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: allQuizzes = [], isLoading: loading, error: queryError } = useQuery({
-    queryKey: ["quizzes", user?.id],
-    queryFn: () => fetchUserQuizzes(user!.id),
-    enabled: !!user,
+      queryClient.setQueryData<Quiz[]>(["quizzes", user?.id], (prev) =>
+        prev ? prev.filter((q) => q.id !== quizId) : []
+      );
   });
 
   const drafts = allQuizzes.filter((q) => q.status === "draft");
