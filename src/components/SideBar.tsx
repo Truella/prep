@@ -1,8 +1,15 @@
 import React from "react";
-import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import {
+	ArrowLeft01Icon,
+	ArrowRight01Icon,
+	Moon01Icon,
+	Sun01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { NAV_ITEMS } from "../constants/navItems";
+import { useTheme } from "../lib/theme";
 import { SidebarLink } from "./SideBarLink";
+import { SidebarItemLabel } from "./SidebarItemLabel";
 
 const SIDEBAR_COLLAPSED_KEY = "sidebar-collapsed";
 
@@ -28,11 +35,15 @@ interface SideBarProps {
     setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProps) {
+	const { resolvedTheme, setTheme } = useTheme();
+	const themeButtonRef = React.useRef<HTMLButtonElement>(null);
 	const isCollapsed = React.useSyncExternalStore(
 		subscribeToCollapsedState,
 		getCollapsedSnapshot,
 		() => false,
 	);
+	const isDark = resolvedTheme === "dark";
+	const themeLabel = isDark ? "Switch to light theme" : "Switch to dark theme";
 
 	const toggleCollapsed = () => {
 		try {
@@ -50,7 +61,7 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 				`}
 				style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}
 			>
-				<div className={`h-full overflow-y-auto p-4 ${isCollapsed ? "lg:p-2" : ""}`}>
+				<div className={`flex h-full flex-col overflow-y-auto p-4 ${isCollapsed ? "lg:p-2" : ""}`}>
 					<div className={`mb-4 hidden lg:flex ${isCollapsed ? "justify-center" : "justify-end"}`}>
 						<button
 							type="button"
@@ -67,6 +78,17 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 							<SidebarLink key={item.path} {...item} collapsed={isCollapsed} />
 						))}
 					</nav>
+					<button
+						ref={themeButtonRef}
+						type="button"
+						onClick={() => setTheme(isDark ? "light" : "dark")}
+						className={`mt-auto flex w-full items-center gap-3 rounded-lg px-4 py-3 font-medium transition hover:bg-surface-raised ${isCollapsed ? "lg:justify-center lg:px-3" : ""}`}
+						style={{ color: "var(--color-text-secondary)" }}
+						aria-label={themeLabel}
+					>
+						<HugeiconsIcon icon={isDark ? Sun01Icon : Moon01Icon} />
+						<SidebarItemLabel label={themeLabel} collapsed={isCollapsed} itemRef={themeButtonRef} />
+					</button>
 				</div>
 			</aside>
 			{/* Overlay for mobile */}
