@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useQuizzes } from "../hooks/useQuizzes";
 import { useAnalyticsStats } from "../hooks/useStats";
-import QuizCard from "../components/QuizCard";
+import QuizRow from "../components/QuizRow";
 
 export default function Dashboard() {
 	const { published, loading, copyQuizLink, refetch } = useQuizzes();
@@ -113,7 +113,7 @@ export default function Dashboard() {
 				{!loading && recentQuizzes.length > 0 && (
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 						{recentQuizzes.map((quiz) => (
-							<QuizCard
+							<QuizRow
 								key={quiz.id}
 								quiz={quiz}
 								onCopyLink={copyQuizLink}

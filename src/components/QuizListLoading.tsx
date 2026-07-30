@@ -1,10 +1,11 @@
-import SkeletonGrid from "../components/skeletons/SkeletonGrid";
-import QuizCardSkeleton from "../components/skeletons/QuizSkeleton";
+import QuizRowSkeleton from "../components/skeletons/QuizRowSkeleton";
 
 export default function QuizListLoading() {
 	return (
-		<SkeletonGrid count={6} columns={{ default: 1, md: 2, lg: 3 }}>
-			<QuizCardSkeleton />
-		</SkeletonGrid>
+		<div className="space-y-2">
+			{Array.from({ length: 6 }).map((_, index) => (
+				<QuizRowSkeleton key={index} />
+			))}
+		</div>
 	);
 }
