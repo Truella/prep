@@ -9,7 +9,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { NAV_ITEMS } from "../constants/navItems";
 import { useTheme } from "../lib/theme";
 import { SidebarLink } from "./SideBarLink";
-import { SidebarItemLabel } from "./SidebarItemLabel";
 
 const SIDEBAR_COLLAPSED_KEY = "sidebar-collapsed";
 
@@ -36,7 +35,6 @@ interface SideBarProps {
 }
 export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProps) {
 	const { resolvedTheme, setTheme } = useTheme();
-	const themeButtonRef = React.useRef<HTMLButtonElement>(null);
 	const isCollapsed = React.useSyncExternalStore(
 		subscribeToCollapsedState,
 		getCollapsedSnapshot,
@@ -79,15 +77,13 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 						))}
 					</nav>
 					<button
-						ref={themeButtonRef}
 						type="button"
 						onClick={() => setTheme(isDark ? "light" : "dark")}
-						className={`mt-auto flex w-full items-center gap-3 rounded-lg px-4 py-3 font-medium transition hover:bg-surface-raised ${isCollapsed ? "lg:justify-center lg:px-3" : ""}`}
+						className={`mt-auto flex rounded-lg p-3 transition hover:bg-surface-raised ${isCollapsed ? "lg:self-center" : ""}`}
 						style={{ color: "var(--color-text-secondary)" }}
 						aria-label={themeLabel}
 					>
 						<HugeiconsIcon icon={isDark ? Sun01Icon : Moon01Icon} />
-						<SidebarItemLabel label={themeLabel} collapsed={isCollapsed} itemRef={themeButtonRef} />
 					</button>
 				</div>
 			</aside>
