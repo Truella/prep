@@ -84,6 +84,7 @@ export default function PublishSettingsModal({
 	return (
 		<dialog
 			ref={dialogRef}
+			aria-labelledby="publish-settings-title"
 			className="rounded-2xl max-w-md w-full shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
 			style={{
 				backgroundColor: "var(--color-surface)",
@@ -93,7 +94,7 @@ export default function PublishSettingsModal({
 		>
 			<div className="p-8 space-y-6">
 				<div>
-					<h3 className="text-xl font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
+					<h3 id="publish-settings-title" className="text-xl font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
 						Publish Quiz
 					</h3>
 					<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
