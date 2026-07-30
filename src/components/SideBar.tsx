@@ -1,7 +1,6 @@
 import React from "react";
 import { NAV_ITEMS } from "../constants/navItems";
 import { SidebarLink } from "./SideBarLink";
-import AnalyticsWidget from "./Analytics";
 interface SideBarProps {
     isSidebarOpen: boolean;
     setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -18,20 +17,11 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 				style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}
 			>
 				<div className="h-full overflow-y-auto p-4">
-					{/* Navigation Links */}
-					<nav className="space-y-2 mb-6">
+					<nav className="space-y-2">
 						{NAV_ITEMS.map((item) => (
 							<SidebarLink key={item.path} {...item} />
 						))}
 					</nav>
-
-					{/* Analytics Section */}
-					<div className="border-t pt-4" style={{ borderColor: "var(--color-border)" }}>
-						<h3 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--color-text-secondary)" }}>
-							Analytics
-						</h3>
-						<AnalyticsWidget />
-					</div>
 				</div>
 			</aside>
 			{/* Overlay for mobile */}
