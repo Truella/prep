@@ -2,20 +2,23 @@
 
 interface BuilderToolbarProps {
   onAdd: () => void;
-  onSubmit: () => void;
+  onSaveAsDraft: () => void;
+  onPublish: () => void;
   isUploading: boolean;
   quizId?: string;
 }
 
 export default function BuilderToolbar({
   onAdd,
-  onSubmit,
+  onSaveAsDraft,
+  onPublish,
   isUploading,
   quizId,
 }: BuilderToolbarProps) {
   return (
     <div className="flex gap-3">
       <button
+        type="button"
         onClick={onAdd}
         className="flex-1 px-4 py-3 rounded-xl border transition font-medium text-sm"
         style={{ borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
@@ -23,12 +26,22 @@ export default function BuilderToolbar({
         + Add Question
       </button>
       <button
-        onClick={onSubmit}
+        type="button"
+        onClick={onSaveAsDraft}
         disabled={isUploading || !quizId}
-        className="flex-1 px-4 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
-        style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
+        className="flex-1 px-4 py-3 rounded-xl border text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition"
+        style={{ borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
       >
-        {isUploading ? "Publishing..." : "Publish Quiz"}
+        {isUploading ? "Saving..." : "Save as Draft"}
+      </button>
+      <button
+        type="button"
+        onClick={onPublish}
+        disabled={isUploading || !quizId}
+        className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
+        style={{ backgroundColor: "var(--color-accent)", color: "#0A0A0F" }}
+      >
+        Publish
       </button>
     </div>
   );

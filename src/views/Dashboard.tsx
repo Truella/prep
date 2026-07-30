@@ -6,10 +6,10 @@ import { useAnalyticsStats } from "../hooks/useStats";
 import QuizCard from "../components/QuizCard";
 
 export default function Dashboard() {
-	const { quizzes, loading, copyQuizLink, refetch } = useQuizzes();
+	const { published, loading, copyQuizLink, refetch } = useQuizzes();
 	const { stats } = useAnalyticsStats();
 
-	const recentQuizzes = quizzes.slice(0, 3);
+	const recentQuizzes = published.slice(0, 3);
 
 	return (
 		<div className="space-y-10">
@@ -99,7 +99,7 @@ export default function Dashboard() {
 						style={{ borderColor: "var(--color-border)" }}
 					>
 						<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-							No quizzes yet.{" "}
+							No published quizzes yet.{" "}
 							<Link
 								href="/dashboard/create"
 								style={{ color: "var(--color-accent)" }}

@@ -240,8 +240,10 @@ describe("useTakeQuiz", () => {
 			.mockReturnValueOnce(createChain({ data: mockQuestionsData, error: null }));
 
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
-		await waitFor(() => expect(result.current.loading).toBe(false));
-		expect(result.current.timerSeconds).toBeGreaterThan(0);
+		await waitFor(() => {
+			expect(typeof result.current.timerSeconds).toBe("number");
+			expect(result.current.timerSeconds).toBeGreaterThan(0);
+		});
 	});
 
 	it("auto-submits when stored deadline is in the past", async () => {
@@ -319,8 +321,10 @@ describe("useTakeQuiz", () => {
 			.mockReturnValue(createChain({ data: null, error: null }));
 
 		const { result } = renderHook(() => useTakeQuiz("quiz1"));
-		await waitFor(() => expect(result.current.loading).toBe(false));
-		expect(result.current.timerSeconds).toBeGreaterThan(0);
+		await waitFor(() => {
+			expect(typeof result.current.timerSeconds).toBe("number");
+			expect(result.current.timerSeconds).toBeGreaterThan(0);
+		});
 
 		act(() => result.current.handleAnswerSelect(3));
 		await act(async () => result.current.handleTimerExpire());

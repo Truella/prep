@@ -1,48 +1,12 @@
-import { renderHook, act } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
-import { useCreateQuiz } from "./useCreateQuiz";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import toast from "react-hot-toast";
-import type { MCQRow } from "../lib/types";
+import { useCreateQuiz } from "./useCreateQuiz";
 import type { AppQuestion } from "../lib/types";
-
-function makeQuestion(overrides: Partial<AppQuestion> = {}): AppQuestion {
-	return {
-		id: "temp-0",
-		quizId: "quiz1",
-		questionText: "Q",
-		optionA: "A",
-		optionB: "B",
-		optionC: "C",
-		optionD: "D",
-		correctIndex: 0 as const,
-		points: 1,
-		order: 0,
-		...overrides,
-	};
-}
-
-async function mockCreateQuizFlow() {
-	const { supabase } = await import("../lib/supabase");
-	vi.mocked(supabase.auth.getUser).mockResolvedValue({
-		data: { user: { id: "user1" } },
-		error: null,
-	} as never);
-	const insertChain = {
-		select: vi.fn().mockReturnThis(),
-		single: vi.fn().mockResolvedValue({ data: { id: "quiz1" }, error: null }),
-	};
-	vi.mocked(supabase.from).mockReturnValue({
-		insert: vi.fn(() => insertChain),
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	} as any);
-	return { supabase };
-}
 
 vi.mock("../lib/supabase", () => ({
 	supabase: {
-		auth: {
-			getUser: vi.fn(),
-		},
+		auth: { getUser: vi.fn() },
 		from: vi.fn(),
 	},
 }));
@@ -55,300 +19,288 @@ vi.mock("react-hot-toast", () => ({
 	default: { error: vi.fn(), success: vi.fn() },
 }));
 
-beforeEach(() => {
-	vi.clearAllMocks();
-	localStorage.clear();
-});
+const question: AppQuestion = {
+	id: "temp-0",
+	quizId: "quiz-1",
+	questionText: "Question?",
+	optionA: "A",
+	optionB: "B",
+	optionC: "C",
+	optionD: "D",
+	correctIndex: 0,
+	points: 1,
+	order: 0,
+};
+
+function createQuizInsert(data = { id: "quiz-1", code: null }) {
+	return {
+		insert: vi.fn(() => ({
+			select: vi.fn(() => ({
+				single: vi.fn().mockResolvedValue({ data, error: null }),
+			})),
+		})),
+	};
+}
 
 describe("useCreateQuiz", () => {
-	it("createQuiz with empty title calls toast.error without calling supabase", async () => {
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		localStorage.clear();
 		const { supabase } = await import("../lib/supabase");
+		vi.mocked(supabase.auth.getUser).mockResolvedValue({
+			data: { user: { id: "user-1" } },
+			error: null,
+		} as never);
+	});
+
+	it("always starts with blank metadata", () => {
+		localStorage.setItem("quiz_meta_draft", JSON.stringify({ title: "Stale" }));
+		const { result } = renderHook(() => useCreateQuiz());
+		expect(result.current.quiz).toEqual({ title: "", description: "" });
+	});
+
+	it("creates a draft without a code", async () => {
+		const { supabase } = await import("../lib/supabase");
+		const source = createQuizInsert();
+		vi.mocked(supabase.from).mockReturnValue(source as never);
 		const { result } = renderHook(() => useCreateQuiz());
 
-		await act(async () => {
-			await result.current.createQuiz();
-		});
+		act(() => result.current.setTitle("Lifecycle Quiz"));
+		await act(() => result.current.createQuiz());
 
+		expect(source.insert).toHaveBeenCalledWith(expect.objectContaining({
+			title: "Lifecycle Quiz",
+			status: "draft",
+			code: null,
+		}));
+		expect(result.current.quiz.status).toBe("draft");
+		expect(result.current.quizCode).toBeNull();
+	});
+
+	it("rejects creation without a title", async () => {
+		const { supabase } = await import("../lib/supabase");
+		const { result } = renderHook(() => useCreateQuiz());
+		await act(() => result.current.createQuiz());
 		expect(toast.error).toHaveBeenCalledWith("Quiz title is required");
 		expect(supabase.from).not.toHaveBeenCalled();
 	});
 
-	it("createQuiz with valid title and authenticated user calls supabase.insert", async () => {
-		const { supabase } = await mockCreateQuizFlow();
-
+	it("saves questions while keeping the quiz as a draft", async () => {
+		const { supabase } = await import("../lib/supabase");
+		const quizSource = createQuizInsert();
+		const questionInsert = vi.fn().mockResolvedValue({
+			data: [{ id: "saved-question-1", quiz_id: "quiz-1", Question: "Question?", Option_A: "A", Option_B: "B", Option_C: "C", Option_D: "D", Correct_Answer: "A", Points: 1, created_at: "" }],
+			error: null,
+		});
+		vi.mocked(supabase.from)
+			.mockReturnValueOnce(quizSource as never)
+			.mockReturnValueOnce({ insert: () => ({ select: () => questionInsert() }) } as never);
 		const { result } = renderHook(() => useCreateQuiz());
+		act(() => result.current.setTitle("Draft Quiz"));
+		await act(() => result.current.createQuiz());
 
-		act(() => result.current.setTitle("My Quiz"));
-
+		let saved = false;
 		await act(async () => {
-			await result.current.createQuiz();
+			saved = await result.current.saveAsDraft([question]);
 		});
 
-		expect(supabase.from).toHaveBeenCalledWith("quizzes");
-		expect(toast.success).toHaveBeenCalledWith("Quiz created! Now upload questions.");
+		expect(saved).toBe(true);
+		expect(questionInsert).toHaveBeenCalledOnce();
+		expect(result.current.shareableLink).toBeNull();
+		expect(result.current.quizCode).toBeNull();
 	});
 
-	it("createQuiz when not authenticated calls toast.error", async () => {
+	it("does not reinsert resumed questions and inserts only new questions", async () => {
 		const { supabase } = await import("../lib/supabase");
-		vi.mocked(supabase.auth.getUser).mockResolvedValue({
-			data: { user: null },
+		const existingQuestion: AppQuestion = { ...question, id: "db-question-1" };
+		const newQuestion: AppQuestion = { ...question, id: "draft-new-1", questionText: "New question?", order: 1 };
+		const questionInsert = vi.fn().mockResolvedValue({
+			data: [{ id: "db-question-2", quiz_id: "quiz-1", Question: "New question?", Option_A: "A", Option_B: "B", Option_C: "C", Option_D: "D", Correct_Answer: "A", Points: 1, created_at: "" }],
 			error: null,
+		});
+		vi.mocked(supabase.from).mockReturnValueOnce(createQuizInsert() as never).mockReturnValueOnce({
+			insert: vi.fn(() => ({ select: questionInsert })),
 		} as never);
 
 		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("My Quiz"));
-
+		act(() => result.current.setTitle("Resumed Quiz"));
+		await act(() => result.current.createQuiz());
 		await act(async () => {
-			await result.current.createQuiz();
+			await result.current.saveAsDraft([existingQuestion, newQuestion]);
 		});
 
-		expect(toast.error).toHaveBeenCalledWith("You must be logged in to create a quiz");
+		expect(questionInsert).toHaveBeenCalledOnce();
+		expect(questionInsert).toHaveBeenCalledWith();
+		expect(result.current.questions.map((item) => item.id)).toEqual([
+			"db-question-1",
+			"db-question-2",
+		]);
 	});
 
-	it("uploadQuestions with empty questions array calls toast.error", async () => {
-		await mockCreateQuizFlow();
-
-		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("My Quiz"));
-
-		await act(async () => {
-			await result.current.createQuiz();
-		});
-
-		await act(async () => {
-			await result.current.uploadQuestions([]);
-		});
-
-		expect(toast.error).toHaveBeenCalledWith("Quiz ID missing or no questions to upload");
-	});
-
-	it("uploadQuestions with questions succeeds and sets shareableLink", async () => {
-		const { supabase } = await mockCreateQuizFlow();
-
-		const fromFn = vi.fn();
-		vi.mocked(supabase.from).mockImplementation(fromFn);
-
-		fromFn.mockReturnValue({
-			insert: vi.fn(() => ({
-				select: vi.fn(() => ({
-					single: vi.fn().mockResolvedValue({ data: { id: "quiz1" }, error: null }),
+	it("publishes unchanged resumed questions without inserting them again", async () => {
+		const { supabase } = await import("../lib/supabase");
+		const existingQuestion: AppQuestion = { ...question, id: "db-question-1" };
+		const update = vi.fn(() => ({
+			eq: vi.fn(() => ({
+				eq: vi.fn(() => ({
+					select: vi.fn(() => ({
+						single: vi.fn().mockResolvedValue({
+							data: { id: "quiz-1", code: "ABC234" },
+							error: null,
+						}),
+					})),
 				})),
 			})),
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
-
+		}));
+		vi.mocked(supabase.from)
+			.mockReturnValueOnce(createQuizInsert() as never)
+			.mockReturnValueOnce({ update } as never);
 		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("My Quiz"));
+		act(() => result.current.setTitle("Resumed Quiz"));
+		await act(() => result.current.createQuiz());
 
 		await act(async () => {
-			await result.current.createQuiz();
+			await result.current.publishQuiz([existingQuestion], {
+				visibility: "private",
+				category: null,
+				difficulty: null,
+			});
 		});
 
-		fromFn.mockReset();
-		fromFn.mockReturnValue({
-			insert: vi.fn().mockResolvedValue({ error: null }),
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
-
-		await act(async () => {
-			const ok = await result.current.uploadQuestions([makeQuestion()]);
-			expect(ok).toBe(true);
-		});
-
-		expect(result.current.shareableLink).toContain("/quiz/quiz1");
+		expect(supabase.from).toHaveBeenCalledTimes(2);
+		expect(supabase.from).not.toHaveBeenCalledWith("questions");
+		expect(update).toHaveBeenCalledOnce();
 	});
 
-	it("uploadQuestions when already published calls toast.error", async () => {
-		const { supabase } = await mockCreateQuizFlow();
-
-		const fromFn = vi.fn();
-		vi.mocked(supabase.from).mockImplementation(fromFn);
-
-		fromFn.mockReturnValue({
-			insert: vi.fn(() => ({
-				select: vi.fn(() => ({
-					single: vi.fn().mockResolvedValue({ data: { id: "quiz1" }, error: null }),
+	it("publishes with settings, a code, and a shareable link", async () => {
+		const { supabase } = await import("../lib/supabase");
+		const quizSource = createQuizInsert();
+		const questionInsert = vi.fn().mockResolvedValue({
+			data: [{ id: "saved-question-1", quiz_id: "quiz-1", Question: "Question?", Option_A: "A", Option_B: "B", Option_C: "C", Option_D: "D", Correct_Answer: "A", Points: 1, created_at: "" }],
+			error: null,
+		});
+		const update = vi.fn(() => ({
+			eq: vi.fn(() => ({
+				eq: vi.fn(() => ({
+					select: vi.fn(() => ({
+						single: vi.fn().mockResolvedValue({
+							data: { id: "quiz-1", code: "ABC234" },
+							error: null,
+						}),
+					})),
 				})),
 			})),
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
-
+		}));
+		vi.mocked(supabase.from)
+			.mockReturnValueOnce(quizSource as never)
+			.mockReturnValueOnce({ insert: vi.fn(() => ({ select: questionInsert })) } as never)
+			.mockReturnValueOnce({ update } as never);
 		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("My Quiz"));
+		act(() => result.current.setTitle("Published Quiz"));
+		await act(() => result.current.createQuiz());
 
+		let published = false;
 		await act(async () => {
-			await result.current.createQuiz();
+			published = await result.current.publishQuiz([question], {
+				visibility: "public",
+				category: "Science",
+				difficulty: "Beginner",
+			});
 		});
 
-		fromFn.mockReset();
-		fromFn.mockReturnValue({
-			insert: vi.fn().mockResolvedValue({ error: null }),
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
-
-		await act(async () => {
-			await result.current.uploadQuestions([makeQuestion()]);
-		});
-
-		await act(async () => {
-			const ok = await result.current.uploadQuestions([makeQuestion()]);
-			expect(ok).toBe(false);
-		});
-		expect(toast.error).toHaveBeenCalledWith("Quiz already published");
+		expect(published).toBe(true);
+		expect(update).toHaveBeenCalledWith(expect.objectContaining({
+			status: "published",
+			visibility: "public",
+			category: "Science",
+			difficulty: "Beginner",
+		}));
+		expect(result.current.quizCode).toBe("ABC234");
+		expect(result.current.shareableLink).toContain("/quiz/quiz-1");
 	});
 
-	it("reset clears all state", async () => {
+	it("reset clears lifecycle state and stale drafts", () => {
+		localStorage.setItem("quiz_meta_draft", "stale");
+		localStorage.setItem("quiz_builder_draft", "stale");
 		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("Some Title"));
-		act(() => result.current.setDescription("Desc"));
-		act(() => result.current.setTimeLimit(10));
+		act(() => result.current.setTitle("Changed"));
 		act(() => result.current.reset());
-
-		expect(result.current.quiz.title).toBe("");
-		expect(result.current.quiz.description).toBe("");
-		expect(result.current.timeLimit).toBeNull();
-		expect(result.current.questions).toEqual([]);
-		expect(result.current.shareableLink).toBeNull();
+		expect(result.current.quiz).toEqual({ title: "", description: "" });
+		expect(localStorage.getItem("quiz_meta_draft")).toBeNull();
+		expect(localStorage.getItem("quiz_builder_draft")).toBeNull();
 	});
 
-	it("updateQuizMeta saves to localStorage and updates quiz state", () => {
-		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.updateQuizMeta({ title: "Meta Title", description: "Meta Desc" }));
-		expect(result.current.quiz.title).toBe("Meta Title");
-		expect(result.current.quiz.description).toBe("Meta Desc");
-		const saved = JSON.parse(localStorage.getItem("quiz_meta_draft")!);
-		expect(saved.title).toBe("Meta Title");
-	});
-
-	it("setQuestionsFromCSV parses a CSV file and loads questions", async () => {
-		const { parseAndValidateCSV } = await import("../utils/csvParser");
-		vi.mocked(parseAndValidateCSV).mockResolvedValue({
-			success: true,
-			data: [
-				{
-					Question: "Q1",
-					Option_A: "A",
-					Option_B: "B",
-					Option_C: "C",
-					Option_D: "D",
-					Correct_Answer: "D",
-					Points: "1",
-				},
-			] as MCQRow[],
+	describe("resume", () => {
+		it("shows loading state when resumeQuizId is provided", async () => {
+			const { supabase } = await import("../lib/supabase");
+			const single = vi.fn().mockResolvedValue({ data: null, error: null });
+			const eq3 = vi.fn(() => ({ single }));
+			const eq2 = vi.fn(() => ({ eq: eq3 }));
+			const eq1 = vi.fn(() => ({ eq: eq2 }));
+			vi.mocked(supabase.from).mockReturnValue({
+				select: vi.fn(() => ({ eq: eq1 })),
+			} as never);
+			const { result } = renderHook(() => useCreateQuiz("draft-1"));
+			expect(result.current.isLoadingDraft).toBe(true);
 		});
 
-		const { supabase } = await mockCreateQuizFlow();
-		const fromFn = vi.fn();
-		vi.mocked(supabase.from).mockImplementation(fromFn);
-		fromFn.mockReturnValue({
-			insert: vi.fn(() => ({
-				select: vi.fn(() => ({
-					single: vi.fn().mockResolvedValue({ data: { id: "quiz1" }, error: null }),
-				})),
-			})),
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
+		it("loads draft quiz metadata and questions", async () => {
+			const { supabase } = await import("../lib/supabase");
+			const draftData = { id: "draft-1", title: "Resumed", description: "", time_limit: null, visibility: "private", category: null, difficulty: null, status: "draft", code: null };
+			const quizSingle = vi.fn().mockResolvedValue({ data: draftData, error: null });
+			const quizEq3 = vi.fn(() => ({ single: quizSingle }));
+			const quizEq2 = vi.fn(() => ({ eq: quizEq3 }));
+			const quizEq1 = vi.fn(() => ({ eq: quizEq2 }));
+			const quizSelect = vi.fn(() => ({ eq: quizEq1 }));
+			const questionsResult = { data: [], error: null };
+			const questionsOrder = vi.fn(() => (questionsResult));
+			const questionsEq = vi.fn(() => ({ order: questionsOrder }));
+			const questionsSelect = vi.fn(() => ({ eq: questionsEq }));
+			vi.mocked(supabase.from)
+				.mockReturnValueOnce({ select: quizSelect } as never)
+				.mockReturnValueOnce({ select: questionsSelect } as never);
 
-		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("My Quiz"));
-		await act(async () => { await result.current.createQuiz(); });
+			vi.mocked(supabase.auth.getUser).mockResolvedValue({
+				data: { user: { id: "user-1" } },
+				error: null,
+			} as never);
 
-		await act(async () => {
-			await result.current.setQuestionsFromCSV(new File(["dummy"], "test.csv"));
+			const { result } = renderHook(() => useCreateQuiz("draft-1"));
+
+			await waitFor(() => expect(result.current.isLoadingDraft).toBe(false));
+			expect(result.current.quiz.title).toBe("Resumed");
+			expect(result.current.questions).toEqual([]);
 		});
 
-		expect(result.current.questions).toHaveLength(1);
-		expect(result.current.questions[0].questionText).toBe("Q1");
-		expect(toast.success).toHaveBeenCalledWith("1 questions loaded");
-	});
+		it("shows error toast on auth failure", async () => {
+			const { supabase } = await import("../lib/supabase");
+			vi.mocked(supabase.auth.getUser).mockResolvedValue({
+				data: { user: null },
+				error: { message: "Not authenticated" },
+			} as never);
 
-	it("setQuestionsFromCSV shows toast on parse failure", async () => {
-		const { parseAndValidateCSV } = await import("../utils/csvParser");
-		vi.mocked(parseAndValidateCSV).mockResolvedValue({
-			success: false,
-			message: "Invalid CSV format",
+			const { result } = renderHook(() => useCreateQuiz("draft-1"));
+
+			await waitFor(() => expect(result.current.isLoadingDraft).toBe(false));
+			expect(toast.error).toHaveBeenCalledWith("You must be logged in to resume a draft");
 		});
 
-		const { result } = renderHook(() => useCreateQuiz());
+		it("shows error toast when draft not found", async () => {
+			const { supabase } = await import("../lib/supabase");
+			vi.mocked(supabase.auth.getUser).mockResolvedValue({
+				data: { user: { id: "user-1" } },
+				error: null,
+			} as never);
+			const single = vi.fn().mockResolvedValue({ data: null, error: { message: "Not found" } });
+			const quizEq = vi.fn(() => ({ eq: vi.fn(() => ({ eq: vi.fn(() => ({ single })) })) }));
+			vi.mocked(supabase.from).mockReturnValueOnce({
+				select: vi.fn(() => ({ eq: quizEq })),
+			} as never);
 
-		await act(async () => {
-			await result.current.setQuestionsFromCSV(new File(["bad"], "test.csv"));
+			const { result } = renderHook(() => useCreateQuiz("draft-1"));
+
+			await waitFor(() => expect(result.current.isLoadingDraft).toBe(false));
+			expect(toast.error).toHaveBeenCalledWith("Draft not found or you do not have access");
 		});
-
-		expect(toast.error).toHaveBeenCalledWith("Invalid CSV format");
-		expect(result.current.questions).toHaveLength(0);
-	});
-
-	it("uploadQuestions returns false when supabase insert fails", async () => {
-		const { supabase } = await mockCreateQuizFlow();
-		const fromFn = vi.fn();
-		vi.mocked(supabase.from).mockImplementation(fromFn);
-
-		fromFn.mockReturnValue({
-			insert: vi.fn(() => ({
-				select: vi.fn(() => ({
-					single: vi.fn().mockResolvedValue({ data: { id: "quiz1" }, error: null }),
-				})),
-			})),
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
-
-		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("My Quiz"));
-		await act(async () => { await result.current.createQuiz(); });
-
-		fromFn.mockReset();
-		fromFn.mockReturnValue({
-			insert: vi.fn().mockResolvedValue({ error: { message: "DB Error" } }),
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
-
-		await act(async () => {
-			const ok = await result.current.uploadQuestions([makeQuestion()]);
-			expect(ok).toBe(false);
-		});
-		expect(toast.error).toHaveBeenCalledWith("Failed to save questions: DB Error");
-	});
-
-	it("createQuiz handles insert returning no id", async () => {
-		const { supabase } = await mockCreateQuizFlow();
-		const chain = {
-			select: vi.fn().mockReturnThis(),
-			single: vi.fn().mockResolvedValue({ data: null, error: null }),
-		};
-		vi.mocked(supabase.from).mockReturnValue({
-			insert: vi.fn(() => chain),
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
-
-		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("My Quiz"));
-
-		await act(async () => {
-			await result.current.createQuiz();
-		});
-
-		expect(toast.error).toHaveBeenCalledWith("Failed to create quiz");
-	});
-
-	it("createQuiz handles insert error", async () => {
-		const { supabase } = await mockCreateQuizFlow();
-		const insertChain = {
-			select: vi.fn().mockReturnThis(),
-			single: vi.fn().mockResolvedValue({ data: null, error: { message: "Insert failed" } }),
-		};
-		vi.mocked(supabase.from).mockReturnValue({
-			insert: vi.fn(() => insertChain),
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} as any);
-
-		const { result } = renderHook(() => useCreateQuiz());
-		act(() => result.current.setTitle("My Quiz"));
-
-		await act(async () => {
-			await result.current.createQuiz();
-		});
-
-		expect(toast.error).toHaveBeenCalledWith("Failed to create quiz");
 	});
 });

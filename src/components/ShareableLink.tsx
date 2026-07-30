@@ -3,16 +3,35 @@ import toast from "react-hot-toast";
 
 export default function ShareableLink({
 	shareableLink,
+	quizCode,
 }: {
 	shareableLink: string;
+	quizCode?: string;
 }) {
 	const [copied, setCopied] = useState(false);
+	const [codeCopied, setCodeCopied] = useState(false);
 
-	const handleCopy = () => {
-		navigator.clipboard.writeText(shareableLink);
-		setCopied(true);
-		toast.success("Link copied!");
-		setTimeout(() => setCopied(false), 2000);
+	const handleCopy = async () => {
+		try {
+			await navigator.clipboard.writeText(shareableLink);
+			setCopied(true);
+			toast.success("Link copied!");
+			setTimeout(() => setCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy link");
+		}
+	};
+
+	const handleCodeCopy = async () => {
+		if (!quizCode) return;
+		try {
+			await navigator.clipboard.writeText(quizCode);
+			setCodeCopied(true);
+			toast.success("Code copied!");
+			setTimeout(() => setCodeCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy code");
+		}
 	};
 
 	return (
@@ -99,6 +118,22 @@ export default function ShareableLink({
 					)}
 				</button>
 			</div>
+
+			{quizCode && (
+				<div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t border-green-500/20">
+					<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+						Share code: <span className="ml-2 font-mono font-bold text-base" style={{ color: "var(--color-text-primary)" }}>{quizCode}</span>
+					</p>
+					<button
+						type="button"
+						onClick={handleCodeCopy}
+						className="px-4 py-2 rounded-lg border text-sm font-medium transition"
+						style={{ borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
+					>
+						{codeCopied ? "Copied" : "Copy code"}
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }

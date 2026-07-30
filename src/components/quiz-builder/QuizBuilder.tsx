@@ -29,24 +29,33 @@ function blankQuestion(order: number): AppQuestion {
 
 interface QuizBuilderProps {
 	quizId: string | undefined;
-	onSubmit: (questions: AppQuestion[]) => Promise<boolean>;
+	initialQuestions?: AppQuestion[];
+	onSaveAsDraft: (questions: AppQuestion[]) => Promise<boolean>;
+	onPublish: (questions: AppQuestion[]) => void;
 	isUploading: boolean;
 }
 
 export default function QuizBuilder({
 	quizId,
-	onSubmit,
+	initialQuestions,
+	onSaveAsDraft,
+	onPublish,
 	isUploading,
 }: QuizBuilderProps) {
-	const [questions, setQuestions] = useState<AppQuestion[]>([
-		blankQuestion(0),
-	]);
+	const [questions, setQuestions] = useState<AppQuestion[]>(() =>
+		initialQuestions && initialQuestions.length > 0 ? initialQuestions : [blankQuestion(0)],
+	);
 	const [errors, setErrors] = useState<Map<number, string[]>>(new Map());
 
 	const { toggle, isExpanded, onQuestionAdded, removeAtIndex, swapIndices } =
 		useQuestionCollapse(1);
 
 	useEffect(() => {
+		if (initialQuestions && initialQuestions.length > 0) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
+			setQuestions(initialQuestions);
+			return;
+		}
 		try {
 			const raw = localStorage.getItem(DRAFT_KEY);
 			if (!raw) return;
@@ -73,11 +82,10 @@ export default function QuizBuilder({
 				}
 			}
 			if (validated.length > 0) {
-				// eslint-disable-next-line react-hooks/set-state-in-effect
 				setQuestions(validated);
 			}
 		} catch {}
-	}, [quizId]);
+	}, [initialQuestions, quizId]);
 
 	const persist = (qs: AppQuestion[]) => {
 		try {
@@ -186,14 +194,21 @@ export default function QuizBuilder({
 		});
 	};
 
-	const handleSubmit = async () => {
+	const handleSaveAsDraft = async () => {
 		const errs = validateQuizForSubmit(questions);
 		setErrors(errs);
 		if (errs.size > 0) return;
-		const ok = await onSubmit(questions);
+		const ok = await onSaveAsDraft(questions);
 		if (ok) {
 			localStorage.removeItem(DRAFT_KEY);
 		}
+	};
+
+	const handlePublish = () => {
+		const errs = validateQuizForSubmit(questions);
+		setErrors(errs);
+		if (errs.size > 0) return;
+		onPublish(questions);
 	};
 
 	return (
@@ -216,7 +231,8 @@ export default function QuizBuilder({
 
 			<BuilderToolbar
 				onAdd={addQuestion}
-				onSubmit={handleSubmit}
+				onSaveAsDraft={handleSaveAsDraft}
+				onPublish={handlePublish}
 				isUploading={isUploading}
 				quizId={quizId}
 			/>

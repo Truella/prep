@@ -17,7 +17,8 @@ async function fetchPublicQuizzes(filters: Filters): Promise<PublicQuiz[]> {
     .select(
       "id, title, description, category, difficulty, times_taken, average_rating, created_at"
     )
-    .eq("visibility", "public");
+    .eq("visibility", "public")
+    .eq("status", "published");
 
   if (filters.category) query = query.eq("category", filters.category);
   if (filters.difficulty) query = query.eq("difficulty", filters.difficulty);

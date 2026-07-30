@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { useQuizDetail } from "../hooks/useQuizDetail";
 import MetaEditor from "../components/quiz-detail/MetaEditor";
 import QuestionEditor from "../components/quiz-detail/QuestionEditor";
 import AttemptStats from "../components/quiz-detail/AttemptStats";
+import PublishSettingsModal from "../components/quiz-bank/PublishSettingsModal";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Copy01Icon, ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
@@ -16,6 +18,8 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 	const router = useRouter();
 	const [tab, setTab] = useState<Tab>("questions");
 	const [confirmDelete, setConfirmDelete] = useState(false);
+	const [confirmUnpublish, setConfirmUnpublish] = useState(false);
+	const [showPublishSettings, setShowPublishSettings] = useState(false);
 
 	const {
 		quiz,
@@ -28,6 +32,8 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 		updateQuestion,
 		deleteQuestion,
 		deleteQuiz,
+		unpublish,
+		republish,
 		copyLink,
 	} = useQuizDetail(quizId);
 
@@ -38,6 +44,21 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 		}
 		const ok = await deleteQuiz();
 		if (ok) router.push("/dashboard/my-quizzes");
+	};
+
+	const handleUnpublish = async () => {
+		if (!confirmUnpublish) {
+			setConfirmUnpublish(true);
+			return;
+		}
+		if (await unpublish()) setConfirmUnpublish(false);
+	};
+
+	const copyCode = (code: string) => {
+		navigator.clipboard
+			.writeText(code)
+			.then(() => toast.success("Code copied!"))
+			.catch(() => toast.error("Failed to copy code"));
 	};
 
 	if (loading) {
@@ -106,18 +127,20 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 					</p>
 				</div>
 				<div className="flex gap-2 shrink-0">
-				<button
-					type="button"
-					onClick={copyLink}
-					className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs transition"
-					style={{
-						borderColor: "var(--color-border)",
-						color: "var(--color-text-secondary)",
-					}}
-				>
-						<HugeiconsIcon icon={Copy01Icon} size={14} />
-						Copy link
-					</button>
+					{quiz.status === "published" && (
+						<button
+							type="button"
+							onClick={copyLink}
+							className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs transition"
+							style={{
+								borderColor: "var(--color-border)",
+								color: "var(--color-text-secondary)",
+							}}
+						>
+							<HugeiconsIcon icon={Copy01Icon} size={14} />
+							Copy link
+						</button>
+					)}
 					<Link
 						href={`/quiz/${quizId}`}
 						target="_blank"
@@ -137,11 +160,11 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 				className="flex gap-1 border-b"
 				style={{ borderColor: "var(--color-border)" }}
 			>
-			{TABS.map((t) => (
-				<button
-					type="button"
-					key={t.id}
-					onClick={() => setTab(t.id)}
+				{TABS.map((t) => (
+					<button
+						type="button"
+						key={t.id}
+						onClick={() => setTab(t.id)}
 						className="px-4 py-2 text-sm font-medium transition border-b-2 -mb-px"
 						style={{
 							borderColor: tab === t.id ? "var(--color-accent)" : "transparent",
@@ -192,6 +215,77 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 						onSave={updateQuizMeta}
 					/>
 
+					<div
+						className="p-5 rounded-xl border space-y-3"
+						style={{
+							borderColor: "var(--color-border)",
+							backgroundColor: "var(--color-surface-raised)",
+						}}
+					>
+						<p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+							Publishing
+						</p>
+						{quiz.status === "draft" ? (
+							<>
+								<p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+									This draft is only available to you in preview mode.
+								</p>
+								<button
+									type="button"
+									onClick={() => setShowPublishSettings(true)}
+									className="px-4 py-2 rounded-lg text-xs font-semibold transition"
+									style={{ backgroundColor: "var(--color-accent)", color: "#0A0A0F" }}
+								>
+									Publish
+								</button>
+							</>
+						) : (
+							<>
+								{quiz.code && (
+									<div className="flex items-center gap-3">
+										<code
+											className="px-3 py-2 rounded-lg text-sm font-semibold tracking-widest"
+											style={{ backgroundColor: "var(--color-bg)", color: "var(--color-text-primary)" }}
+										>
+											{quiz.code}
+										</code>
+										<button
+											type="button"
+											onClick={() => copyCode(quiz.code!)}
+											className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs"
+											style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}
+										>
+											<HugeiconsIcon icon={Copy01Icon} size={14} />
+											Copy code
+										</button>
+									</div>
+								)}
+								<button
+									type="button"
+									disabled={saving}
+									onClick={handleUnpublish}
+									className="px-4 py-2 rounded-lg text-xs font-semibold transition disabled:opacity-50"
+									style={{
+										backgroundColor: confirmUnpublish ? "rgb(239 68 68)" : "rgb(239 68 68 / 0.15)",
+										color: confirmUnpublish ? "#fff" : "rgb(248 113 113)",
+									}}
+								>
+									{confirmUnpublish ? "Confirm unpublish" : "Unpublish"}
+								</button>
+								{confirmUnpublish && (
+									<button
+										type="button"
+										onClick={() => setConfirmUnpublish(false)}
+										className="ml-2 text-xs"
+										style={{ color: "var(--color-text-secondary)" }}
+									>
+										Cancel
+									</button>
+								)}
+							</>
+						)}
+					</div>
+
 					{/* Danger zone */}
 					<div
 						className="p-5 rounded-xl border space-y-3"
@@ -236,6 +330,15 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 			)}
 
 			{tab === "stats" && <AttemptStats attempts={attempts} />}
+
+			<PublishSettingsModal
+				isOpen={showPublishSettings}
+				onClose={() => setShowPublishSettings(false)}
+				onConfirm={async (settings) => {
+					if (await republish(settings)) setShowPublishSettings(false);
+				}}
+				isLoading={saving}
+			/>
 		</div>
 	);
 }
