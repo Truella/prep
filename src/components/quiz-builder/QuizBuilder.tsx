@@ -195,6 +195,21 @@ export default function QuizBuilder({
 	};
 
 	const handleSaveAsDraft = async () => {
+		const hasQuestionContent = questions.some((question) =>
+			[
+				question.questionText,
+				question.optionA,
+				question.optionB,
+				question.optionC,
+				question.optionD,
+			].some((value) => value.trim().length > 0),
+		);
+		if (!hasQuestionContent) {
+			const ok = await onSaveAsDraft([]);
+			if (ok) localStorage.removeItem(DRAFT_KEY);
+			return;
+		}
+
 		const errs = validateQuizForSubmit(questions);
 		setErrors(errs);
 		if (errs.size > 0) return;

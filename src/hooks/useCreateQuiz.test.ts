@@ -110,6 +110,25 @@ describe("useCreateQuiz", () => {
 		expect(result.current.quizCode).toBeNull();
 	});
 
+	it("saves an empty quiz as a draft", async () => {
+		const { supabase } = await import("../lib/supabase");
+		const source = createQuizInsert();
+		vi.mocked(supabase.from).mockReturnValueOnce(source as never);
+		const { result } = renderHook(() => useCreateQuiz());
+
+		act(() => result.current.setTitle("Empty Draft"));
+		await act(() => result.current.createQuiz());
+
+		let saved = false;
+		await act(async () => {
+			saved = await result.current.saveAsDraft([]);
+		});
+
+		expect(saved).toBe(true);
+		expect(supabase.from).toHaveBeenCalledTimes(1);
+		expect(toast.success).toHaveBeenCalledWith("Saved as draft");
+	});
+
 	it("does not reinsert resumed questions and inserts only new questions", async () => {
 		const { supabase } = await import("../lib/supabase");
 		const existingQuestion: AppQuestion = { ...question, id: "db-question-1" };

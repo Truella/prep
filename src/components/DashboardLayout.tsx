@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	};
 
 	return (
-		<div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--color-bg)" }}>
+		<div className="min-h-screen overflow-x-clip" style={{ backgroundColor: "var(--color-bg)" }}>
 			{/* Top Navigation */}
 			<TopBar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} />
 			<div className="flex min-w-0">

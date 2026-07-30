@@ -247,8 +247,8 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		questionsOverride?: AppQuestion[],
 	): Promise<boolean> => {
 		const toSave = questionsOverride ?? state.questions;
-		if (!state.quiz.id || toSave.length === 0) {
-			toast.error("Quiz ID missing or no questions to save");
+		if (!state.quiz.id) {
+			toast.error("Quiz ID missing");
 			return false;
 		}
 
