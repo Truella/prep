@@ -64,6 +64,16 @@ export default function PublishSettingsModal({
 	useEffect(() => {
 		const el = dialogRef.current;
 		if (!el) return;
+		const handler = (event: Event) => {
+			if (isLoading) event.preventDefault();
+		};
+		el.addEventListener("cancel", handler);
+		return () => el.removeEventListener("cancel", handler);
+	}, [isLoading]);
+
+	useEffect(() => {
+		const el = dialogRef.current;
+		if (!el) return;
 		const handler = () => {
 			if (!isLoading) onClose();
 		};
