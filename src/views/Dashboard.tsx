@@ -4,11 +4,21 @@ import Link from "next/link";
 import { useQuizzes } from "../hooks/useQuizzes";
 import { useAnalyticsStats } from "../hooks/useStats";
 import QuizRow from "../components/QuizRow";
+import QuizRowSkeleton from "../components/skeletons/QuizRowSkeleton";
 
 export default function Dashboard() {
-	const { published, loading, copyQuizLink, refetch } = useQuizzes();
+	const {
+		drafts,
+		published,
+		loading,
+		copyQuizLink,
+		deleteQuiz,
+		unpublishQuiz,
+		refetch,
+	} = useQuizzes();
 	const { stats } = useAnalyticsStats();
 
+	const recentDrafts = drafts.slice(0, 2);
 	const recentQuizzes = published.slice(0, 3);
 
 	return (
@@ -40,7 +50,7 @@ export default function Dashboard() {
 			<div className="grid grid-cols-3 gap-4">
 				{[
 					{ label: "Quizzes", value: stats.totalQuizzes },
-					{ label: "Questions", value: stats.totalQuestions },
+					{ label: "Drafts", value: drafts.length },
 					{ label: "Attempts", value: stats.totalAttempts },
 				].map((s) => (
 					<div
@@ -64,6 +74,33 @@ export default function Dashboard() {
 				))}
 			</div>
 
+			{!loading && recentDrafts.length > 0 && (
+				<section>
+					<div className="mb-4 flex items-center justify-between">
+						<h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
+							Continue where you left off
+						</h3>
+						<Link
+							href="/dashboard/my-quizzes"
+							className="text-xs font-medium"
+							style={{ color: "var(--color-accent)" }}
+						>
+							View all →
+						</Link>
+					</div>
+					<div className="space-y-2">
+						{recentDrafts.map((quiz) => (
+							<QuizRow
+								key={quiz.id}
+								quiz={quiz}
+								onDelete={deleteQuiz}
+								onRefetch={refetch}
+							/>
+						))}
+					</div>
+				</section>
+			)}
+
 			<div>
 				<div className="flex items-center justify-between mb-4">
 					<h3
@@ -82,13 +119,9 @@ export default function Dashboard() {
 				</div>
 
 				{loading && (
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div className="space-y-2">
 						{[1, 2, 3].map((i) => (
-							<div
-								key={i}
-								className="h-44 rounded-2xl animate-pulse"
-								style={{ backgroundColor: "var(--color-surface)" }}
-							/>
+							<QuizRowSkeleton key={i} />
 						))}
 					</div>
 				)}
@@ -111,12 +144,13 @@ export default function Dashboard() {
 				)}
 
 				{!loading && recentQuizzes.length > 0 && (
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div className="space-y-2">
 						{recentQuizzes.map((quiz) => (
 							<QuizRow
 								key={quiz.id}
 								quiz={quiz}
 								onCopyLink={copyQuizLink}
+								onUnpublish={unpublishQuiz}
 								onRefetch={refetch}
 							/>
 						))}
