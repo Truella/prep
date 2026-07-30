@@ -26,37 +26,62 @@ interface QuizRowQuiz {
 interface QuizRowProps {
 	quiz: QuizRowQuiz;
 	onCopyLink?: (id: string) => void;
-	onRefetch?: () => void;
+	onRefetch?: () => void | Promise<unknown>;
 	onUnpublish?: (quizId: string) => Promise<void>;
 	onDelete?: (quizId: string) => Promise<void>;
 }
 
+type ConfirmAction = "delete" | "unpublish";
+
+interface ConfirmableAction {
+	kind: ConfirmAction;
+	operation: () => Promise<void>;
+	successMessage: string | null;
+	errorMessage: string | null;
+}
+
 export default function QuizRow({ quiz, onCopyLink, onRefetch, onUnpublish, onDelete }: QuizRowProps) {
 	const [menuOpen, setMenuOpen] = useState(false);
-	const [confirmAction, setConfirmAction] = useState<"delete" | "unpublish" | null>(null);
+	const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null);
 	const [committing, setCommitting] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
+	const confirmationArmedAt = useRef(0);
 	const isDraft = quiz.status === "draft";
 	const attempts = quiz.times_taken ?? 0;
 
 	useEffect(() => {
 		if (!menuOpen) return;
+		const closeActions = () => {
+			setMenuOpen(false);
+			setConfirmAction(null);
+			confirmationArmedAt.current = 0;
+		};
 		const closeMenu = (event: MouseEvent) => {
 			if (!menuRef.current?.contains(event.target as Node)) {
-				setMenuOpen(false);
-				setConfirmAction(null);
+				closeActions();
 			}
 		};
+		const closeMenuOnEscape = (event: KeyboardEvent) => {
+			if (event.key === "Escape") closeActions();
+		};
 		document.addEventListener("mousedown", closeMenu);
-		return () => document.removeEventListener("mousedown", closeMenu);
+		document.addEventListener("keydown", closeMenuOnEscape);
+		return () => {
+			document.removeEventListener("mousedown", closeMenu);
+			document.removeEventListener("keydown", closeMenuOnEscape);
+		};
 	}, [menuOpen]);
 
-	const handleCopyLink = () => {
+	const handleCopyLink = async () => {
 		if (onCopyLink) {
 			onCopyLink(quiz.id);
 		} else {
-			navigator.clipboard.writeText(`${window.location.origin}/quiz/${quiz.id}`);
-			toast.success("Quiz link copied!");
+			try {
+				await navigator.clipboard.writeText(`${window.location.origin}/quiz/${quiz.id}`);
+				toast.success("Quiz link copied!");
+			} catch {
+				toast.error("Failed to copy link");
+			}
 		}
 		setMenuOpen(false);
 	};
@@ -71,56 +96,60 @@ export default function QuizRow({ quiz, onCopyLink, onRefetch, onUnpublish, onDe
 		setMenuOpen(false);
 	};
 
-	const handleUnpublish = async () => {
-		if (confirmAction !== "unpublish") {
-			setConfirmAction("unpublish");
+	const runConfirmableAction = async ({
+		kind,
+		operation,
+		successMessage,
+		errorMessage,
+	}: ConfirmableAction) => {
+		if (confirmAction !== kind) {
+			setConfirmAction(kind);
+			confirmationArmedAt.current = Date.now();
 			return;
 		}
+		if (Date.now() - confirmationArmedAt.current < 400) return;
+
 		setCommitting(true);
 		try {
-			if (onUnpublish) {
-				await onUnpublish(quiz.id);
-			} else {
-				const { error } = await supabase
-					.from("quizzes")
-					.update({ status: "draft", code: null, visibility: "private" })
-					.eq("id", quiz.id);
-				if (error) throw error;
-				toast.success("Quiz unpublished and moved to drafts");
-			}
-			onRefetch?.();
+			await operation();
+			if (successMessage) toast.success(successMessage);
+			await onRefetch?.();
 			setMenuOpen(false);
-		} catch {
-			toast.error("Failed to unpublish");
 			setConfirmAction(null);
+			confirmationArmedAt.current = 0;
+		} catch {
+			if (errorMessage) toast.error(errorMessage);
 		} finally {
 			setCommitting(false);
 		}
 	};
 
-	const handleDelete = async () => {
-		if (confirmAction !== "delete") {
-			setConfirmAction("delete");
-			return;
-		}
-		setCommitting(true);
-		try {
+	const handleUnpublish = () => runConfirmableAction({
+		kind: "unpublish",
+		operation: async () => {
+			if (onUnpublish) return onUnpublish(quiz.id);
+			const { error } = await supabase
+				.from("quizzes")
+				.update({ status: "draft", code: null, visibility: "private" })
+				.eq("id", quiz.id);
+			if (error) throw error;
+		},
+		successMessage: onUnpublish ? null : "Quiz unpublished and moved to drafts",
+		errorMessage: onUnpublish ? null : "Failed to unpublish",
+	});
+
+	const handleDelete = () => runConfirmableAction({
+		kind: "delete",
+		operation: async () => {
 			if (onDelete) {
-				await onDelete(quiz.id);
-			} else {
-				const { error } = await supabase.from("quizzes").delete().eq("id", quiz.id);
-				if (error) throw error;
-				toast.success("Draft deleted");
+				return onDelete(quiz.id);
 			}
-			onRefetch?.();
-			setMenuOpen(false);
-		} catch {
-			toast.error("Failed to delete draft");
-			setConfirmAction(null);
-		} finally {
-			setCommitting(false);
-		}
-	};
+			const { error } = await supabase.from("quizzes").delete().eq("id", quiz.id);
+			if (error) throw error;
+		},
+		successMessage: onDelete ? null : "Draft deleted",
+		errorMessage: onDelete ? null : "Failed to delete draft",
+	});
 
 	const primaryHref = isDraft
 		? `/dashboard/create?resume=${quiz.id}`
@@ -159,11 +188,13 @@ export default function QuizRow({ quiz, onCopyLink, onRefetch, onUnpublish, onDe
 					onClick={() => {
 						setMenuOpen((open) => !open);
 						setConfirmAction(null);
+						confirmationArmedAt.current = 0;
 					}}
 					className="rounded-lg p-2 transition hover:bg-surface-raised"
 					style={{ color: "var(--color-text-secondary)" }}
 					aria-label={`More actions for ${quiz.title || "untitled draft"}`}
 					aria-expanded={menuOpen}
+					aria-haspopup="menu"
 				>
 					<HugeiconsIcon icon={MoreVerticalIcon} size={18} />
 				</button>
@@ -171,23 +202,25 @@ export default function QuizRow({ quiz, onCopyLink, onRefetch, onUnpublish, onDe
 					<div
 						className="absolute right-0 top-full z-30 mt-1 w-44 rounded-lg border p-1 shadow-xl"
 						style={{ backgroundColor: "var(--color-surface-raised)", borderColor: "var(--color-border)" }}
+						role="menu"
 					>
 						{!isDraft && (
-							<button type="button" onClick={handleCopyLink} className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-surface">
+							<button type="button" role="menuitem" onClick={handleCopyLink} className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-surface">
 								Copy link
 							</button>
 						)}
 						{!isDraft && quiz.code && (
-							<button type="button" onClick={handleCopyCode} className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-surface">
+							<button type="button" role="menuitem" onClick={handleCopyCode} className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-surface">
 								Copy code
 							</button>
 						)}
 						<button
 							type="button"
+							role="menuitem"
 							onClick={isDraft ? handleDelete : handleUnpublish}
 							disabled={committing}
 							className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-surface disabled:opacity-60"
-							style={{ color: confirmAction ? "rgb(248 113 113)" : "var(--color-text-secondary)" }}
+							style={{ color: confirmAction ? "var(--color-error)" : "var(--color-text-secondary)" }}
 						>
 							{committing
 								? "Working..."

@@ -1,14 +1,16 @@
 # PREP — Dashboard UX PRT
+
 **Branch:** `feat/dashboard-ux`
 
 ```bash
-git checkout main && git pull
+git checkout master && git pull
 git checkout -b feat/dashboard-ux
 ```
 
 ---
 
 ## COMMIT DUX-1 — Remove duplicate sidebar analytics
+
 **Commit:** `refactor(dashboard): remove duplicate sidebar analytics widget`
 
 ---PROMPT---
@@ -26,6 +28,7 @@ Do not touch `useAnalyticsStats` in `src/hooks/useStats.ts`, it's still used by 
 ---
 
 ## COMMIT DUX-2 — Collapsible sidebar with icon rail and tooltips
+
 **Commit:** `feat(dashboard): collapsible sidebar with tooltips`
 
 ---PROMPT---
@@ -48,6 +51,7 @@ Desktop only for the collapse behavior — the existing mobile drawer (`isSideba
 ---
 
 ## COMMIT DUX-3 — Theme toggle in sidebar
+
 **Commit:** `feat(dashboard): theme toggle in sidebar`
 
 ---PROMPT---
@@ -61,6 +65,7 @@ Add a theme toggle button to `src/components/SideBar.tsx`, placed at the bottom 
 ---
 
 ## COMMIT DUX-4 — QuizRow component
+
 **Commit:** `feat(dashboard): QuizRow replacing QuizCard and DraftQuizCard`
 
 ---PROMPT---
@@ -90,6 +95,7 @@ Create `src/components/skeletons/QuizRowSkeleton.tsx` matching the new row heigh
 ---
 
 ## COMMIT DUX-5 — Fix Dashboard drafts visibility and stats
+
 **Commit:** `fix(dashboard): surface drafts, replace Questions stat with Drafts`
 
 ---PROMPT---
@@ -107,6 +113,7 @@ In `src/views/Dashboard.tsx`:
 ---
 
 ## COMMIT DUX-6 — My Quizzes uses QuizRow
+
 **Commit:** `refactor(dashboard): My Quizzes uses QuizRow`
 
 ---PROMPT---

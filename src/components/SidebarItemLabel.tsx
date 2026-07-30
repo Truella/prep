@@ -7,9 +7,10 @@ interface SidebarItemLabelProps {
 	label: string;
 	collapsed: boolean;
 	itemRef: RefObject<HTMLElement | null>;
+	showLabel?: boolean;
 }
 
-export function SidebarItemLabel({ label, collapsed, itemRef }: SidebarItemLabelProps) {
+export function SidebarItemLabel({ label, collapsed, itemRef, showLabel = true }: SidebarItemLabelProps) {
 	const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
 
 	useEffect(() => {
@@ -36,7 +37,7 @@ export function SidebarItemLabel({ label, collapsed, itemRef }: SidebarItemLabel
 
 	return (
 		<>
-			<span className={collapsed ? "lg:sr-only" : ""}>{label}</span>
+			<span className={!showLabel || collapsed ? "sr-only" : ""}>{label}</span>
 			{collapsed && position && createPortal(
 				<span
 					className="pointer-events-none fixed z-50 hidden -translate-y-1/2 whitespace-nowrap rounded-md border px-2 py-1 text-xs shadow-lg lg:block"

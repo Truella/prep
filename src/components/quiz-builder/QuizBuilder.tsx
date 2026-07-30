@@ -206,7 +206,11 @@ export default function QuizBuilder({
 		);
 		if (!hasQuestionContent) {
 			const ok = await onSaveAsDraft([]);
-			if (ok) localStorage.removeItem(DRAFT_KEY);
+			if (ok) {
+				try {
+					localStorage.removeItem(DRAFT_KEY);
+				} catch {}
+			}
 			return;
 		}
 
@@ -215,7 +219,9 @@ export default function QuizBuilder({
 		if (errs.size > 0) return;
 		const ok = await onSaveAsDraft(questions);
 		if (ok) {
-			localStorage.removeItem(DRAFT_KEY);
+			try {
+				localStorage.removeItem(DRAFT_KEY);
+			} catch {}
 		}
 	};
 

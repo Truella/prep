@@ -9,6 +9,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { NAV_ITEMS } from "../constants/navItems";
 import { useTheme } from "../lib/theme";
 import { SidebarLink } from "./SideBarLink";
+import { SidebarItemLabel } from "./SidebarItemLabel";
 
 const SIDEBAR_COLLAPSED_KEY = "sidebar-collapsed";
 
@@ -42,6 +43,7 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 	);
 	const isDark = resolvedTheme === "dark";
 	const themeLabel = isDark ? "Switch to light theme" : "Switch to dark theme";
+	const themeButtonRef = React.useRef<HTMLButtonElement>(null);
 
 	const toggleCollapsed = () => {
 		try {
@@ -77,6 +79,7 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 						))}
 					</nav>
 					<button
+					ref={themeButtonRef}
 						type="button"
 						onClick={() => setTheme(isDark ? "light" : "dark")}
 						className={`mt-auto flex rounded-lg p-3 transition hover:bg-surface-raised ${isCollapsed ? "lg:self-center" : ""}`}
@@ -84,6 +87,7 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 						aria-label={themeLabel}
 					>
 						<HugeiconsIcon icon={isDark ? Sun01Icon : Moon01Icon} />
+						<SidebarItemLabel label={themeLabel} collapsed={isCollapsed} itemRef={themeButtonRef} showLabel={false} />
 					</button>
 				</div>
 			</aside>
