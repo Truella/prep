@@ -112,11 +112,13 @@ export default function QuizRow({ quiz, onCopyLink, onRefetch, onUnpublish, onDe
 		setCommitting(true);
 		try {
 			await operation();
-			if (successMessage) toast.success(successMessage);
-			await onRefetch?.();
 			setMenuOpen(false);
 			setConfirmAction(null);
 			confirmationArmedAt.current = 0;
+			if (successMessage) toast.success(successMessage);
+			try {
+				await onRefetch?.();
+			} catch {}
 		} catch {
 			if (errorMessage) toast.error(errorMessage);
 		} finally {
