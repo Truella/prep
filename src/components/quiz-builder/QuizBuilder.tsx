@@ -195,12 +195,46 @@ export default function QuizBuilder({
 	};
 
 	const handleSaveAsDraft = async () => {
+		const hasQuestionContent = questions.some((question) =>
+			[
+				question.questionText,
+				question.optionA,
+				question.optionB,
+				question.optionC,
+				question.optionD,
+			].some((value) => value.trim().length > 0),
+		);
+		if (!hasQuestionContent) {
+			setErrors(new Map());
+			let draftSnapshot: string | null = null;
+			try {
+				draftSnapshot = localStorage.getItem(DRAFT_KEY);
+			} catch {}
+			const ok = await onSaveAsDraft([]);
+			if (ok) {
+				try {
+					if (localStorage.getItem(DRAFT_KEY) === draftSnapshot) {
+						localStorage.removeItem(DRAFT_KEY);
+					}
+				} catch {}
+			}
+			return;
+		}
+
 		const errs = validateQuizForSubmit(questions);
 		setErrors(errs);
 		if (errs.size > 0) return;
+		let draftSnapshot: string | null = null;
+		try {
+			draftSnapshot = localStorage.getItem(DRAFT_KEY);
+		} catch {}
 		const ok = await onSaveAsDraft(questions);
 		if (ok) {
-			localStorage.removeItem(DRAFT_KEY);
+			try {
+				if (localStorage.getItem(DRAFT_KEY) === draftSnapshot) {
+					localStorage.removeItem(DRAFT_KEY);
+				}
+			} catch {}
 		}
 	};
 

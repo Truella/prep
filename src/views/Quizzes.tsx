@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useQuizzes } from "../hooks/useQuizzes";
-import QuizCard from "../components/QuizCard";
-import DraftQuizCard from "../components/DraftQuizCard";
+import QuizRow from "../components/QuizRow";
 import QuizListLoading from "../components/QuizListLoading";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
@@ -40,9 +39,9 @@ export default function Quizzes() {
 							>
 								Drafts ({drafts.length})
 							</h3>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							<div className="space-y-2">
 								{drafts.map((quiz) => (
-									<DraftQuizCard key={quiz.id} quiz={quiz} onRefetch={refetch} onDelete={deleteQuiz} />
+									<QuizRow key={quiz.id} quiz={quiz} onRefetch={refetch} onDelete={deleteQuiz} />
 								))}
 							</div>
 						</div>
@@ -68,9 +67,9 @@ export default function Quizzes() {
 								</p>
 							</div>
 						) : (
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							<div className="space-y-2">
 								{published.map((quiz) => (
-									<QuizCard key={quiz.id} quiz={quiz} onCopyLink={copyQuizLink} onRefetch={refetch} onUnpublish={unpublishQuiz} />
+									<QuizRow key={quiz.id} quiz={quiz} onCopyLink={copyQuizLink} onRefetch={refetch} onUnpublish={unpublishQuiz} />
 								))}
 							</div>
 						)}

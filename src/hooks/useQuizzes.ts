@@ -65,6 +65,7 @@ export function useQuizzes() {
 		} catch (err) {
 			const message = err instanceof Error ? err.message : "Unknown error";
 			toast.error(`Failed to unpublish: ${message}`);
+			throw err;
 		}
 	};
 
@@ -78,12 +79,13 @@ export function useQuizzes() {
       );
       queryClient.invalidateQueries({ queryKey: ["stats"] });
       toast.success("Quiz deleted");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      toast.error(`Failed to delete quiz: ${message}`);
-      // Revert by invalidating
-      queryClient.invalidateQueries({ queryKey: ["quizzes"] });
-    }
+		} catch (err) {
+			const message = err instanceof Error ? err.message : "Unknown error";
+			toast.error(`Failed to delete quiz: ${message}`);
+			// Revert by invalidating
+			queryClient.invalidateQueries({ queryKey: ["quizzes"] });
+			throw err;
+		}
   };
 
 	return {

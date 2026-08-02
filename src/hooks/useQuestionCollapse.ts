@@ -22,7 +22,10 @@ export function useQuestionCollapse(initialCount: number) {
 	);
 
 	const toggle = useCallback((index: number) => {
-		setExpandedMap((prev) => ({ ...prev, [index]: !prev[index] }));
+		setExpandedMap((prev) => ({
+			...prev,
+			[index]: prev[index] === false,
+		}));
 	}, []);
 
 	const expand = useCallback((index: number) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCreateQuiz } from "../hooks/useCreateQuiz";
 import QuizBuilder from "../components/quiz-builder/QuizBuilder";
 import UploadQuestionsForm from "../components/UploadQuestionsForm";
@@ -15,6 +15,7 @@ import type { PublishSettings } from "../hooks/useCreateQuiz";
 type Tab = "build" | "csv";
 
 export default function CreateQuizCSV() {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const resumeQuizId = searchParams.get("resume");
 	const [tab, setTab] = useState<Tab>("build");
@@ -57,7 +58,14 @@ export default function CreateQuizCSV() {
 		if (published) {
 			setIsPublishModalOpen(false);
 			setPendingQuestions(undefined);
+			router.push(`/dashboard/quiz/${quiz.id}`);
 		}
+	};
+
+	const handleSaveAsDraft = async (questionsOverride?: AppQuestion[]) => {
+		const saved = await saveAsDraft(questionsOverride);
+		if (saved) router.push("/dashboard/my-quizzes");
+		return saved;
 	};
 
 	const statCardStyle = {
@@ -113,7 +121,7 @@ export default function CreateQuizCSV() {
 								<QuizBuilder
 									quizId={quiz.id}
 									initialQuestions={questions}
-									onSaveAsDraft={saveAsDraft}
+									onSaveAsDraft={handleSaveAsDraft}
 									onPublish={handlePublishClick}
 									isUploading={isUploadingQuestions}
 								/>
@@ -167,28 +175,29 @@ export default function CreateQuizCSV() {
 												})}
 											</div>
 
-											<div className="flex gap-3 pt-2">
-												<button
-													type="button"
-													onClick={() => void saveAsDraft()}
-													disabled={isUploadingQuestions}
-													className="flex-1 px-4 py-3 rounded-xl border text-sm font-medium transition disabled:opacity-50"
-													style={{ borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
-												>
-													{isUploadingQuestions ? "Saving..." : "Save as Draft"}
-												</button>
-												<button
-													type="button"
-													onClick={() => handlePublishClick()}
-													disabled={isUploadingQuestions}
-													className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition disabled:opacity-50"
-													style={{ backgroundColor: "var(--color-accent)", color: "#0A0A0F" }}
-												>
-													Publish
-												</button>
-											</div>
 										</div>
 									)}
+
+							<div className="flex gap-3 pt-2">
+								<button
+									type="button"
+									onClick={() => void handleSaveAsDraft()}
+									disabled={isUploadingQuestions}
+									className="flex-1 px-4 py-3 rounded-xl border text-sm font-medium transition disabled:opacity-50"
+									style={{ borderColor: "var(--color-border)", color: "var(--color-text-primary)" }}
+								>
+									{isUploadingQuestions ? "Saving..." : "Save as Draft"}
+								</button>
+								<button
+									type="button"
+									onClick={() => handlePublishClick()}
+									disabled={isUploadingQuestions || questions.length === 0}
+									className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition disabled:opacity-50"
+									style={{ backgroundColor: "var(--color-accent)", color: "#0A0A0F" }}
+								>
+									Publish
+								</button>
+							</div>
 								</div>
 							)}
 						</>
