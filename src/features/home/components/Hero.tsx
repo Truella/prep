@@ -4,7 +4,7 @@ import HeroCard from "./HeroCard";
 
 export default function Hero() {
   return (
-    <section className="pt-32 pb-24 px-6">
+    <section className="h-dvh max-h-240 flex items-center pt-32 pb-24 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left — text */}
