@@ -126,48 +126,33 @@ prep/
 │   ├── page.tsx                  # Landing page
 │   └── globals.css
 ├── src/
-│   ├── components/
-│   │   ├── auth/                 # AuthPageClient
-│   │   ├── quiz/                 # Quiz-taking UI (Timer, QuestionCard, Results, Review, etc.)
-│   │   ├── quiz-builder/         # BuilderQuestionCard, QuizBuilder, TimeLimitInput
-│   │   ├── skeletons/            # Loading skeletons
-│   │   ├── DashboardLayout.tsx    # Sidebar + TopBar layout
-│   │   ├── UploadQuestionsForm.tsx# CSV upload form
-│   │   ├── ShareableLink.tsx     # Link copy component
-│   │   └── ...
-│   ├── context/
-│   │   └── AuthContext.tsx       # Auth provider + hook
-│   ├── hooks/
-│   │   ├── useAuth.ts            # Auth state hook
-│   │   ├── useCreateQuiz.ts      # Quiz creation + question upload
-│   │   ├── useTakeQuiz.ts        # Quiz-taking logic (timer, progress, submit)
-│   │   ├── useQuizProgress.ts    # LocalStorage progress persistence
-│   │   ├── useQuizzes.ts         # Quiz listing
-│   │   ├── useStats.ts           # Dashboard stats
-│   │   ├── useQuestionCollapse.ts# Builder collapse state
-│   │   └── ...
+│   ├── features/
+│   │   ├── auth/                 # Auth components, context, and hooks
+│   │   ├── dashboard/            # Dashboard shell, navigation, stats, and view
+│   │   ├── docs/                 # Documentation UI
+│   │   ├── home/                 # Landing-page sections
+│   │   ├── quiz-bank/            # Public quiz discovery and ratings
+│   │   ├── quiz-management/      # Creation, builder, detail, and owned quizzes
+│   │   └── quiz-taking/          # Quiz session, progress, results, and review
 │   ├── lib/
-│   │   ├── types.ts              # Shared TypeScript types
+│   │   ├── types.ts              # Cross-feature TypeScript types
+│   │   ├── theme.tsx             # Theme provider and hook
 │   │   └── supabase.ts           # Supabase client
-│   ├── utils/
-│   │   ├── csvParser.ts          # CSV → questions parsing
-│   │   ├── csvGenerator.ts       # Questions → CSV export
-│   │   ├── transforms.ts         # DB ↔ App data transforms
-│   │   ├── questionValidation.ts # Question/quiz validation
-│   │   └── helpers.ts
-│   ├── views/
-│   │   ├── CreateQuiz.tsx        # Tabbed create page (build / csv)
-│   │   ├── Dashboard.tsx         # Dashboard stats view
-│   │   ├── Quizzes.tsx           # Quiz list view
-│   │   └── Auth/                 # Auth page view
-│   ├── constants/
-│   │   └── navItems.ts           # Sidebar navigation config
-│   └── index.css
+│   └── shared/
+│       ├── components/           # Shared feedback and animation components
+│       ├── navigation/           # Cross-route navigation
+│       ├── providers/            # Application providers
+│       └── ui/skeletons/         # Shared skeleton primitives
+├── tests/
+│   ├── unit/                     # Isolated utility, hook, and component tests
+│   ├── integration/              # Hook tests with mocked service boundaries
+│   └── test-utils/               # Shared test helpers
 ├── supabase/
 │   ├── migrations/               # SQL migrations (managed via Supabase CLI)
 │   └── config.toml
 ├── docs/
-│   └── prt.md                    # Pull request tracking plan
+│   ├── prt.md                    # Pull request tracking plan
+│   └── VITE_TO_NEXT_MIGRATION.md # Historical framework migration plan
 ├── vitest.config.ts
 ├── eslint.config.mjs
 └── next.config.ts

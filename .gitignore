@@ -34,3 +34,6 @@ out/
 *.tsbuildinfo
 
 coverage/
+
+# Local Supabase state
+supabase/.temp/

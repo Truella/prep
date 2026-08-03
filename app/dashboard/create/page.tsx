@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import CreateQuizCSV from "../../../src/views/CreateQuiz";
+import CreateQuizCSV from "@/features/quiz-management/views/CreateQuiz";
 
 export default function CreateQuizPage() {
 	return (

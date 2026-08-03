@@ -1,4 +1,4 @@
-import AuthView from "../../src/views/Auth/AuthView";
+import AuthView from "@/features/auth/components/AuthView";
 
 export default function AuthPage() {
   return <AuthView />;

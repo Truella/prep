@@ -1,4 +1,4 @@
-import TakeQuizInputClient from "../../src/components/quiz/TakeQuizInputClient";
+import TakeQuizInputClient from "@/features/quiz-taking/components/TakeQuizInputClient";
 
 export default function TakeQuizInputPage() {
 	return <TakeQuizInputClient />;

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, Inter, JetBrains_Mono } from "next/font/google";
-import { ThemeProvider } from "../src/lib/theme";
-import { AuthProvider } from "../src/context/AuthContext";
+import { ThemeProvider } from "@/lib/theme";
+import { AuthProvider } from "@/features/auth/context/AuthContext";
 import { Toaster } from "react-hot-toast";
-import ErrorBoundary from "../src/components/ErrorBoundary";
-import ReactQueryProvider from "../src/components/ReactQueryProvider";
+import ErrorBoundary from "@/shared/components/ErrorBoundary";
+import ReactQueryProvider from "@/shared/providers/ReactQueryProvider";
 import "./globals.css";
 
 const inter = Inter({

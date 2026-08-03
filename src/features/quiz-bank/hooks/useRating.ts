@@ -1,0 +1,70 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+
+async function fetchRating(quizId: string, userId: string): Promise<number | null> {
+  const { data, error } = await supabase
+    .from("quiz_ratings")
+    .select("rating")
+    .eq("quiz_id", quizId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? data.rating : null;
+}
+
+async function upsertRating(
+  quizId: string,
+  userId: string,
+  rating: number
+): Promise<void> {
+  const { error } = await supabase
+    .from("quiz_ratings")
+    .upsert(
+      { quiz_id: quizId, user_id: userId, rating },
+      { onConflict: "quiz_id,user_id" }
+    );
+  if (error) throw error;
+}
+
+export function useRating(quizId: string) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: currentRating = null, isLoading: loading, error: queryError } = useQuery({
+    queryKey: ["rating", quizId, user?.id],
+    queryFn: () => fetchRating(quizId, user!.id),
+    enabled: !!user && !!quizId,
+  });
+
+  const mutation = useMutation({
+    mutationFn: (rating: number) => upsertRating(quizId, user!.id, rating),
+    onSuccess: (_, rating) => {
+      queryClient.setQueryData(["rating", quizId, user?.id], rating);
+      queryClient.invalidateQueries({ queryKey: ["quizBank"] });
+      queryClient.invalidateQueries({ queryKey: ["quiz", quizId] });
+      toast.success("Rating submitted!");
+    },
+    onError: () => toast.error("Failed to submit rating"),
+  });
+
+  return {
+    currentRating,
+    loading,
+    error: queryError
+      ? (queryError as Error).message
+      : mutation.error
+        ? (mutation.error as Error).message
+        : null,
+    submitRating: async (rating: number) => {
+      if (!user) return undefined;
+      try {
+        await mutation.mutateAsync(rating);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  };
+}

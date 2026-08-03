@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { supabase } from "../../../src/lib/supabase";
-import TakeQuizClient from "../../../src/components/quiz/TakeQuizClient";
+import { supabase } from "@/lib/supabase";
+import TakeQuizClient from "@/features/quiz-taking/components/TakeQuizClient";
 
 interface PageProps {
 	params: Promise<{ quizId: string }>;
