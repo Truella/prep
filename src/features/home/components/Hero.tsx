@@ -1,11 +1,13 @@
 "use client";
 
 import HeroCard from "./HeroCard";
+import HeroGrid from "./HeroGrid";
 
 export default function Hero() {
   return (
-    <section className="h-dvh max-h-240 flex items-center pt-32 pb-24 px-6">
-      <div className="max-w-6xl mx-auto">
+    <section className="relative h-dvh max-h-240 overflow-hidden flex items-center pt-32 pb-24 px-6">
+      <HeroGrid />
+      <div className="relative z-10 max-w-6xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left — text */}
           <div className="space-y-8">
