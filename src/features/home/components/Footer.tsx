@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer
-      className="py-8 px-6 border-t"
+      className="py-8 px-6"
       style={{
         borderColor: "var(--color-border)",
         backgroundColor: "var(--color-surface)",

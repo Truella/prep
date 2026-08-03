@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import HeroCard from "./HeroCard";
 import HeroGrid from "./HeroGrid";
 
 export default function Hero() {
   return (
-    <section className="relative h-dvh max-h-240 overflow-hidden flex items-center pt-32 pb-24 px-6">
+    <section className="relative lg:h-dvh lg:max-h-240 overflow-hidden flex items-center pt-32 pb-24 px-6">
       <HeroGrid />
       <div className="relative z-10 max-w-6xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -30,18 +31,18 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <a
+              <Link
                 href="/auth"
-                className="px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:opacity-90 bg-accent text-bg"
+                className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm transition-all hover:opacity-90 bg-accent text-bg"
               >
                 Create a quiz
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/take"
-                className="px-7 py-3.5 rounded-xl font-semibold text-sm border border-border text-text-primary transition hover:bg-surface"
+                className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm border border-border text-text-primary transition hover:bg-surface"
               >
                 Take a quiz
-              </a>
+              </Link>
             </div>
 
             <p className="text-xs text-text-secondary">

@@ -46,7 +46,7 @@ export default function QuizBankPreview() {
 	}
 	return (
 		<section
-			className="py-24 px-6 border-t"
+			className="py-24 px-6"
 			style={{ borderColor: "var(--color-border)" }}
 		>
 			<div className="max-w-6xl mx-auto">
