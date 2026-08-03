@@ -38,8 +38,8 @@ export default function HeroGrid() {
           const proximity = Math.max(0, 1 - distance / IMPACT_RADIUS);
           const falloff = proximity * proximity * (3 - 2 * proximity);
           const strength = falloff * effect;
-          const wobble = strength * 1.8;
-          const angle = elapsed / 280 + (x + y) * 0.025;
+          const wobble = strength * 7.5;
+          const angle = elapsed / 150 + (x + y) * 0.025;
 
           context.beginPath();
           context.fillStyle = color;
