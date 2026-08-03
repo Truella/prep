@@ -17,6 +17,8 @@ const NAV_LINKS = [
   { href: "/docs/getting-started", label: "Docs" },
 ];
 
+const DESKTOP_NAV_LINKS = [{ href: "/", label: "Home" }, ...NAV_LINKS];
+
 export default function ExternalNav() {
   const { setTheme, resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -32,8 +34,8 @@ export default function ExternalNav() {
       </Link>
 
       {/* Desktop nav */}
-      <div className="hidden sm:flex items-center gap-6">
-        {NAV_LINKS.map((link) => (
+      <div className="absolute left-1/2 hidden -translate-x-1/2 sm:flex items-center gap-6">
+        {DESKTOP_NAV_LINKS.map((link) => (
           <Link
             key={link.href}
             href={link.href}
@@ -42,6 +44,9 @@ export default function ExternalNav() {
             {link.label}
           </Link>
         ))}
+      </div>
+
+      <div className="hidden sm:flex items-center gap-6">
         <Link
           href="/auth"
           className="text-sm px-4 py-1.5 rounded-lg border border-border text-text-primary hover:bg-surface transition"
