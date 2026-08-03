@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import QuizBankView from "../../src/views/QuizBankView";
+import QuizBankView from "@/features/quiz-bank/views/QuizBankView";
 
 export const metadata: Metadata = {
   title: "Quiz Bank",

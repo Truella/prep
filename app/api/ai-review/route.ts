@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { AIReviewPayload } from "../../../src/lib/types";
+import type { AIReviewPayload } from "@/lib/types";
 
 // In-memory rate limit store — resets on cold start, acceptable for portfolio scale
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();

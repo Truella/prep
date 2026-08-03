@@ -1,4 +1,4 @@
-import QuizDetailView from "../../../../src/views/QuizDetailView";
+import QuizDetailView from "@/features/quiz-management/views/QuizDetailView";
 import type { Metadata } from "next";
 
 interface PageProps {

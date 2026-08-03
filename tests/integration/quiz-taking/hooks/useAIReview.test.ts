@@ -1,0 +1,127 @@
+import { renderHook, act } from "@testing-library/react";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import { useAIReview } from "@/features/quiz-taking/hooks/useAIReview";
+
+const makeResponse = (body: object, status: number) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+
+beforeEach(() => {
+  vi.restoreAllMocks();
+  localStorage.clear();
+});
+
+const PAYLOAD = {
+  questions: [],
+  selectedAnswers: {},
+  score: 5,
+  totalPoints: 10,
+};
+
+describe("useAIReview", () => {
+  it("returns null review when quizId is empty", () => {
+    const { result } = renderHook(() => useAIReview(""));
+    expect(result.current.review).toBeNull();
+  });
+
+  it("returns null review when quizId is undefined", () => {
+    const { result } = renderHook(() => useAIReview(undefined as unknown as string));
+    expect(result.current.review).toBeNull();
+  });
+
+  it("restores cached review from localStorage on mount", () => {
+    localStorage.setItem("quiz_ai_review_quiz1", "Cached review text");
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    expect(result.current.review).toBe("Cached review text");
+  });
+  it("sets review on 200 response", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(makeResponse({ review: "Great job!" }, 200))
+    );
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    await act(() => result.current.getReview(PAYLOAD));
+    expect(result.current.review).toBe("Great job!");
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(result.current.isRateLimited).toBe(false);
+  });
+
+  it("sets rate limit error message on 429", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(makeResponse({ error: "Rate limit" }, 429))
+    );
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    await act(() => result.current.getReview(PAYLOAD));
+    expect(result.current.error).toContain("5 free reviews");
+    expect(result.current.isRateLimited).toBe(true);
+  });
+
+  it("sets generic error on non-429 failure", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(makeResponse({ error: "Server error" }, 500))
+    );
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    await act(() => result.current.getReview(PAYLOAD));
+    expect(result.current.error).toContain("temporarily unavailable");
+  });
+
+  it("sets generic error on network failure", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Network")));
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    await act(() => result.current.getReview(PAYLOAD));
+    expect(result.current.error).toContain("temporarily unavailable");
+  });
+
+  it("loading is true during request and false after", async () => {
+    let resolve: (r: Response) => void;
+    const pending = new Promise<Response>((res) => (resolve = res));
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(pending));
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    act(() => {
+      result.current.getReview(PAYLOAD);
+    });
+    expect(result.current.loading).toBe(true);
+    await act(async () => {
+      resolve!(makeResponse({ review: "Done" }, 200));
+    });
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("handles localStorage.getItem failure on mount", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementationOnce(() => {
+      throw new Error("Storage error");
+    });
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    expect(result.current.review).toBeNull();
+  });
+
+  it("handles localStorage.setItem failure after successful review", async () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementationOnce(() => {
+      throw new Error("Storage full");
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(makeResponse({ review: "Great job!" }, 200))
+    );
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    await act(() => result.current.getReview(PAYLOAD));
+    expect(result.current.review).toBe("Great job!");
+  });
+
+  it("clearReview resets review and error to null", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(makeResponse({ review: "Good" }, 200))
+    );
+    const { result } = renderHook(() => useAIReview("quiz1"));
+    await act(() => result.current.getReview(PAYLOAD));
+    act(() => result.current.clearReview());
+    expect(result.current.review).toBeNull();
+    expect(result.current.error).toBeNull();
+  });
+});

@@ -1,8 +1,8 @@
-import DocsLayout from "../../../src/components/docs/DocsLayout";
-import GettingStarted from "../../../src/components/docs/GettingStarted";
-import CSVGuide from "../../../src/components/docs/CSVGuide";
-import Troubleshooting from "../../../src/components/docs/Troubleshooting";
-import QuestionTips from "../../../src/components/docs/QuestionTips";
+import DocsLayout from "@/features/docs/components/DocsLayout";
+import GettingStarted from "@/features/docs/components/GettingStarted";
+import CSVGuide from "@/features/docs/components/CSVGuide";
+import Troubleshooting from "@/features/docs/components/Troubleshooting";
+import QuestionTips from "@/features/docs/components/QuestionTips";
 import type { Metadata } from "next";
 
 const SECTION_TITLES: Record<string, string> = {

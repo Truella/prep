@@ -1,12 +1,12 @@
-import ExternalNav from "../src/components/ExternalNav";
-import Hero from "../src/components/home/Hero";
-import HowItWorks from "../src/components/home/HowItWorks";
-import TakeAQuizStrip from "../src/components/home/TakeAQuizStrip";
-import Features from "../src/components/home/Features";
-import QuizBankPreview from "../src/components/home/QuizBankPreview";
-import WhoItsFor from "../src/components/home/WhoItsFor";
-import CTASection from "../src/components/home/CTASection";
-import Footer from "../src/components/home/Footer";
+import ExternalNav from "@/shared/navigation/ExternalNav";
+import Hero from "@/features/home/components/Hero";
+import HowItWorks from "@/features/home/components/HowItWorks";
+import TakeAQuizStrip from "@/features/home/components/TakeAQuizStrip";
+import Features from "@/features/home/components/Features";
+import QuizBankPreview from "@/features/home/components/QuizBankPreview";
+import WhoItsFor from "@/features/home/components/WhoItsFor";
+import CTASection from "@/features/home/components/CTASection";
+import Footer from "@/features/home/components/Footer";
 
 export default function Home() {
   return (

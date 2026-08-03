@@ -1,4 +1,4 @@
-import Quizzes from "../../../src/views/Quizzes";
+import Quizzes from "@/features/quiz-management/views/Quizzes";
 
 export default function MyQuizzesPage() {
 	return <Quizzes />;
