@@ -1,7 +1,6 @@
 import ExternalNav from "@/shared/navigation/ExternalNav";
 import Hero from "@/features/home/components/Hero";
 import HowItWorks from "@/features/home/components/HowItWorks";
-import TakeAQuizStrip from "@/features/home/components/TakeAQuizStrip";
 import Features from "@/features/home/components/Features";
 import QuizBankPreview from "@/features/home/components/QuizBankPreview";
 import WhoItsFor from "@/features/home/components/WhoItsFor";
@@ -17,7 +16,6 @@ export default function Home() {
       <ExternalNav />
       <Hero />
       <HowItWorks />
-      <TakeAQuizStrip />
       <Features />
       <QuizBankPreview />
       <WhoItsFor />

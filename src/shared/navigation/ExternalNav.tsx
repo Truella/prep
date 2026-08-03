@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Sun01Icon,
@@ -19,8 +20,13 @@ const NAV_LINKS = [
 
 const DESKTOP_NAV_LINKS = [{ href: "/", label: "Home" }, ...NAV_LINKS];
 
+function isNavLinkActive(pathname: string, href: string) {
+  return pathname === href || (href.startsWith("/docs") && pathname.startsWith("/docs"));
+}
+
 export default function ExternalNav() {
   const { setTheme, resolvedTheme } = useTheme();
+  const pathname = usePathname();
   const isDark = resolvedTheme === "dark";
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -35,15 +41,24 @@ export default function ExternalNav() {
 
       {/* Desktop nav */}
       <div className="absolute left-1/2 hidden -translate-x-1/2 sm:flex items-center gap-6">
-        {DESKTOP_NAV_LINKS.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="text-sm text-text-secondary hover:text-text-primary transition"
-          >
-            {link.label}
-          </Link>
-        ))}
+        {DESKTOP_NAV_LINKS.map((link) => {
+          const isActive = isNavLinkActive(pathname, link.href);
+
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={isActive ? "page" : undefined}
+              className={
+                isActive
+                  ? "text-sm text-text-primary font-medium transition"
+                  : "text-sm text-text-secondary hover:text-text-primary transition"
+              }
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </div>
 
       <div className="hidden sm:flex items-center gap-6">
@@ -97,16 +112,25 @@ export default function ExternalNav() {
           className="absolute top-full left-0 right-0 flex sm:hidden flex-col gap-2 p-4 border-b border-border bg-bg/95 backdrop-blur-md"
           style={{ zIndex: 60 }}
         >
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className="text-sm text-text-secondary hover:text-text-primary transition py-2"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const isActive = isNavLinkActive(pathname, link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                aria-current={isActive ? "page" : undefined}
+                className={
+                  isActive
+                    ? "text-sm text-text-primary font-medium transition py-2"
+                    : "text-sm text-text-secondary hover:text-text-primary transition py-2"
+                }
+              >
+                {link.label}
+              </Link>
+            );
+          })}
           <Link
             href="/auth"
             onClick={() => setMenuOpen(false)}

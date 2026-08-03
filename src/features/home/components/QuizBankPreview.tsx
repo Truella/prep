@@ -41,7 +41,9 @@ export default function QuizBankPreview() {
 			setLoading(false);
 		})();
 	}, []);
-
+	if (preview.length === 0) {
+		return null;
+	}
 	return (
 		<section
 			className="py-24 px-6 border-t"
