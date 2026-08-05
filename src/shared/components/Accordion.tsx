@@ -13,11 +13,17 @@ export interface AccordionItem {
 interface AccordionProps {
   items: AccordionItem[];
   allowMultiple?: boolean;
+  headingLevel?: 2 | 3 | 4 | 5 | 6;
 }
 
-export default function Accordion({ items, allowMultiple = true }: AccordionProps) {
+export default function Accordion({
+  items,
+  allowMultiple = true,
+  headingLevel = 3,
+}: AccordionProps) {
   const idPrefix = useId();
   const [openItems, setOpenItems] = useState<Set<number>>(new Set());
+  const Heading = `h${headingLevel}` as "h2" | "h3" | "h4" | "h5" | "h6";
 
   function toggleItem(index: number) {
     setOpenItems((current) => {
@@ -37,24 +43,26 @@ export default function Accordion({ items, allowMultiple = true }: AccordionProp
 
         return (
           <div key={item.question} className={index ? "border-t border-border" : ""}>
-            <button
-              id={buttonId}
-              type="button"
-              className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-accent sm:px-6"
-              aria-expanded={isOpen}
-              aria-controls={panelId}
-              onClick={() => toggleItem(index)}
-            >
-              <span>{item.question}</span>
-              <motion.span
-                className="shrink-0 text-text-secondary"
-                animate={{ rotate: isOpen ? 45 : 0 }}
-                transition={{ duration: 0.2 }}
-                aria-hidden="true"
+            <Heading>
+              <button
+                id={buttonId}
+                type="button"
+                className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-accent sm:px-6"
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => toggleItem(index)}
               >
-                <HugeiconsIcon icon={PlusSignIcon} size={20} />
-              </motion.span>
-            </button>
+                <span>{item.question}</span>
+                <motion.span
+                  className="shrink-0 text-text-secondary"
+                  animate={{ rotate: isOpen ? 45 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  aria-hidden="true"
+                >
+                  <HugeiconsIcon icon={PlusSignIcon} size={20} />
+                </motion.span>
+              </button>
+            </Heading>
             <AnimatePresence initial={false}>
               {isOpen && (
                 <motion.div

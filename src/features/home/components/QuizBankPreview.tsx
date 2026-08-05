@@ -41,7 +41,7 @@ export default function QuizBankPreview() {
 			setLoading(false);
 		})();
 	}, []);
-	if (preview.length === 0) {
+	if (!loading && preview.length === 0) {
 		return null;
 	}
 	return (

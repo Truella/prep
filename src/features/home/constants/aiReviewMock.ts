@@ -46,7 +46,7 @@ export const AI_REVIEW_MOCK_DATASETS: AIReviewMockDataset[] = [
   },
   {
     category: "History",
-    percentage: 65,
+    percentage: 64,
     earnedPoints: 16,
     totalPoints: 25,
     reviewPoints: [

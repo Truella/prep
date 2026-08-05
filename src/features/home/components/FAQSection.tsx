@@ -47,7 +47,7 @@ export default function FAQSection() {
           </p>
         </FadeUp>
         <FadeUp delay={0.1}>
-          <Accordion items={FAQ_ITEMS} allowMultiple={false} />
+          <Accordion items={FAQ_ITEMS} allowMultiple={false} headingLevel={3} />
         </FadeUp>
       </div>
     </section>

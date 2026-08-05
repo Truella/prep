@@ -8,19 +8,18 @@ const REST_ALPHA = 0.3;
 const EFFECT_DURATION = 600;
 const THEME_TRANSITION_DURATION = 300;
 
-function parseColor(value: string): [number, number, number] | null {
-  const hex = value.trim().replace("#", "");
-  if (/^[0-9a-f]{6}$/i.test(hex)) {
-    return [
-      Number.parseInt(hex.slice(0, 2), 16),
-      Number.parseInt(hex.slice(2, 4), 16),
-      Number.parseInt(hex.slice(4, 6), 16),
-    ];
-  }
+function resolveColor(value: string): [number, number, number] | null {
+  const resolver = document.createElement("canvas");
+  resolver.width = 1;
+  resolver.height = 1;
+  const resolverContext = resolver.getContext("2d");
+  if (!resolverContext) return null;
 
-  const rgb = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
-  if (rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
-  return null;
+  resolverContext.fillStyle = "#010203";
+  resolverContext.fillStyle = value;
+  resolverContext.fillRect(0, 0, 1, 1);
+  const resolved = resolverContext.getImageData(0, 0, 1, 1).data;
+  return [resolved[0], resolved[1], resolved[2]];
 }
 
 function colorString([red, green, blue]: [number, number, number]) {
@@ -116,14 +115,16 @@ export default function HeroGrid() {
       } else {
         effectTarget = 0;
       }
+      startAnimation();
     };
 
     const clearPointer = () => {
       effectTarget = 0;
+      startAnimation();
     };
 
     const updateColor = () => {
-      const nextColor = parseColor(
+      const nextColor = resolveColor(
         getComputedStyle(document.documentElement)
           .getPropertyValue("--color-text-secondary")
           .trim(),
@@ -151,16 +152,20 @@ export default function HeroGrid() {
       colorTo = nextColor;
       colorTransitionStarted = now;
 
-      if (!visible) draw(now);
+      if (visible) startAnimation();
+      else draw(now);
     };
 
     const animate = (time: number) => {
       const delta = Math.min(time - lastFrame, 50);
       lastFrame = time;
       effect += (effectTarget - effect) * (1 - Math.exp(-delta / (EFFECT_DURATION / 4)));
+      if (Math.abs(effectTarget - effect) < 0.001) effect = effectTarget;
       draw(time);
 
-      if (visible) {
+      const effectSettled = effect === effectTarget;
+      const colorSettled = time - colorTransitionStarted >= THEME_TRANSITION_DURATION;
+      if (visible && (!effectSettled || !colorSettled)) {
         animationFrame = requestAnimationFrame(animate);
       } else {
         running = false;

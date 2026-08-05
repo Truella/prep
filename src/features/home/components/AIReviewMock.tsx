@@ -171,7 +171,7 @@ function AnalyzingCard({ dataset }: { dataset: AIReviewMockDataset }) {
           backgroundColor: "var(--color-accent)",
           boxShadow: "0 0 18px 4px var(--color-accent-dim)",
         }}
-        animate={{ y: [0, 320] }}
+        animate={{ top: ["0%", "100%"] }}
         transition={{ duration: 1.3, repeat: Infinity, ease: "linear" }}
       />
     </motion.div>
@@ -180,15 +180,15 @@ function AnalyzingCard({ dataset }: { dataset: AIReviewMockDataset }) {
 
 function ReviewCard({
   dataset,
-  animate = true,
+  shouldAnimate = true,
 }: {
   dataset: AIReviewMockDataset;
-  animate?: boolean;
+  shouldAnimate?: boolean;
 }) {
   return (
     <motion.div
       className="h-full"
-      initial={animate ? { opacity: 0 } : false}
+      initial={shouldAnimate ? { opacity: 0 } : false}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
@@ -201,9 +201,9 @@ function ReviewCard({
           <motion.div
             key={point}
             className="flex gap-3 text-sm leading-relaxed text-text-secondary"
-            initial={animate ? { opacity: 0, x: -10 } : false}
+            initial={shouldAnimate ? { opacity: 0, x: -10 } : false}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: animate ? 0.2 + index * 0.25 : 0 }}
+            transition={{ delay: shouldAnimate ? 0.2 + index * 0.25 : 0 }}
           >
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
             <span>{point}</span>
@@ -212,9 +212,9 @@ function ReviewCard({
       </div>
       <motion.p
         className="mt-7 border-t border-border pt-5 text-sm font-medium text-text-primary"
-        initial={animate ? { opacity: 0, y: 8 } : false}
+        initial={shouldAnimate ? { opacity: 0, y: 8 } : false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: animate ? 1.05 : 0 }}
+        transition={{ delay: shouldAnimate ? 1.05 : 0 }}
       >
         {dataset.recommendation}
       </motion.p>
@@ -266,7 +266,7 @@ export default function AIReviewMock() {
         }}
       >
         {reducedMotion ? (
-          <ReviewCard dataset={dataset} animate={false} />
+          <ReviewCard dataset={dataset} shouldAnimate={false} />
         ) : (
           <>
             <div aria-hidden="true" className="invisible grid">
@@ -275,7 +275,7 @@ export default function AIReviewMock() {
                   key={sizingDataset.category}
                   className="col-start-1 row-start-1"
                 >
-                  <ReviewCard dataset={sizingDataset} animate={false} />
+                  <ReviewCard dataset={sizingDataset} shouldAnimate={false} />
                 </div>
               ))}
             </div>
