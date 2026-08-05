@@ -295,18 +295,19 @@ export default function QuizBuildMock() {
   }, [isVisible, phase, reducedMotion]);
 
   const successPhase = QUIZ_BUILD_PHASE_DURATIONS.length - 1;
+  const showingSuccess = reducedMotion || phase === successPhase;
   return (
     <div ref={containerRef} className="w-full max-w-md">
       <div className="relative min-h-[430px] overflow-hidden rounded-2xl border border-border bg-surface-raised p-5 shadow-2xl shadow-black/10">
         <AnimatePresence mode="wait">
           <motion.div
-            key={reducedMotion ? "static" : phase}
+            key={showingSuccess ? "success" : "builder"}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {reducedMotion || phase === successPhase ? <SuccessState /> : <BuilderState phase={phase} />}
+            {showingSuccess ? <SuccessState /> : <BuilderState phase={phase} />}
           </motion.div>
         </AnimatePresence>
       </div>
