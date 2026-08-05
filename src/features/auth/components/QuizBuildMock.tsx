@@ -298,18 +298,23 @@ export default function QuizBuildMock() {
   const showingSuccess = reducedMotion || phase === successPhase;
   return (
     <div ref={containerRef} className="w-full max-w-md">
-      <div className="relative min-h-[430px] overflow-hidden rounded-2xl border border-border bg-surface-raised p-5 shadow-2xl shadow-black/10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={showingSuccess ? "success" : "builder"}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {showingSuccess ? <SuccessState /> : <BuilderState phase={phase} />}
-          </motion.div>
-        </AnimatePresence>
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-surface-raised p-5 shadow-2xl shadow-black/10">
+        <div aria-hidden="true" className="invisible">
+          <BuilderState phase={4} />
+        </div>
+        <div className="absolute inset-5">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={showingSuccess ? "success" : "builder"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {showingSuccess ? <SuccessState /> : <BuilderState phase={phase} />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
       {!reducedMotion && (
         <div className="mt-3 flex justify-center gap-1.5">
