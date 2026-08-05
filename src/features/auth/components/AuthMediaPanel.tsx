@@ -5,7 +5,7 @@ import QuizBuildMock from "./QuizBuildMock";
 
 export default function AuthMediaPanel() {
   return (
-    <div className="relative flex h-full min-h-0 items-center justify-center overflow-hidden bg-surface px-8 py-8 xl:px-12">
+    <div className="relative flex h-full min-h-0 items-center overflow-hidden bg-surface px-8 xl:px-12">
       <svg
         aria-hidden="true"
         className="absolute right-8 top-8 h-16 w-16 text-border"
@@ -17,7 +17,7 @@ export default function AuthMediaPanel() {
         )}
       </svg>
 
-      <div className="relative z-10 mx-auto w-full max-w-md">
+      <div className="relative z-10 mx-auto mt-16 w-full max-w-md">
         <FadeUp>
           <p className="text-xs font-semibold uppercase tracking-widest text-accent">
             Quiz builder

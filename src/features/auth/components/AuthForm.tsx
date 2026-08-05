@@ -1,16 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import toast from "react-hot-toast";
 import { SupabaseError } from "@/lib/types";
 
 export default function AuthForm() {
   const { signUp, signIn } = useAuth();
+  const reducedMotion = useReducedMotion();
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const entrance = (delay: number) => ({
+    initial: { opacity: 0, x: reducedMotion ? 0 : 20 },
+    animate: { opacity: 1, x: 0 },
+    transition: {
+      duration: reducedMotion ? 0 : 0.45,
+      delay: reducedMotion ? 0 : delay,
+      ease: "easeOut" as const,
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +47,10 @@ export default function AuthForm() {
       onSubmit={handleSubmit}
       className="space-y-6"
     >
-      <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-2">
+      <motion.div
+        className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-2xl"
+        {...entrance(0.05)}
+      >
         <svg
           className="h-8 w-8 text-accent"
           viewBox="0 0 24 24"
@@ -58,9 +72,9 @@ export default function AuthForm() {
             strokeLinejoin="round"
           />
         </svg>
-      </div>
+      </motion.div>
 
-      <div className="text-center">
+      <motion.div className="text-center" {...entrance(0.14)}>
         <h2
           className="mb-2 text-3xl font-bold text-text-primary"
           style={{ fontFamily: "var(--font-display)" }}
@@ -70,10 +84,10 @@ export default function AuthForm() {
         <p className="text-sm text-text-secondary">
           {isSignup ? "Sign up to get started" : "Sign in to continue"}
         </p>
-      </div>
+      </motion.div>
 
       <div className="space-y-4">
-        <div>
+        <motion.div {...entrance(0.23)}>
           <label
             htmlFor="email"
             className="mb-2 block text-sm font-medium text-text-secondary"
@@ -89,9 +103,9 @@ export default function AuthForm() {
             required
             className="auth-input w-full rounded-xl border border-border bg-surface-raised px-4 py-3 text-sm text-text-primary transition focus:outline-none"
           />
-        </div>
+        </motion.div>
 
-        <div>
+        <motion.div {...entrance(0.32)}>
           <label
             htmlFor="password"
             className="mb-2 block text-sm font-medium text-text-secondary"
@@ -107,13 +121,14 @@ export default function AuthForm() {
             required
             className="auth-input w-full rounded-xl border border-border bg-surface-raised px-4 py-3 text-sm text-text-primary transition focus:outline-none"
           />
-        </div>
+        </motion.div>
       </div>
 
-      <button
+      <motion.button
         type="submit"
         disabled={loading}
         className="w-full rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-bg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        {...entrance(0.41)}
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
@@ -141,9 +156,9 @@ export default function AuthForm() {
         ) : (
           <span>{isSignup ? "Create Account" : "Sign In"}</span>
         )}
-      </button>
+      </motion.button>
 
-      <div className="relative">
+      <motion.div className="relative" {...entrance(0.5)}>
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border" />
         </div>
@@ -152,15 +167,16 @@ export default function AuthForm() {
             {isSignup ? "Already have an account?" : "Don't have an account?"}
           </span>
         </div>
-      </div>
+      </motion.div>
 
-      <button
+      <motion.button
         type="button"
         onClick={() => setIsSignup((v) => !v)}
         className="w-full rounded-xl border border-border bg-surface-raised px-6 py-3.5 text-sm font-medium text-text-primary transition-all"
+        {...entrance(0.59)}
       >
         {isSignup ? "Sign In Instead" : "Create Account"}
-      </button>
+      </motion.button>
     </form>
   );
 }

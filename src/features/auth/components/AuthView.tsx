@@ -21,11 +21,11 @@ export default function AuthView() {
     <div className="min-h-dvh bg-bg">
       <ExternalNav />
 
-      <main className="mx-auto flex min-h-dvh w-full max-w-[1600px] items-center justify-center bg-bg px-6 lg:grid lg:h-dvh lg:min-h-0 lg:grid-cols-[55%_45%] lg:items-stretch lg:px-0">
+      <main className="mx-auto flex min-h-dvh w-full max-w-400 items-center justify-center bg-bg px-6 lg:grid lg:h-dvh lg:min-h-0 lg:grid-cols-[55%_45%] lg:items-stretch lg:px-0">
         <div className="hidden min-h-0 lg:block">
           <AuthMediaPanel />
         </div>
-        <div className="flex min-h-0 items-center justify-center bg-bg lg:px-10 xl:px-16">
+        <div className="not-lg:w-full flex min-h-0 items-center justify-center bg-bg lg:px-10 xl:px-16">
           <div className="w-full max-w-md">
             <AuthForm />
           </div>
