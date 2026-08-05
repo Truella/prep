@@ -109,7 +109,7 @@ export default function QuizBankPreview() {
 					</div>
 				)}
 
-				<div className="mt-6 sm:hidden text-center">
+				<FadeUp delay={0.2} className="mt-6 sm:hidden text-center">
 					<Link
 						href="/quiz-bank"
 						className="text-sm font-medium"
@@ -117,7 +117,7 @@ export default function QuizBankPreview() {
 					>
 						Browse all →
 					</Link>
-				</div>
+				</FadeUp>
 			</div>
 		</section>
 	);

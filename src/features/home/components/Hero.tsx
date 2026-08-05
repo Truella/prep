@@ -1,10 +1,26 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import HeroCard from "./HeroCard";
 import HeroGrid from "./HeroGrid";
 
 export default function Hero() {
+  const reducedMotion = useReducedMotion();
+  const entrance = (delay: number, x = 0, y = 0) => ({
+    initial: {
+      opacity: 0,
+      x: reducedMotion ? 0 : x,
+      y: reducedMotion ? 0 : y,
+    },
+    animate: { opacity: 1, x: 0, y: 0 },
+    transition: {
+      duration: reducedMotion ? 0 : 0.55,
+      delay: reducedMotion ? 0 : delay,
+      ease: "easeOut" as const,
+    },
+  });
+
   return (
     <section className="relative lg:h-dvh lg:max-h-240 overflow-hidden flex items-center pt-32 pb-24 px-6">
       <HeroGrid />
@@ -20,24 +36,34 @@ export default function Hero() {
               }}
             />
             <div className="space-y-2">
-              <span className="text-xs font-mono font-semibold tracking-widest uppercase text-accent">
+              <motion.span
+                className="inline-block text-xs font-mono font-semibold tracking-widest uppercase text-accent"
+                {...entrance(0.05, -16)}
+              >
                 CBT & MCQ Exam Practice
-              </span>
-              <h1
+              </motion.span>
+              <motion.h1
                 className="text-5xl md:text-6xl leading-tight text-text-primary"
                 style={{ fontFamily: "var(--font-display)" }}
+                {...entrance(0.18, -32)}
               >
                 Practice like it&apos;s real. Know what to fix next.
-              </h1>
+              </motion.h1>
             </div>
 
-            <p className="text-lg leading-relaxed max-w-lg text-text-secondary">
+            <motion.p
+              className="text-lg leading-relaxed max-w-lg text-text-secondary"
+              {...entrance(0.34, -24)}
+            >
               Build CBT practice tests from your own questions. Set a timer,
               share with your study group, and get AI feedback on exactly
               where you need to improve.
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <motion.div
+              className="flex flex-col sm:flex-row gap-3"
+              {...entrance(0.5, 0, 18)}
+            >
               <Link
                 href="/auth"
                 className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm transition-all hover:opacity-90 bg-accent text-bg"
@@ -50,17 +76,23 @@ export default function Hero() {
               >
                 Take a quiz
               </Link>
-            </div>
+            </motion.div>
 
-            <p className="text-xs text-text-secondary">
+            <motion.p
+              className="text-xs text-text-secondary"
+              {...entrance(0.62, -10)}
+            >
               Free to use. No card required.
-            </p>
+            </motion.p>
           </div>
 
           {/* Right — animated card */}
-          <div className="flex justify-center lg:justify-end">
+          <motion.div
+            className="flex justify-center lg:justify-end"
+            {...entrance(0.75, 32)}
+          >
             <HeroCard />
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -82,14 +82,17 @@ export default function Features() {
         <div className="space-y-10">
           {FEATURE_GROUPS.map((group, groupIndex) => (
             <div key={group.label}>
-              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+              <FadeUp delay={groupIndex * 0.05}>
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-secondary">
                 {group.label}
-              </p>
+                </p>
+              </FadeUp>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {group.features.map((feature, featureIndex) => (
                   <FadeUp
                     key={feature.title}
-                    delay={(groupIndex * 2 + featureIndex) * 0.07}
+                    delay={0.08 + featureIndex * 0.12}
+                    className="h-full"
                   >
                     <div
                       className={`h-full rounded-2xl border space-y-3 ${
