@@ -6,6 +6,26 @@ const DOT_SPACING = 28;
 const IMPACT_RADIUS = 100;
 const REST_ALPHA = 0.3;
 const EFFECT_DURATION = 600;
+const THEME_TRANSITION_DURATION = 300;
+
+function parseColor(value: string): [number, number, number] | null {
+  const hex = value.trim().replace("#", "");
+  if (/^[0-9a-f]{6}$/i.test(hex)) {
+    return [
+      Number.parseInt(hex.slice(0, 2), 16),
+      Number.parseInt(hex.slice(2, 4), 16),
+      Number.parseInt(hex.slice(4, 6), 16),
+    ];
+  }
+
+  const rgb = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+  return null;
+}
+
+function colorString([red, green, blue]: [number, number, number]) {
+  return `rgb(${Math.round(red)}, ${Math.round(green)}, ${Math.round(blue)})`;
+}
 
 export default function HeroGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,7 +41,10 @@ export default function HeroGrid() {
     const pointer = { x: -Infinity, y: -Infinity };
     let width = 0;
     let height = 0;
-    let color = "#9999A8";
+    const initialColor: [number, number, number] = [153, 153, 168];
+    let colorFrom = initialColor;
+    let colorTo = initialColor;
+    let colorTransitionStarted = -Infinity;
     let animationFrame = 0;
     let lastFrame = performance.now();
     let visible = true;
@@ -31,6 +54,16 @@ export default function HeroGrid() {
 
     const draw = (elapsed: number) => {
       context.clearRect(0, 0, width, height);
+      const colorProgress = Math.min(
+        1,
+        Math.max(0, (elapsed - colorTransitionStarted) / THEME_TRANSITION_DURATION),
+      );
+      const resolvedColor: [number, number, number] = [
+        colorFrom[0] + (colorTo[0] - colorFrom[0]) * colorProgress,
+        colorFrom[1] + (colorTo[1] - colorFrom[1]) * colorProgress,
+        colorFrom[2] + (colorTo[2] - colorFrom[2]) * colorProgress,
+      ];
+      context.fillStyle = colorString(resolvedColor);
 
       for (let y = DOT_SPACING / 2; y < height; y += DOT_SPACING) {
         for (let x = DOT_SPACING / 2; x < width; x += DOT_SPACING) {
@@ -42,7 +75,6 @@ export default function HeroGrid() {
           const angle = elapsed / 150 + (x + y) * 0.025;
 
           context.beginPath();
-          context.fillStyle = color;
           context.globalAlpha = REST_ALPHA + strength * 0.3;
           context.arc(
             x + Math.cos(angle) * wobble,
@@ -91,8 +123,35 @@ export default function HeroGrid() {
     };
 
     const updateColor = () => {
-      color = getComputedStyle(document.documentElement).getPropertyValue("--color-text-secondary").trim() || color;
-      if (reducedMotion || !visible) draw(0);
+      const nextColor = parseColor(
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--color-text-secondary")
+          .trim(),
+      );
+      if (!nextColor) return;
+
+      const now = performance.now();
+      if (reducedMotion) {
+        colorFrom = nextColor;
+        colorTo = nextColor;
+        colorTransitionStarted = now - THEME_TRANSITION_DURATION;
+        draw(now);
+        return;
+      }
+
+      const progress = Math.min(
+        1,
+        Math.max(0, (now - colorTransitionStarted) / THEME_TRANSITION_DURATION),
+      );
+      colorFrom = [
+        colorFrom[0] + (colorTo[0] - colorFrom[0]) * progress,
+        colorFrom[1] + (colorTo[1] - colorFrom[1]) * progress,
+        colorFrom[2] + (colorTo[2] - colorFrom[2]) * progress,
+      ];
+      colorTo = nextColor;
+      colorTransitionStarted = now;
+
+      if (!visible) draw(now);
     };
 
     const animate = (time: number) => {
@@ -132,18 +191,13 @@ export default function HeroGrid() {
       },
       { threshold: 0 },
     );
-    const themeObserver = new MutationObserver(updateColor);
-
     updateColor();
     resize();
     window.addEventListener("resize", resize);
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(canvas.parentElement ?? canvas);
     visibilityObserver.observe(canvas.parentElement ?? canvas);
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
+    window.addEventListener("theme-change", updateColor);
 
     if (!reducedMotion) {
       window.addEventListener("pointermove", updatePointer, { passive: true });
@@ -158,7 +212,7 @@ export default function HeroGrid() {
       window.removeEventListener("pointerleave", clearPointer);
       resizeObserver.disconnect();
       visibilityObserver.disconnect();
-      themeObserver.disconnect();
+      window.removeEventListener("theme-change", updateColor);
     };
   }, []);
 

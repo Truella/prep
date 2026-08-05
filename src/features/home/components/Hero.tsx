@@ -31,8 +31,12 @@ export default function Hero() {
             <div
               className="absolute -inset-x-10 -inset-y-14 -z-10 pointer-events-none"
               style={{
-                background:
-                  "radial-gradient(ellipse at center, var(--color-bg) 35%, transparent 75%)",
+                backgroundColor: "var(--color-bg)",
+                maskImage:
+                  "radial-gradient(ellipse at center, black 35%, transparent 75%)",
+                WebkitMaskImage:
+                  "radial-gradient(ellipse at center, black 35%, transparent 75%)",
+                transition: "background-color 0.3s ease",
               }}
             />
             <div className="space-y-2">
