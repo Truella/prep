@@ -11,7 +11,14 @@ export default function Hero() {
       <div className="relative z-10 max-w-6xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left — text */}
-          <div className="space-y-8">
+          <div className="relative space-y-8">
+            <div
+              className="absolute -inset-x-10 -inset-y-14 -z-10 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, var(--color-bg) 35%, transparent 75%)",
+              }}
+            />
             <div className="space-y-2">
               <span className="text-xs font-mono font-semibold tracking-widest uppercase text-accent">
                 CBT & MCQ Exam Practice
@@ -20,7 +27,7 @@ export default function Hero() {
                 className="text-5xl md:text-6xl leading-tight text-text-primary"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                Practice the way you&apos;ll be tested.
+                Practice like it&apos;s real. Know what to fix next.
               </h1>
             </div>
 

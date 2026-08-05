@@ -41,6 +41,22 @@ const FEATURES = [
   },
 ];
 
+const FEATURE_GROUPS = [
+  {
+    label: "Core Experience",
+    prominent: true,
+    features: [FEATURES[1], FEATURES[0]],
+  },
+  {
+    label: "Study & Share",
+    features: [FEATURES[2], FEATURES[4]],
+  },
+  {
+    label: "Convenience",
+    features: [FEATURES[3], FEATURES[5]],
+  },
+];
+
 export default function Features() {
   return (
     <section
@@ -63,36 +79,50 @@ export default function Features() {
           </h2>
         </FadeUp>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURES.map((f, i) => (
-            <FadeUp key={i} delay={i * 0.07}>
-              <div
-                className="p-6 rounded-2xl border space-y-3 h-full"
-                style={{
-                  backgroundColor: "var(--color-surface-raised)",
-                  borderColor: "var(--color-border)",
-                }}
-              >
-                <span
-                  className="text-2xl"
-                  style={{ color: "var(--color-accent)" }}
-                >
-                  {f.icon}
-                </span>
-                <h3
-                  className="font-semibold text-sm"
-                  style={{ color: "var(--color-text-primary)" }}
-                >
-                  {f.title}
-                </h3>
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: "var(--color-text-secondary)" }}
-                >
-                  {f.description}
-                </p>
+        <div className="space-y-10">
+          {FEATURE_GROUPS.map((group, groupIndex) => (
+            <div key={group.label}>
+              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+                {group.label}
+              </p>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {group.features.map((feature, featureIndex) => (
+                  <FadeUp
+                    key={feature.title}
+                    delay={(groupIndex * 2 + featureIndex) * 0.07}
+                  >
+                    <div
+                      className={`h-full rounded-2xl border space-y-3 ${
+                        group.prominent ? "p-8 md:min-h-56" : "p-6"
+                      }`}
+                      style={{
+                        backgroundColor: "var(--color-surface-raised)",
+                        borderColor: "var(--color-border)",
+                      }}
+                    >
+                      <span
+                        className={group.prominent ? "text-3xl" : "text-2xl"}
+                        style={{ color: "var(--color-accent)" }}
+                      >
+                        {feature.icon}
+                      </span>
+                      <h3
+                        className={`font-semibold ${group.prominent ? "text-base" : "text-sm"}`}
+                        style={{ color: "var(--color-text-primary)" }}
+                      >
+                        {feature.title}
+                      </h3>
+                      <p
+                        className="text-sm leading-relaxed"
+                        style={{ color: "var(--color-text-secondary)" }}
+                      >
+                        {feature.description}
+                      </p>
+                    </div>
+                  </FadeUp>
+                ))}
               </div>
-            </FadeUp>
+            </div>
           ))}
         </div>
       </div>
