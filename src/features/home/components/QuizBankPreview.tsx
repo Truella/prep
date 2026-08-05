@@ -41,10 +41,12 @@ export default function QuizBankPreview() {
 			setLoading(false);
 		})();
 	}, []);
-
+	if (!loading && preview.length === 0) {
+		return null;
+	}
 	return (
 		<section
-			className="py-24 px-6 border-t"
+			className="py-24 px-6"
 			style={{ borderColor: "var(--color-border)" }}
 		>
 			<div className="max-w-6xl mx-auto">
@@ -107,7 +109,7 @@ export default function QuizBankPreview() {
 					</div>
 				)}
 
-				<div className="mt-6 sm:hidden text-center">
+				<FadeUp delay={0.2} className="mt-6 sm:hidden text-center">
 					<Link
 						href="/quiz-bank"
 						className="text-sm font-medium"
@@ -115,7 +117,7 @@ export default function QuizBankPreview() {
 					>
 						Browse all →
 					</Link>
-				</div>
+				</FadeUp>
 			</div>
 		</section>
 	);

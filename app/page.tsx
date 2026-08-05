@@ -1,28 +1,30 @@
 import ExternalNav from "@/shared/navigation/ExternalNav";
 import Hero from "@/features/home/components/Hero";
 import HowItWorks from "@/features/home/components/HowItWorks";
-import TakeAQuizStrip from "@/features/home/components/TakeAQuizStrip";
 import Features from "@/features/home/components/Features";
+import AIReviewSection from "@/features/home/components/AIReviewSection";
 import QuizBankPreview from "@/features/home/components/QuizBankPreview";
+import FAQSection from "@/features/home/components/FAQSection";
 import WhoItsFor from "@/features/home/components/WhoItsFor";
 import CTASection from "@/features/home/components/CTASection";
 import Footer from "@/features/home/components/Footer";
 
 export default function Home() {
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: "var(--color-bg)" }}
-    >
-      <ExternalNav />
-      <Hero />
-      <HowItWorks />
-      <TakeAQuizStrip />
-      <Features />
-      <QuizBankPreview />
-      <WhoItsFor />
-      <CTASection />
-      <Footer />
-    </div>
-  );
+		<div
+			className="min-h-screen"
+			style={{ backgroundColor: "var(--color-bg)" }}
+		>
+			<ExternalNav />
+			<Hero />
+			<HowItWorks />
+			<Features />
+			<AIReviewSection />
+			<QuizBankPreview />
+			<WhoItsFor />
+			<FAQSection />
+			<CTASection />
+			<Footer />
+		</div>
+	);
 }

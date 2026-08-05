@@ -6,7 +6,7 @@ import FadeUp from "@/shared/components/FadeUp";
 export default function CTASection() {
   return (
     <section
-      className="py-24 px-6 border-t"
+      className="py-24 px-6"
       style={{ borderColor: "var(--color-border)" }}
     >
       <div className="max-w-2xl mx-auto text-center space-y-6">
