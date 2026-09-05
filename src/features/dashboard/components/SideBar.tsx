@@ -4,6 +4,7 @@ import {
 	ArrowRight01Icon,
 	Moon01Icon,
 	Sun01Icon,
+	Logout01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { NAV_ITEMS } from "../constants/navItems";
@@ -33,8 +34,9 @@ function subscribeToCollapsedState(callback: () => void) {
 interface SideBarProps {
     isSidebarOpen: boolean;
     setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    handleLogout: () => void;
 }
-export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProps) {
+export default function SideBar({ isSidebarOpen, setIsSidebarOpen, handleLogout }: SideBarProps) {
 	const { resolvedTheme, setTheme } = useTheme();
 	const isCollapsed = React.useSyncExternalStore(
 		subscribeToCollapsedState,
@@ -44,6 +46,7 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 	const isDark = resolvedTheme === "dark";
 	const themeLabel = isDark ? "Switch to light theme" : "Switch to dark theme";
 	const themeButtonRef = React.useRef<HTMLButtonElement>(null);
+	const logoutButtonRef = React.useRef<HTMLButtonElement>(null);
 
 	const toggleCollapsed = () => {
 		try {
@@ -56,12 +59,22 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 		<>
 			<aside
 				className={`
-					fixed bottom-0 left-0 top-16 z-40 h-[calc(100dvh-4rem)] w-64 ${isCollapsed ? "lg:w-[68px]" : "lg:w-64"} transform border-r backdrop-blur-xl transition-[width,transform] duration-200 ease-in-out lg:sticky lg:self-start
+					fixed bottom-0 left-0 top-0 z-40 h-screen w-64 overflow-hidden ${isCollapsed ? "lg:w-[68px]" : "lg:w-64"} transform border-r backdrop-blur-xl lg:sticky lg:self-start
 					${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
 				`}
-				style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}
+				style={{
+					backgroundColor: "var(--color-surface)",
+					borderColor: "var(--color-border)",
+					transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+				}}
 			>
-				<div className={`flex h-full flex-col overflow-y-auto p-4 ${isCollapsed ? "lg:p-2" : ""}`}>
+				<div
+					className="flex h-full flex-col overflow-hidden"
+					style={{
+						transition: "padding 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+						padding: isCollapsed ? "0.5rem" : "1rem",
+					}}
+				>
 					<div className={`mb-4 hidden lg:flex ${isCollapsed ? "justify-center" : "justify-end"}`}>
 						<button
 							type="button"
@@ -73,28 +86,43 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen }: SideBarProp
 							<HugeiconsIcon icon={isCollapsed ? ArrowRight01Icon : ArrowLeft01Icon} size={18} />
 						</button>
 					</div>
-					<nav className="space-y-2">
+					<nav className="space-y-2 overflow-y-auto">
 						{NAV_ITEMS.map((item) => (
 							<SidebarLink key={item.path} {...item} collapsed={isCollapsed} />
 						))}
 					</nav>
-					<button
-					ref={themeButtonRef}
-						type="button"
-						onClick={() => setTheme(isDark ? "light" : "dark")}
-						className={`mt-auto flex rounded-lg p-3 transition hover:bg-surface-raised ${isCollapsed ? "lg:self-center" : ""}`}
-						style={{ color: "var(--color-text-secondary)" }}
-						aria-label={themeLabel}
-					>
-						<HugeiconsIcon icon={isDark ? Sun01Icon : Moon01Icon} />
-						<SidebarItemLabel label={themeLabel} collapsed={isCollapsed} itemRef={themeButtonRef} showLabel={false} />
-					</button>
+
+					<div className="mt-auto space-y-2">
+						<button
+							ref={themeButtonRef}
+							type="button"
+							onClick={() => setTheme(isDark ? "light" : "dark")}
+							className={`flex w-full rounded-lg p-3 transition hover:bg-surface-raised ${isCollapsed ? "lg:justify-center" : ""}`}
+							style={{ color: "var(--color-text-secondary)" }}
+							aria-label={themeLabel}
+						>
+							<HugeiconsIcon icon={isDark ? Sun01Icon : Moon01Icon} />
+							<SidebarItemLabel label={themeLabel} collapsed={isCollapsed} itemRef={themeButtonRef} showLabel={false} />
+						</button>
+
+						<button
+							ref={logoutButtonRef}
+							type="button"
+							onClick={handleLogout}
+							className={`flex w-full rounded-lg p-3 transition hover:bg-surface-raised ${isCollapsed ? "lg:justify-center" : ""}`}
+							style={{ color: "var(--color-text-secondary)" }}
+							aria-label="Log out"
+						>
+							<HugeiconsIcon icon={Logout01Icon} />
+							<SidebarItemLabel label="Log out" collapsed={isCollapsed} itemRef={logoutButtonRef} showLabel={false} />
+						</button>
+					</div>
 				</div>
 			</aside>
 			{/* Overlay for mobile */}
 			{isSidebarOpen && (
 				<div
-					className="fixed inset-0 backdrop-blur-sm z-30 lg:hidden"
+					className="fixed inset-0 backdrop-blur-sm z-30 lg:hidden sidebar-overlay"
 					style={{ backgroundColor: "color-mix(in srgb, var(--color-bg) 80%, transparent)" }}
 					onClick={() => setIsSidebarOpen(false)}
 				/>

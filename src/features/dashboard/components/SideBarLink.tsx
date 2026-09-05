@@ -24,8 +24,8 @@ export function SidebarLink({ label, path, icon, collapsed = false }: SidebarLin
 				isActive ? "" : "hover:bg-surface"
 			} ${collapsed ? "relative group lg:justify-center lg:px-3" : ""}`}
 			style={{
-				backgroundColor: isActive ? "var(--color-text-primary)" : "transparent",
-				color: isActive ? "var(--color-bg)" : "var(--color-text-secondary)",
+				backgroundColor: isActive ? "var(--color-accent-dim)" : "transparent",
+				color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
 			}}
 			onMouseEnter={(e) => { if (!isActive) { e.currentTarget.style.color = "var(--color-text-primary)"; } }}
 			onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.color = "var(--color-text-secondary)"; } }}
