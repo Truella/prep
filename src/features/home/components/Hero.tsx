@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import HeroCard from "./HeroCard";
-import HeroGrid from "./HeroGrid";
+import HeroIconField from "./HeroIconField";
 
 export default function Hero() {
   const reducedMotion = useReducedMotion();
@@ -23,7 +23,7 @@ export default function Hero() {
 
   return (
     <section className="relative lg:h-dvh lg:max-h-240 overflow-hidden flex items-center pt-32 pb-24 px-6">
-      <HeroGrid />
+      <HeroIconField />
       <div className="relative z-10 max-w-6xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left — text */}
@@ -51,7 +51,7 @@ export default function Hero() {
                 style={{ fontFamily: "var(--font-display)" }}
                 {...entrance(0.18, -32)}
               >
-                Practice like it&apos;s real. Know what to fix next.
+                Turn your questions into CBT practice.
               </motion.h1>
             </div>
 
@@ -59,9 +59,7 @@ export default function Hero() {
               className="text-lg leading-relaxed max-w-lg text-text-secondary"
               {...entrance(0.34, -24)}
             >
-              Build CBT practice tests from your own questions. Set a timer,
-              share with your study group, and get AI feedback on exactly
-              where you need to improve.
+              Upload your questions, build a quiz, and practice like it&apos;s the real exam. When you&apos;re done, Prep shows you what you know, what you&apos;re missing, and what to study next.
             </motion.p>
 
             <motion.div
@@ -86,7 +84,7 @@ export default function Hero() {
               className="text-xs text-text-secondary"
               {...entrance(0.62, -10)}
             >
-              Free to use. No card required.
+              Free to use. No account required to take a quiz.
             </motion.p>
           </div>
 

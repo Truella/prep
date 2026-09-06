@@ -5,29 +5,49 @@ import FadeUp from "@/shared/components/FadeUp";
 
 const FAQ_ITEMS: AccordionItem[] = [
   {
-    question: "Does PREP cost anything?",
+    question: "Does Prep generate questions for me?",
     answer:
-      "PREP is free to use. You can create, share, and take quizzes without entering card details.",
+      "Not currently. Prep is designed for the questions you already have. You can upload them through CSV or create them manually using the quiz builder.",
   },
   {
-    question: "Do quiz-takers need an account?",
+    question: "How can I add questions?",
     answer:
-      "No. Anyone with the quiz link or code can start immediately without creating an account.",
+      "You can either add questions manually through the quiz builder or upload them using a CSV file.",
+  },
+  {
+    question: "Do quiz takers need an account?",
+    answer:
+      "No. You can share a quiz link and people can take it without creating an account.",
+  },
+  {
+    question: "Can I make my quiz private?",
+    answer:
+      "Yes. You can choose whether your quiz is publicly available or private.",
   },
   {
     question: "How does the AI review work?",
     answer:
-      "After an attempt, you can request feedback based on your results. It highlights strengths, weak areas, and what to review next; scoring itself is not done by AI.",
+      "After you submit a quiz, Prep uses the questions and your selected answers as context to analyze your performance and highlight areas you should revisit.",
   },
   {
-    question: "Can I reuse and share a quiz again?",
+    question: "Can I set a timer?",
     answer:
-      "Yes. Keep the same quiz for repeated practice and share its link with as many study groups as you need.",
+      "Yes. You can set a countdown to simulate exam conditions. The quiz automatically submits when the timer runs out.",
   },
   {
-    question: "Is there a question limit?",
+    question: "Can I reuse a quiz?",
     answer:
-      "You can build substantial practice sets manually or by CSV. For the best taking experience, split very large syllabuses into focused quizzes.",
+      "Yes. Once you've created a quiz, you can share and take it again.",
+  },
+  {
+    question: "What can I upload?",
+    answer:
+      "Prep currently supports CSV files formatted for quiz questions, with a generous per-quiz limit.",
+  },
+  {
+    question: "Is there a limit on how many questions I can upload?",
+    answer:
+      "Yes, quizzes are capped at 250 questions, well above what a typical practice test needs. This keeps things fast without the restrictive low caps of standard form-builder extensions.",
   },
 ];
 

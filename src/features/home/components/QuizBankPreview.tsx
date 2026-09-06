@@ -53,19 +53,19 @@ export default function QuizBankPreview() {
 				<FadeUp className="flex items-end justify-between mb-10">
 					<div>
 						<h2
-							className="text-3xl mb-2"
+							className="text-3xl md:text-4xl leading-tight mb-2"
 							style={{
 								fontFamily: "var(--font-display)",
 								color: "var(--color-text-primary)",
 							}}
 						>
-							From the Quiz Bank
+							Don&apos;t have questions yet? Start with someone else&apos;s.
 						</h2>
 						<p
 							className="text-sm"
 							style={{ color: "var(--color-text-secondary)" }}
 						>
-							Practice with quizzes shared by other students.
+							Browse quizzes shared by other Prep users and find something to practice.
 						</p>
 					</div>
 					<Link
@@ -78,7 +78,7 @@ export default function QuizBankPreview() {
 				</FadeUp>
 
 				{loading ? (
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
 						{[1, 2, 3].map((i) => (
 							<div
 								key={i}
@@ -100,9 +100,9 @@ export default function QuizBankPreview() {
 						))}
 					</div>
 				) : (
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
 						{preview.map((quiz, i) => (
-							<FadeUp key={quiz.id} delay={i * 0.1}>
+							<FadeUp key={quiz.id} delay={i * 0.1} className="h-full">
 								<QuizBankCard quiz={quiz} />
 							</FadeUp>
 						))}

@@ -18,13 +18,14 @@ export default function CTASection() {
               color: "var(--color-text-primary)",
             }}
           >
-            Your exam is coming.
+            You already have the{" "}
+            <span className="italic text-accent">questions</span>.
           </h2>
           <p
             className="text-lg mt-3"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Start practicing today. It&apos;s free.
+            Now turn them into practice. Build your first CBT in minutes.
           </p>
         </FadeUp>
         <FadeUp delay={0.1}>
@@ -37,7 +38,7 @@ export default function CTASection() {
                 color: "#0A0A0F",
               }}
             >
-              Create your first quiz
+              Create a quiz
             </Link>
             <Link
               href="/take"

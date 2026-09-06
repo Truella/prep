@@ -4,40 +4,46 @@ import FadeUp from "@/shared/components/FadeUp";
 
 const FEATURES = [
   {
-    title: "Timed practice",
+    title: "AI review",
     description:
-      "Set a countdown that matches your real exam conditions. Auto-submits when time runs out.",
-    icon: "⏱",
-  },
-  {
-    title: "AI performance review",
-    description:
-      "After each attempt, get a breakdown of your strengths and the specific topics you need to revisit.",
+      "Understand your weak areas and what to revisit after every attempt.",
     icon: "◈",
   },
   {
-    title: "CSV upload",
+    title: "Quiz builder",
     description:
-      "Turn your notes or past paper questions into a quiz in seconds. One spreadsheet, ready to share.",
+      "Prefer to build from scratch? Add questions, options, answers, and settings directly in Prep.",
+    icon: "+",
+  },
+  {
+    title: "Timed exams",
+    description:
+      "Practice against the clock and automatically submit when time runs out.",
+    icon: "⏱",
+  },
+  {
+    title: "CSV import",
+    description:
+      "Turn an existing question bank into a quiz without typing every question manually.",
     icon: "↑",
   },
   {
-    title: "Public quiz bank",
+    title: "Shareable quizzes",
     description:
-      "Browse quizzes shared by others. Filter by subject and difficulty. No account needed to take.",
-    icon: "⊞",
-  },
-  {
-    title: "Share with anyone",
-    description:
-      "One link. Your study group can take the quiz immediately — no sign-up required for takers.",
+      "Send one link to your classmates, friends, or students.",
     icon: "⇢",
   },
   {
-    title: "Progress saved",
+    title: "Saved progress",
     description:
-      "Close the tab and pick up exactly where you left off. Your answers are saved automatically.",
+      "Close the tab and come back without losing your attempt.",
     icon: "◉",
+  },
+  {
+    title: "Public or private",
+    description:
+      "Share with everyone or keep your quiz restricted to the people you choose.",
+    icon: "⊞",
   },
 ];
 
@@ -45,15 +51,15 @@ const FEATURE_GROUPS = [
   {
     label: "Core Experience",
     prominent: true,
-    features: [FEATURES[1], FEATURES[0]],
+    features: [FEATURES[0], FEATURES[2], FEATURES[1]],
   },
   {
     label: "Study & Share",
-    features: [FEATURES[2], FEATURES[4]],
+    features: [FEATURES[3], FEATURES[4]],
   },
   {
     label: "Convenience",
-    features: [FEATURES[3], FEATURES[5]],
+    features: [FEATURES[6], FEATURES[5]],
   },
 ];
 
@@ -69,13 +75,14 @@ export default function Features() {
       <div className="max-w-6xl mx-auto">
         <FadeUp>
           <h2
-            className="text-3xl mb-12"
+            className="text-3xl md:text-4xl mb-12 leading-tight"
             style={{
               fontFamily: "var(--font-display)",
               color: "var(--color-text-primary)",
             }}
           >
-            Everything you need to prepare.
+            Built around the way CBT prep actually{" "}
+            <span className="italic text-accent">works</span>.
           </h2>
         </FadeUp>
 
@@ -84,7 +91,7 @@ export default function Features() {
             <div key={group.label}>
               <FadeUp delay={groupIndex * 0.05}>
                 <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                {group.label}
+                  {group.label}
                 </p>
               </FadeUp>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

@@ -1,43 +1,60 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import FadeUp from "@/shared/components/FadeUp";
+import BringQuestionsMock from "./how-it-works-mocks/BringQuestionsMock";
+import TimerSettingsMock from "./how-it-works-mocks/TimerSettingsMock";
+import ShareQuizMock from "./how-it-works-mocks/ShareQuizMock";
+import AIReviewStepMock from "./how-it-works-mocks/AIReviewStepMock";
 
 const STEPS = [
   {
-    label: "Add your questions",
+    number: "01",
+    title: "Bring your questions",
     description:
-      "Create questions manually or upload a CSV. Add an optional timer.",
+      "Already have questions? Upload a CSV or add them manually using the quiz builder. No need to recreate your question bank from scratch.",
+    Mock: BringQuestionsMock,
+    wide: true,
   },
   {
-    label: "Share the link",
+    number: "02",
+    title: "Make it a real practice test",
     description:
-      "Share a link. Anyone can join instantly, no account required.",
+      "Set your timer, choose your quiz settings, and get a CBT-style experience designed for actually practicing.",
+    Mock: TimerSettingsMock,
+    wide: false,
   },
   {
-    label: "Review your results",
+    number: "03",
+    title: "Share it",
     description:
-      "Get your score, breakdown, and AI feedback on what to review.",
+      "Send one link to your friends, classmates, or study group. They can start taking the quiz without creating an account.",
+    Mock: ShareQuizMock,
+    wide: false,
+  },
+  {
+    number: "04",
+    title: "Find out what to study",
+    description:
+      "See your score and get an AI-powered review of your attempt. Find your weak areas and go into your next attempt knowing what to focus on.",
+    Mock: AIReviewStepMock,
+    wide: true,
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section
-      className="py-24 px-6"
-      style={{ borderColor: "var(--color-border)" }}
-    >
+    <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <FadeUp>
           <h2
-            className="text-3xl mb-2"
+            className="text-3xl md:text-4xl mb-3"
             style={{
               fontFamily: "var(--font-display)",
               color: "var(--color-text-primary)",
             }}
           >
-            How it works
+            From question bank to <span className="italic text-accent">practice</span> in minutes.
           </h2>
           <p
             className="text-sm mb-12"
@@ -47,88 +64,49 @@ export default function HowItWorks() {
           </p>
         </FadeUp>
 
-        <div className="relative pl-8 md:pl-0">
-          <div
-            className="absolute left-1.5 top-6 bottom-6 w-px md:hidden"
-            style={{ backgroundColor: "var(--color-border)" }}
-          />
-          <svg
-            aria-hidden="true"
-            className="absolute inset-0 hidden h-full w-full md:block"
-            preserveAspectRatio="none"
-            viewBox="0 0 1000 180"
-          >
-            <path
-              d="M 310 90 H 326 V 45 H 337"
-              fill="none"
-              stroke="var(--color-border)"
-              strokeWidth="2"
-              vectorEffect="non-scaling-stroke"
-            />
-            <path
-              d="M 663 135 H 674 V 90 H 690"
-              fill="none"
-              stroke="var(--color-border)"
-              strokeWidth="2"
-              vectorEffect="non-scaling-stroke"
-            />
-            {[
-              [310, 90],
-              [337, 45],
-              [663, 135],
-              [690, 90],
-            ].map(([cx, cy]) => (
-              <circle
-                key={`${cx}-${cy}`}
-                cx={cx}
-                cy={cy}
-                r="4"
-                fill="var(--color-accent)"
-                vectorEffect="non-scaling-stroke"
-              />
-            ))}
-          </svg>
-
-          <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
-            {STEPS.map((step, i) => (
-              <FadeUp key={step.label} delay={i * 0.1} className="relative h-full">
-                <span
-                  className="absolute -left-[1.875rem] top-6 z-10 h-3 w-3 rounded-full md:hidden"
-                  style={{ backgroundColor: "var(--color-accent)" }}
-                />
-                <motion.div
-                  className="h-full rounded-2xl border p-6 space-y-3 cursor-default"
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6">
+          {STEPS.map((step, i) => {
+            const Mock = step.Mock;
+            return (
+              <FadeUp
+                key={step.number}
+                delay={i * 0.08}
+                className={`h-full ${step.wide ? "md:col-span-4" : "md:col-span-2"}`}
+              >
+                <div
+                  className="h-full rounded-3xl border p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6"
                   style={{
                     backgroundColor: "var(--color-surface)",
                     borderColor: "var(--color-border)",
                   }}
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                  <motion.span
-                    className="text-xs font-mono font-bold inline-block"
-                    style={{ color: "var(--color-accent)" }}
-                    whileHover={{ scale: 1.15 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                  >
-                    0{i + 1}
-                  </motion.span>
-                  <h3
-                    className="font-semibold text-base"
-                    style={{ color: "var(--color-text-primary)" }}
-                  >
-                    {step.label}
-                  </h3>
-                  <p
-                    className="text-sm leading-relaxed"
-                    style={{ color: "var(--color-text-secondary)" }}
-                  >
-                    {step.description}
-                  </p>
-                </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <span
+                      className="text-xs font-mono font-bold inline-block mb-3"
+                      style={{ color: "var(--color-accent)" }}
+                    >
+                      {step.number}
+                    </span>
+                    <h3
+                      className="font-semibold text-base mb-2"
+                      style={{ color: "var(--color-text-primary)" }}
+                    >
+                      {step.title}
+                    </h3>
+                    <p
+                      className="text-sm leading-relaxed"
+                      style={{ color: "var(--color-text-secondary)" }}
+                    >
+                      {step.description}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 w-full md:w-[320px]">
+                    <Mock />
+                  </div>
+                </div>
               </FadeUp>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
         <FadeUp delay={0.3} className="mt-10 text-center">

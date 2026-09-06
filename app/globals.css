@@ -43,6 +43,103 @@
   }
 }
 
+/* Palette Overrides */
+/* 1: earth, 2: navy, 3: rust, 4: electric, 5: emerald, 6: indigo */
+:root[data-palette="1"], .dark[data-palette="1"] {
+  --color-bg: #000000;
+  --color-surface: #1F150C;
+  --color-accent: #6B4A28;
+}
+:root[data-palette="2"], .dark[data-palette="2"] {
+  --color-bg: #0B2447;
+  --color-surface: #19376D;
+  --color-accent: #576CBC;
+}
+:root[data-palette="3"], .dark[data-palette="3"] {
+  --color-bg: #0C0C0C;
+  --color-surface: #481E14;
+  --color-accent: #F2613F;
+}
+:root[data-palette="4"], .dark[data-palette="4"] {
+  --color-bg: #091540;
+  --color-surface: #142050;
+  --color-accent: #1B2CC1;
+}
+:root[data-palette="5"], .dark[data-palette="5"] {
+  --color-bg: #18230F;
+  --color-surface: #27391C;
+  --color-accent: #1F7D53;
+}
+:root[data-palette="6"], .dark[data-palette="6"] {
+  --color-bg: #080616;
+  --color-surface: #1A1953;
+  --color-accent: #2F2FE4;
+}
+
+/* Light Theme Overrides for palettes */
+.light[data-palette="1"] {
+  --color-bg: #FAFBF8;
+  --color-surface: #FFFFFF;
+  --color-accent: #6B4A28;
+}
+.light[data-palette="2"] {
+  --color-bg: #FAFBF8;
+  --color-surface: #FFFFFF;
+  --color-accent: #576CBC;
+}
+.light[data-palette="3"] {
+  --color-bg: #FAFBF8;
+  --color-surface: #FFFFFF;
+  --color-accent: #F2613F;
+}
+.light[data-palette="4"] {
+  --color-bg: #FAFBF8;
+  --color-surface: #FFFFFF;
+  --color-accent: #1B2CC1;
+}
+.light[data-palette="5"] {
+  --color-bg: #FAFBF8;
+  --color-surface: #FFFFFF;
+  --color-accent: #1F7D53;
+}
+.light[data-palette="6"] {
+  --color-bg: #FAFBF8;
+  --color-surface: #FFFFFF;
+  --color-accent: #2F2FE4;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(.dark)[data-palette="1"] {
+    --color-bg: #FAFBF8;
+    --color-surface: #FFFFFF;
+    --color-accent: #6B4A28;
+  }
+  :root:not(.dark)[data-palette="2"] {
+    --color-bg: #FAFBF8;
+    --color-surface: #FFFFFF;
+    --color-accent: #576CBC;
+  }
+  :root:not(.dark)[data-palette="3"] {
+    --color-bg: #FAFBF8;
+    --color-surface: #FFFFFF;
+    --color-accent: #F2613F;
+  }
+  :root:not(.dark)[data-palette="4"] {
+    --color-bg: #FAFBF8;
+    --color-surface: #FFFFFF;
+    --color-accent: #1B2CC1;
+  }
+  :root:not(.dark)[data-palette="5"] {
+    --color-bg: #FAFBF8;
+    --color-surface: #FFFFFF;
+    --color-accent: #1F7D53;
+  }
+  :root:not(.dark)[data-palette="6"] {
+    --color-bg: #FAFBF8;
+    --color-surface: #FFFFFF;
+    --color-accent: #2F2FE4;
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
   * {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease;
