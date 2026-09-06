@@ -11,7 +11,6 @@ import {
   Cancel01Icon,
 } from "@hugeicons/core-free-icons";
 import { useTheme } from "@/lib/theme";
-import PaletteSwitcher from "@/shared/components/PaletteSwitcher";
 
 const NAV_LINKS = [
   { href: "/take", label: "Take a Quiz" },
@@ -80,7 +79,6 @@ export default function ExternalNav() {
             <span className="w-4" />
           )}
         </button>
-        <PaletteSwitcher />
       </div>
 
       {/* Mobile — theme toggle + hamburger */}
@@ -96,7 +94,6 @@ export default function ExternalNav() {
             <span className="w-4" />
           )}
         </button>
-        <PaletteSwitcher />
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
