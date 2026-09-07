@@ -1,16 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import toast from "react-hot-toast";
 import { SupabaseError } from "@/lib/types";
 
 export default function AuthForm() {
   const { signUp, signIn } = useAuth();
+  const reducedMotion = useReducedMotion();
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const entrance = (delay: number) => ({
+    initial: { opacity: 0, x: reducedMotion ? 0 : 20 },
+    animate: { opacity: 1, x: 0 },
+    transition: {
+      duration: reducedMotion ? 0 : 0.45,
+      delay: reducedMotion ? 0 : delay,
+      ease: "easeOut" as const,
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,19 +45,17 @@ export default function AuthForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border p-8 space-y-6"
-      style={{
-        backgroundColor: "var(--color-surface)",
-        borderColor: "var(--color-border)",
-      }}
+      className="space-y-6"
     >
-      <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-2">
+      <motion.div
+        className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-2xl"
+        {...entrance(0.05)}
+      >
         <svg
-          className="w-8 h-8"
+          className="h-8 w-8 text-accent"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ color: "var(--color-accent)" }}
         >
           <path
             d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
@@ -63,32 +72,25 @@ export default function AuthForm() {
             strokeLinejoin="round"
           />
         </svg>
-      </div>
+      </motion.div>
 
-      <div className="text-center">
+      <motion.div className="text-center" {...entrance(0.14)}>
         <h2
-          className="text-3xl font-bold mb-2"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--color-text-primary)",
-          }}
+          className="mb-2 text-3xl font-bold text-text-primary"
+          style={{ fontFamily: "var(--font-display)" }}
         >
           {isSignup ? "Create Account" : "Welcome Back"}
         </h2>
-        <p
-          className="text-sm"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
+        <p className="text-sm text-text-secondary">
           {isSignup ? "Sign up to get started" : "Sign in to continue"}
         </p>
-      </div>
+      </motion.div>
 
       <div className="space-y-4">
-        <div>
+        <motion.div {...entrance(0.23)}>
           <label
             htmlFor="email"
-            className="block text-sm font-medium mb-2"
-            style={{ color: "var(--color-text-secondary)" }}
+            className="mb-2 block text-sm font-medium text-text-secondary"
           >
             Email
           </label>
@@ -99,20 +101,14 @@ export default function AuthForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none transition"
-            style={{
-              backgroundColor: "var(--color-surface-raised)",
-              border: "1px solid var(--color-border)",
-              color: "var(--color-text-primary)",
-            }}
+            className="auth-input w-full rounded-xl border border-border bg-surface-raised px-4 py-3 text-sm text-text-primary transition focus:outline-none"
           />
-        </div>
+        </motion.div>
 
-        <div>
+        <motion.div {...entrance(0.32)}>
           <label
             htmlFor="password"
-            className="block text-sm font-medium mb-2"
-            style={{ color: "var(--color-text-secondary)" }}
+            className="mb-2 block text-sm font-medium text-text-secondary"
           >
             Password
           </label>
@@ -123,24 +119,16 @@ export default function AuthForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none transition"
-            style={{
-              backgroundColor: "var(--color-surface-raised)",
-              border: "1px solid var(--color-border)",
-              color: "var(--color-text-primary)",
-            }}
+            className="auth-input w-full rounded-xl border border-border bg-surface-raised px-4 py-3 text-sm text-text-primary transition focus:outline-none"
           />
-        </div>
+        </motion.div>
       </div>
 
-      <button
+      <motion.button
         type="submit"
         disabled={loading}
-        className="w-full px-6 py-3.5 rounded-xl font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-        style={{
-          backgroundColor: "var(--color-accent)",
-          color: "#0A0A0F",
-        }}
+        className="w-full rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-bg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        {...entrance(0.41)}
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
@@ -168,40 +156,27 @@ export default function AuthForm() {
         ) : (
           <span>{isSignup ? "Create Account" : "Sign In"}</span>
         )}
-      </button>
+      </motion.button>
 
-      <div className="relative">
+      <motion.div className="relative" {...entrance(0.5)}>
         <div className="absolute inset-0 flex items-center">
-          <div
-            className="w-full border-t"
-            style={{ borderColor: "var(--color-border)" }}
-          />
+          <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span
-            className="px-2"
-            style={{
-              backgroundColor: "var(--color-surface)",
-              color: "var(--color-text-secondary)",
-            }}
-          >
+          <span className="bg-bg px-2 text-text-secondary">
             {isSignup ? "Already have an account?" : "Don't have an account?"}
           </span>
         </div>
-      </div>
+      </motion.div>
 
-      <button
+      <motion.button
         type="button"
         onClick={() => setIsSignup((v) => !v)}
-        className="w-full px-6 py-3.5 rounded-xl font-medium text-sm transition-all"
-        style={{
-          backgroundColor: "var(--color-surface-raised)",
-          border: "1px solid var(--color-border)",
-          color: "var(--color-text-primary)",
-        }}
+        className="w-full rounded-xl border border-border bg-surface-raised px-6 py-3.5 text-sm font-medium text-text-primary transition-all"
+        {...entrance(0.59)}
       >
         {isSignup ? "Sign In Instead" : "Create Account"}
-      </button>
+      </motion.button>
     </form>
   );
 }

@@ -4,6 +4,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import AuthForm from "./AuthForm";
+import AuthMediaPanel from "./AuthMediaPanel";
 import ExternalNav from "@/shared/navigation/ExternalNav";
 
 export default function AuthView() {
@@ -17,17 +18,19 @@ export default function AuthView() {
   }, [user, loading, initializing, router]);
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ backgroundColor: "var(--color-bg)" }}
-    >
+    <div className="min-h-dvh bg-bg">
       <ExternalNav />
 
-      <div className="flex-1 flex items-center justify-center px-6 pt-20">
-        <div className="w-full max-w-md">
-          <AuthForm />
+      <main className="mx-auto flex min-h-dvh w-full max-w-400 items-center justify-center bg-bg px-6 lg:grid lg:h-dvh lg:min-h-0 lg:grid-cols-[55%_45%] lg:items-stretch lg:px-0">
+        <div className="hidden min-h-0 lg:block">
+          <AuthMediaPanel />
         </div>
-      </div>
+        <div className="not-lg:w-full flex min-h-0 items-center justify-center bg-bg lg:px-10 xl:px-16">
+          <div className="w-full max-w-md">
+            <AuthForm />
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

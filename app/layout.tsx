@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Serif_Display, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/lib/theme";
 import { AuthProvider } from "@/features/auth/context/AuthContext";
 import { Toaster } from "react-hot-toast";
@@ -13,11 +13,13 @@ const inter = Inter({
   display: "swap",
 });
 
-const dmSerifDisplay = DM_Serif_Display({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  weight: "400",
   variable: "--font-display",
   display: "swap",
+  axes: ["opsz"],
+  style: "normal",
+  weight: "variable",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -51,7 +53,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${dmSerifDisplay.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         <script
