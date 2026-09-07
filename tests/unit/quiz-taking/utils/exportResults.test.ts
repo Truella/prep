@@ -70,6 +70,20 @@ describe("generateResultsCSV", () => {
 		const csv = generateResultsCSV([tricky], { 0: 3 });
 		expect(csv).toContain('"Say ""hi"", then\nbye"');
 	});
+
+	it.each([
+		["=", "'=1+1"],
+		["+", "'+1+1"],
+		["-", "'-1+1"],
+		["@", "'@SUM(A1:A2)"],
+	])("neutralizes formula prefix %s", (prefix, expectedStart) => {
+		const tricky: AppQuestion = {
+			...QUESTIONS[0],
+			questionText: `${prefix}${prefix === "@" ? "SUM(A1:A2)" : "1+1"}`,
+		};
+		const csv = generateResultsCSV([tricky], { 0: 3 });
+		expect(csv).toContain(expectedStart);
+	});
 });
 
 describe("generateResultsJSON", () => {

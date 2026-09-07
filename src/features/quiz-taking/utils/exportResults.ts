@@ -54,7 +54,12 @@ export function buildExportRows(
 }
 
 function escapeCSVField(value: string | number | boolean): string {
-	const str = String(value);
+	let str = String(value);
+	// Mitigate CSV formula injection: neutralize cells a spreadsheet could
+	// interpret as a formula. Prefix must come before delimiter quoting.
+	if (/^[=+\-@]/.test(str)) {
+		str = `'${str}`;
+	}
 	if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
 		return `"${str.replace(/"/g, '""')}"`;
 	}
