@@ -52,7 +52,7 @@ export default function AuthForm() {
         {...entrance(0.05)}
       >
         <svg
-          className="h-8 w-8 text-accent"
+          className="h-8 w-8 text-text-primary"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +127,7 @@ export default function AuthForm() {
       <motion.button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-bg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-xl bg-text-primary px-6 py-3.5 text-sm font-semibold text-bg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         {...entrance(0.41)}
       >
         {loading ? (

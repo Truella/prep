@@ -25,9 +25,9 @@ export default function SubmitConfirmationModal({
 		return (
 			<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 				<div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-				<div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center">
-					<h3 className="text-xl font-bold text-white mb-2">Time&apos;s up!</h3>
-					<p className="text-gray-400 mb-6">
+				<div className="relative bg-surface border border-border rounded-2xl p-8 max-w-md w-full shadow-2xl text-center">
+					<h3 className="text-xl font-bold text-text-primary mb-2">Time&apos;s up!</h3>
+					<p className="text-text-secondary mb-6">
 						Your quiz has been submitted.
 					</p>
 				</div>
@@ -44,16 +44,14 @@ export default function SubmitConfirmationModal({
 			/>
 
 			{/* Modal */}
-			<div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+			<div className="relative bg-surface border border-border rounded-2xl p-8 max-w-md w-full shadow-2xl">
 				{/* Icon */}
 				<div
-					className={`mx-auto w-16 h-16 rounded-2xl ${
-						allAnswered ? "bg-blue-500/20" : "bg-yellow-500/20"
-					} flex items-center justify-center mb-4`}
+					className="mx-auto w-16 h-16 rounded-2xl bg-surface-raised flex items-center justify-center mb-4"
 				>
 					{allAnswered ? (
 						<svg
-							className="w-8 h-8 text-blue-400"
+							className="w-8 h-8 text-text-primary"
 							viewBox="0 0 24 24"
 							fill="none"
 						>
@@ -67,7 +65,7 @@ export default function SubmitConfirmationModal({
 						</svg>
 					) : (
 						<svg
-							className="w-8 h-8 text-yellow-400"
+							className="w-8 h-8 text-text-secondary"
 							viewBox="0 0 24 24"
 							fill="none"
 						>
@@ -83,26 +81,26 @@ export default function SubmitConfirmationModal({
 				</div>
 
 				{/* Title & Message */}
-				<h3 className="text-xl font-bold text-white text-center mb-2">
+				<h3 className="text-xl font-bold text-text-primary text-center mb-2">
 					{allAnswered ? "Submit Quiz?" : "Incomplete Quiz"}
 				</h3>
 
-				<p className="text-gray-400 text-center mb-6">
+				<p className="text-text-secondary text-center mb-6">
 					{allAnswered ? (
 						<>
 							You&apos;ve answered all{" "}
-							<span className="text-white font-semibold">{totalQuestions}</span>{" "}
+							<span className="text-text-primary font-semibold">{totalQuestions}</span>{" "}
 							questions. Ready to submit?
 						</>
 					) : (
 						<>
 							You&apos;ve answered{" "}
-							<span className="text-white font-semibold">{answeredCount}</span>{" "}
+							<span className="text-text-primary font-semibold">{answeredCount}</span>{" "}
 							out of{" "}
-							<span className="text-white font-semibold">{totalQuestions}</span>{" "}
+							<span className="text-text-primary font-semibold">{totalQuestions}</span>{" "}
 							questions.
 							<br />
-							<span className="text-yellow-400 font-medium">
+							<span className="text-text-primary font-medium">
 								{unansweredCount} question{unansweredCount !== 1 ? "s" : ""}{" "}
 								remaining.
 							</span>
@@ -116,13 +114,13 @@ export default function SubmitConfirmationModal({
 				<div className="flex gap-3">
 					<button
 						onClick={onClose}
-						className="flex-1 px-6 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 transition-all font-medium"
+						className="flex-1 px-6 py-3 rounded-xl border border-border text-text-primary hover:bg-surface-raised transition-all font-medium"
 					>
 						Cancel
 					</button>
 					<button
 						onClick={onConfirm}
-						className="flex-1 px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all"
+						className="flex-1 px-6 py-3 rounded-xl bg-text-primary text-bg font-semibold hover:opacity-90 transition-all"
 					>
 						{allAnswered ? "Submit" : "Submit Anyway"}
 					</button>

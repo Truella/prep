@@ -67,7 +67,7 @@ export default function TakeQuizInputClient() {
           <div className="text-center space-y-2">
             <p
               className="text-xs font-mono font-semibold tracking-widest uppercase"
-              style={{ color: "var(--color-accent)" }}
+              style={{ color: "var(--color-text-secondary)" }}
             >
               PREP
             </p>
@@ -103,8 +103,8 @@ export default function TakeQuizInputClient() {
               disabled={resolving}
               className="w-full px-6 py-3.5 rounded-xl font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50"
               style={{
-                backgroundColor: "var(--color-accent)",
-                color: "#0A0A0F",
+                backgroundColor: "var(--color-text-primary)",
+                color: "var(--color-bg)",
               }}
             >
               {resolving ? "Looking up..." : "Start Quiz"}
@@ -118,7 +118,7 @@ export default function TakeQuizInputClient() {
             <Link
               href="/quiz-bank"
               className="text-sm font-medium"
-              style={{ color: "var(--color-accent)" }}
+              style={{ color: "var(--color-text-primary)" }}
             >
               Browse public quizzes →
             </Link>

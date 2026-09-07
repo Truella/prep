@@ -16,7 +16,7 @@ export default function BringQuestionsMock() {
   }, [reducedMotion]);
 
   return (
-    <div className="w-full max-w-[320px] mx-auto h-[200px] border border-border bg-surface-raised rounded-xl p-4 overflow-hidden relative shadow-sm">
+    <div className="w-full max-w-[320px] mx-auto h-[200px] bg-surface-raised rounded-xl p-4 overflow-hidden relative shadow-sm">
       <AnimatePresence mode="wait">
         <motion.div
           key={phase}
@@ -40,14 +40,14 @@ export default function BringQuestionsMock() {
                   initial={{ width: "0%" }} 
                   animate={{ width: "100%" }} 
                   transition={{ duration: 2 }}
-                  className="h-full bg-accent"
+                  className="h-full bg-sage-accent"
                 />
               </div>
             </div>
           )}
           {phase === 2 && (
             <div className="flex flex-col items-center justify-center gap-2 text-center">
-              <div className="w-8 h-8 rounded-full bg-accent text-bg flex items-center justify-center font-bold">✓</div>
+              <div className="w-8 h-8 rounded-full bg-sage-accent text-bg flex items-center justify-center font-bold">✓</div>
               <div className="text-sm font-medium">24 questions imported</div>
             </div>
           )}

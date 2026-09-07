@@ -41,7 +41,7 @@ export default function Hero() {
             />
             <div className="space-y-2">
               <motion.span
-                className="inline-block text-xs font-mono font-semibold tracking-widest uppercase text-accent"
+                className="inline-block text-xs font-mono font-semibold tracking-widest uppercase text-text-secondary"
                 {...entrance(0.05, -16)}
               >
                 CBT & MCQ Exam Practice
@@ -68,7 +68,7 @@ export default function Hero() {
             >
               <Link
                 href="/auth"
-                className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm transition-all hover:opacity-90 bg-accent text-bg"
+                className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm transition-all hover:opacity-90 bg-text-primary text-bg"
               >
                 Create a quiz
               </Link>

@@ -25,7 +25,7 @@ export default function QuizSharing() {
             style={{ fontFamily: "var(--font-display)" }}
           >
             One quiz. One link. Everyone can{" "}
-            <span className="italic text-accent">practice</span>.
+            <span className="italic text-amber-accent">practice</span>.
           </h2>
           <p className="text-base text-text-secondary leading-relaxed">
             Create a quiz once and send it wherever you want. Make it public for
@@ -38,10 +38,9 @@ export default function QuizSharing() {
           {CARDS.map((card, i) => (
             <FadeUp key={card.title} delay={i * 0.08} className="h-full">
               <div
-                className="h-full rounded-2xl border p-5 space-y-2"
+                className="h-full rounded-2xl p-5 space-y-2"
                 style={{
-                  backgroundColor: "var(--color-surface-raised)",
-                  borderColor: "var(--color-border)",
+                  backgroundColor: "var(--color-amber-surface)",
                 }}
               >
                 <h3

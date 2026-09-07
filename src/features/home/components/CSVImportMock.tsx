@@ -18,7 +18,7 @@ export default function CSVImportMock() {
   }, [reducedMotion]);
 
   return (
-    <div className="w-full max-w-[360px] mx-auto h-[240px] border border-border bg-surface-raised rounded-2xl p-5 overflow-hidden relative shadow-sm flex flex-col justify-center">
+    <div className="w-full max-w-[360px] mx-auto h-[240px] bg-surface-raised rounded-2xl p-5 overflow-hidden relative shadow-sm flex flex-col justify-center">
       <AnimatePresence mode="wait">
         <motion.div
           key={phase}
@@ -30,11 +30,11 @@ export default function CSVImportMock() {
         >
           {phase === 0 && (
             <div className="space-y-3 text-center">
-              <div className="mx-auto w-12 h-12 rounded-full bg-accent-dim flex items-center justify-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-sage-surface flex items-center justify-center">
                 <HugeiconsIcon
                   icon={FileUploadIcon}
                   size={24}
-                  className="text-accent"
+                  className="text-sage-accent"
                 />
               </div>
               <div className="text-sm font-medium text-text-primary">
@@ -55,7 +55,7 @@ export default function CSVImportMock() {
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
                   transition={{ duration: 2 }}
-                  className="h-full bg-accent"
+                  className="h-full bg-sage-accent"
                 />
               </div>
               <div className="text-xs text-text-secondary font-mono">
@@ -65,7 +65,7 @@ export default function CSVImportMock() {
           )}
           {phase === 2 && (
             <div className="flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-10 h-10 rounded-full bg-accent text-bg flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-sage-accent text-bg flex items-center justify-center">
                 <HugeiconsIcon icon={CheckmarkCircle02Icon} size={22} />
               </div>
               <div className="text-sm font-medium text-text-primary">

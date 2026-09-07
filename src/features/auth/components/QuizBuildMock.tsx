@@ -61,7 +61,7 @@ export default function QuizBuildMock() {
             <span
               key={index}
               className={`h-1 rounded-full transition-all duration-300 ${
-                phase === index ? "w-5 bg-accent" : "w-1.5 bg-border"
+                phase === index ? "w-5 bg-sage-accent" : "w-1.5 bg-border"
               }`}
             />
           ))}

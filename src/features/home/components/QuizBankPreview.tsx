@@ -47,7 +47,9 @@ export default function QuizBankPreview() {
 	return (
 		<section
 			className="py-24 px-6"
-			style={{ borderColor: "var(--color-border)" }}
+			style={{
+				backgroundColor: "var(--color-amber-surface)",
+			}}
 		>
 			<div className="max-w-6xl mx-auto">
 				<FadeUp className="flex items-end justify-between mb-10">
@@ -71,7 +73,7 @@ export default function QuizBankPreview() {
 					<Link
 						href="/quiz-bank"
 						className="text-sm font-medium hidden sm:block"
-						style={{ color: "var(--color-accent)" }}
+						style={{ color: "var(--color-amber-accent)" }}
 					>
 						Browse all →
 					</Link>
@@ -82,10 +84,9 @@ export default function QuizBankPreview() {
 						{[1, 2, 3].map((i) => (
 							<div
 								key={i}
-								className="p-5 rounded-2xl border animate-pulse"
+								className="p-5 rounded-2xl animate-pulse"
 								style={{
 									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border)",
 								}}
 							>
 								<div
@@ -113,7 +114,7 @@ export default function QuizBankPreview() {
 					<Link
 						href="/quiz-bank"
 						className="text-sm font-medium"
-						style={{ color: "var(--color-accent)" }}
+						style={{ color: "var(--color-amber-accent)" }}
 					>
 						Browse all →
 					</Link>

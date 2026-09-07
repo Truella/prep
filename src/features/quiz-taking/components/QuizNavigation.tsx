@@ -22,7 +22,7 @@ export default function QuizNavigation({
 			<button
 				onClick={onPrevious}
 				disabled={isFirstQuestion}
-				className="px-6 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+				className="px-6 py-3 rounded-xl border border-border text-text-primary hover:bg-surface-raised disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2"
 			>
 				<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
 					<path
@@ -41,7 +41,7 @@ export default function QuizNavigation({
 			{isLastQuestion ? (
 				<button
 					onClick={onSubmit}
-					className="px-8 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all shadow-lg flex items-center gap-2"
+					className="px-8 py-3 rounded-xl bg-text-primary text-bg font-semibold hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
 				>
 					Submit Quiz
 					<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
@@ -57,7 +57,7 @@ export default function QuizNavigation({
 			) : (
 				<button
 					onClick={onNext}
-					className="px-8 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center gap-2"
+					className="px-8 py-3 rounded-xl bg-text-primary text-bg font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center gap-2"
 				>
 					Next
 					<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">

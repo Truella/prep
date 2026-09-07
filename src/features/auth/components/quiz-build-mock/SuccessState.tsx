@@ -16,9 +16,9 @@ export default function SuccessState() {
   }, []);
 
   return (
-    <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-5 backdrop-blur-xl">
+    <div className="rounded-2xl border border-amber-accent/25 bg-amber-surface p-5 backdrop-blur-xl">
       <div className="mb-4 flex items-start gap-3">
-        <div className="rounded-lg bg-green-500/20 p-2 text-green-400">
+        <div className="rounded-lg bg-amber-accent/15 p-2 text-amber-accent">
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
             <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -37,7 +37,7 @@ export default function SuccessState() {
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-green-500/20 pt-4">
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-amber-accent/25 pt-4">
         <p className="text-xs text-text-secondary">
           Share code: <span className="ml-1 font-mono font-bold text-text-primary">{QUIZ_BUILD_MOCK.shareCode}</span>
         </p>

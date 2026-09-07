@@ -8,42 +8,49 @@ const FEATURES = [
     description:
       "Understand your weak areas and what to revisit after every attempt.",
     icon: "◈",
+    hue: "sky",
   },
   {
     title: "Quiz builder",
     description:
       "Prefer to build from scratch? Add questions, options, answers, and settings directly in Prep.",
     icon: "+",
+    hue: "sage",
   },
   {
     title: "Timed exams",
     description:
       "Practice against the clock and automatically submit when time runs out.",
     icon: "⏱",
+    hue: "coral",
   },
   {
     title: "CSV import",
     description:
       "Turn an existing question bank into a quiz without typing every question manually.",
     icon: "↑",
+    hue: "sage",
   },
   {
     title: "Shareable quizzes",
     description:
       "Send one link to your classmates, friends, or students.",
     icon: "⇢",
+    hue: "amber",
   },
   {
     title: "Saved progress",
     description:
       "Close the tab and come back without losing your attempt.",
     icon: "◉",
+    hue: "teal",
   },
   {
     title: "Public or private",
     description:
       "Share with everyone or keep your quiz restricted to the people you choose.",
     icon: "⊞",
+    hue: "amber",
   },
 ];
 
@@ -68,7 +75,6 @@ export default function Features() {
     <section
       className="py-24 px-6"
       style={{
-        borderColor: "var(--color-border)",
         backgroundColor: "var(--color-surface)",
       }}
     >
@@ -82,7 +88,7 @@ export default function Features() {
             }}
           >
             Built around the way CBT prep actually{" "}
-            <span className="italic text-accent">works</span>.
+            <span className="italic text-text-primary">works</span>.
           </h2>
         </FadeUp>
 
@@ -102,17 +108,16 @@ export default function Features() {
                     className="h-full"
                   >
                     <div
-                      className={`h-full rounded-2xl border space-y-3 ${
+                      className={`h-full rounded-2xl space-y-3 ${
                         group.prominent ? "p-8 md:min-h-56" : "p-6"
                       }`}
                       style={{
-                        backgroundColor: "var(--color-surface-raised)",
-                        borderColor: "var(--color-border)",
+                        backgroundColor: `var(--color-${feature.hue}-surface)`,
                       }}
                     >
                       <span
                         className={group.prominent ? "text-3xl" : "text-2xl"}
-                        style={{ color: "var(--color-accent)" }}
+                        style={{ color: `var(--color-${feature.hue}-accent)` }}
                       >
                         {feature.icon}
                       </span>

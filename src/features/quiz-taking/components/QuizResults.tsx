@@ -16,8 +16,8 @@ function renderInline(text: string): React.ReactNode[] {
 	const parts = text.split(/(\*\*[^*]+\*\*)/g);
 	return parts.map((part, i) => {
 		if (part.startsWith("**") && part.endsWith("**")) {
-			return (
-				<strong key={i} className="text-white font-semibold">
+		return (
+			<strong key={i} className="text-text-primary font-semibold">
 					{part.slice(2, -2)}
 				</strong>
 			);
@@ -36,8 +36,8 @@ function renderReview(text: string): React.ReactNode {
 		nodes.push(
 			<ul key={`ul-${nodes.length}`} className="space-y-1.5 my-2">
 				{bulletBuffer.map((b, i) => (
-					<li key={i} className="flex items-start gap-2 text-sm text-gray-300">
-						<span className="mt-1 w-1.5 h-1.5 rounded-full bg-gray-500 shrink-0" />
+					<li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+						<span className="mt-1 w-1.5 h-1.5 rounded-full bg-text-secondary shrink-0" />
 						<span>{renderInline(b)}</span>
 					</li>
 				))}
@@ -60,7 +60,7 @@ function renderReview(text: string): React.ReactNode {
 			flushBullets();
 			const headingText = line.replace(/^#{1,3}\s+/, "");
 			nodes.push(
-				<p key={`h-${nodes.length}`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-1">
+				<p key={`h-${nodes.length}`} className="text-xs font-semibold text-text-secondary uppercase tracking-wider mt-4 mb-1">
 					{headingText.replace(/\*\*/g, "")}
 				</p>
 			);
@@ -71,7 +71,7 @@ function renderReview(text: string): React.ReactNode {
 		if (/^\*\*.+\*\*:?$/.test(line)) {
 			flushBullets();
 			nodes.push(
-				<p key={`bh-${nodes.length}`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-1">
+				<p key={`bh-${nodes.length}`} className="text-xs font-semibold text-text-secondary uppercase tracking-wider mt-4 mb-1">
 					{line.replace(/\*\*/g, "").replace(/:$/, "")}
 				</p>
 			);
@@ -93,7 +93,7 @@ function renderReview(text: string): React.ReactNode {
 		// Plain paragraph
 		flushBullets();
 		nodes.push(
-			<p key={`p-${nodes.length}`} className="text-sm text-gray-300 leading-relaxed">
+			<p key={`p-${nodes.length}`} className="text-sm text-text-secondary leading-relaxed">
 				{renderInline(line)}
 			</p>
 		);
@@ -157,16 +157,16 @@ export default function QuizResults({
 	}
 	return (
 		<div className="max-w-2xl mx-auto">
-			<div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 text-center">
+			<div className="bg-surface border border-border rounded-3xl p-8 text-center">
 				{/* Icon */}
 				<div
 					className={`mx-auto w-20 h-20 rounded-2xl ${
-						passed ? "bg-green-500/20" : "bg-yellow-500/20"
+						passed ? "bg-correct/15" : "bg-incorrect/15"
 					} flex items-center justify-center mb-6`}
 				>
 					{passed ? (
 						<svg
-							className="w-10 h-10 text-green-400"
+							className="w-10 h-10 text-correct"
 							viewBox="0 0 24 24"
 							fill="none"
 						>
@@ -180,7 +180,7 @@ export default function QuizResults({
 						</svg>
 					) : (
 						<svg
-							className="w-10 h-10 text-yellow-400"
+							className="w-10 h-10 text-incorrect"
 							viewBox="0 0 24 24"
 							fill="none"
 						>
@@ -196,15 +196,15 @@ export default function QuizResults({
 				</div>
 
 				{/* Title */}
-				<h1 className="text-3xl font-bold text-white mb-2">Quiz Complete!</h1>
-				<p className="text-gray-400 mb-8">{quizTitle}</p>
+				<h1 className="text-3xl font-bold text-text-primary mb-2">Quiz Complete!</h1>
+				<p className="text-text-secondary mb-8">{quizTitle}</p>
 
 				{/* Score */}
-				<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
-					<div className="text-6xl font-bold text-white mb-2">
+				<div className="bg-surface-raised border border-border rounded-2xl p-6 mb-8">
+					<div className="text-6xl font-bold text-text-primary mb-2">
 						{percentage}%
 					</div>
-					<div className="text-gray-400 space-y-1">
+					<div className="text-text-secondary space-y-1">
 						<p>
 							{correctCount} out of {totalQuestions} questions correct
 						</p>
@@ -216,19 +216,19 @@ export default function QuizResults({
 							const s = elapsedSeconds % 60;
 							const timeStr = `${m}m ${s}s`;
 							if (isAutoSubmit) {
-								return <p className="text-red-400 font-medium mt-2">Time&apos;s up!</p>;
+								return <p className="text-incorrect font-medium mt-2">Time&apos;s up!</p>;
 							}
 							if (timeLimit && elapsedSeconds < timeLimit * 60) {
 								const remaining = timeLimit * 60 - elapsedSeconds;
 								const rm = Math.floor(remaining / 60);
 								const rs = remaining % 60;
 								return (
-									<p className="text-gray-400 mt-2">
+									<p className="text-text-secondary mt-2">
 										Completed in {timeStr} &middot; {rm}m {rs}s remaining
 									</p>
 								);
 							}
-							return <p className="text-gray-400 mt-2">Completed in {timeStr}</p>;
+							return <p className="text-text-secondary mt-2">Completed in {timeStr}</p>;
 						})()}
 					</div>
 
@@ -237,35 +237,35 @@ export default function QuizResults({
 					{/* AI Review */}
 					<ErrorBoundary
 						fallback={
-							<p className="text-sm text-gray-400 mt-4">AI review unavailable.</p>
+							<p className="text-sm text-text-secondary mt-4">AI review unavailable.</p>
 						}
 					>
 						<div className="mt-6 text-left">
 							{!review && !loading && !error && (
 								<button
 									onClick={() => getReview(reviewPayload)}
-									className="w-full px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all"
+									className="w-full px-6 py-3 rounded-xl bg-text-primary text-bg font-semibold hover:opacity-90 transition-all"
 								>
 									Get AI Review
 								</button>
 							)}
 
 							{loading && (
-								<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-center text-gray-400 text-sm">
+								<div className="bg-surface-raised border border-border rounded-xl p-4 text-center text-text-secondary text-sm">
 									Analysing your results...
 								</div>
 							)}
 
 							{error && (
-								<div className="backdrop-blur-sm bg-white/5 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+								<div className="bg-surface-raised border border-incorrect/30 rounded-xl p-4 text-incorrect text-sm">
 									{error}
 								</div>
 							)}
 
 							{review && (
-								<div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+								<div className="bg-surface-raised border border-border rounded-xl p-4 space-y-3">
 									<div className="flex justify-between items-center">
-										<p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+										<p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
 											AI Review
 										</p>
 										<div className="flex gap-2">
@@ -286,27 +286,27 @@ export default function QuizResults({
 														setTimeout(() => setCopyFailed(false), 2000);
 													}
 												}}
-												className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
+												className="text-xs text-text-secondary hover:text-text-primary transition px-2 py-1 rounded border border-border"
 											>
 												{copyFailed ? "Failed" : copied ? "Copied!" : "Copy"}
 											</button>
 											{!isRateLimited && (
 												<button
 													onClick={() => getReview(reviewPayload)}
-													className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded border border-white/10"
+													className="text-xs text-text-secondary hover:text-text-primary transition px-2 py-1 rounded border border-border"
 												>
 													Regenerate
 												</button>
 											)}
 										</div>
 									</div>
-									<div className="text-gray-300">
+									<div className="text-text-secondary">
 										{renderReview(review)}
 									</div>
 								</div>
 							)}
 
-							<p className="text-xs text-gray-500 mt-3 text-center">
+							<p className="text-xs text-text-secondary mt-3 text-center">
 								Or export manually to use with any AI tool
 							</p>
 						</div>
@@ -317,13 +317,13 @@ export default function QuizResults({
 				<div className="flex gap-3">
 					<button
 						onClick={() => setShowReview(true)}
-						className="flex-1 px-6 py-3 rounded-xl border border-white/20 text-white hover:bg-white/5 transition-all font-medium"
+						className="flex-1 px-6 py-3 rounded-xl border border-border text-text-primary hover:bg-surface-raised transition-all font-medium"
 					>
 						Review Answers
 					</button>
 					<button
 						onClick={onRetake}
-						className="flex-1 px-6 py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-all"
+						className="flex-1 px-6 py-3 rounded-xl bg-text-primary text-bg font-semibold hover:opacity-90 transition-all"
 					>
 						Retake Quiz
 					</button>

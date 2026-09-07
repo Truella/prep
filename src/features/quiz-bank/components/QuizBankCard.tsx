@@ -9,7 +9,7 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
 
   return (
     <div
-      className="group rounded-2xl border p-5 space-y-4 flex flex-col transition-all duration-150 hover:scale-[1.02]"
+      className="group rounded-2xl p-5 space-y-4 flex flex-col transition-all duration-150 hover:scale-[1.02]"
       style={{
         backgroundColor: "var(--color-surface)",
         borderColor: "var(--color-border)",

@@ -15,6 +15,8 @@ const STEPS = [
       "Already have questions? Upload a CSV or add them manually using the quiz builder. No need to recreate your question bank from scratch.",
     Mock: BringQuestionsMock,
     wide: true,
+    surface: "var(--color-sage-surface)",
+    accent: "var(--color-sage-accent)",
   },
   {
     number: "02",
@@ -23,6 +25,8 @@ const STEPS = [
       "Set your timer, choose your quiz settings, and get a CBT-style experience designed for actually practicing.",
     Mock: TimerSettingsMock,
     wide: false,
+    surface: "var(--color-coral-surface)",
+    accent: "var(--color-coral-accent)",
   },
   {
     number: "03",
@@ -31,6 +35,8 @@ const STEPS = [
       "Send one link to your friends, classmates, or study group. They can start taking the quiz without creating an account.",
     Mock: ShareQuizMock,
     wide: false,
+    surface: "var(--color-amber-surface)",
+    accent: "var(--color-amber-accent)",
   },
   {
     number: "04",
@@ -39,6 +45,8 @@ const STEPS = [
       "See your score and get an AI-powered review of your attempt. Find your weak areas and go into your next attempt knowing what to focus on.",
     Mock: AIReviewStepMock,
     wide: true,
+    surface: "var(--color-sky-surface)",
+    accent: "var(--color-sky-accent)",
   },
 ];
 
@@ -54,7 +62,7 @@ export default function HowItWorks() {
               color: "var(--color-text-primary)",
             }}
           >
-            From question bank to <span className="italic text-accent">practice</span> in minutes.
+            From question bank to <span className="italic text-text-primary">practice</span> in minutes.
           </h2>
           <p
             className="text-sm mb-12"
@@ -74,16 +82,15 @@ export default function HowItWorks() {
                 className={`h-full ${step.wide ? "md:col-span-4" : "md:col-span-2"}`}
               >
                 <div
-                  className="h-full rounded-3xl border p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6"
+                  className="h-full rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6"
                   style={{
-                    backgroundColor: "var(--color-surface)",
-                    borderColor: "var(--color-border)",
+                    backgroundColor: step.surface,
                   }}
                 >
                   <div className="flex-1 min-w-0">
                     <span
                       className="text-xs font-mono font-bold inline-block mb-3"
-                      style={{ color: "var(--color-accent)" }}
+                      style={{ color: step.accent }}
                     >
                       {step.number}
                     </span>
@@ -114,7 +121,7 @@ export default function HowItWorks() {
             href="/auth"
             className="inline-block rounded-xl px-7 py-3.5 text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
-              backgroundColor: "var(--color-accent)",
+              backgroundColor: "var(--color-sage-accent)",
               color: "var(--color-bg)",
             }}
           >

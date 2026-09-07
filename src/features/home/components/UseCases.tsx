@@ -8,18 +8,21 @@ const USE_CASES = [
     description:
       "Turn past questions and your own question banks into CBT practice. Repeat until the format feels familiar.",
     large: true,
+    surface: "var(--color-coral-surface)",
   },
   {
     title: "Studying with friends",
     description:
       "Build a quiz once. Send the link. Everyone takes the same test and compares their results.",
     large: false,
+    surface: "var(--color-amber-surface)",
   },
   {
     title: "Teaching or tutoring",
     description:
       "Create practice tests for your students and give them a simple link to start.",
     large: false,
+    surface: "var(--color-magenta-surface)",
   },
 ];
 
@@ -28,7 +31,6 @@ export default function UseCases() {
     <section
       className="py-24 px-6"
       style={{
-        borderColor: "var(--color-border)",
         backgroundColor: "var(--color-surface)",
       }}
     >
@@ -41,7 +43,7 @@ export default function UseCases() {
               color: "var(--color-text-primary)",
             }}
           >
-            However you <span className="italic text-accent">study</span>, Prep fits in.
+            However you <span className="italic text-text-primary">study</span>, Prep fits in.
           </h2>
         </FadeUp>
 
@@ -49,10 +51,9 @@ export default function UseCases() {
           {USE_CASES.filter((uc) => uc.large).map((uc) => (
             <FadeUp key={uc.title} className="md:col-span-4 h-full">
               <div
-                className="h-full rounded-3xl border p-8 md:p-12 flex flex-col justify-center min-h-[260px]"
+                className="h-full rounded-3xl p-8 md:p-12 flex flex-col justify-center min-h-[260px]"
                 style={{
-                  backgroundColor: "var(--color-surface-raised)",
-                  borderColor: "var(--color-border)",
+                  backgroundColor: uc.surface,
                 }}
               >
                 <h3
@@ -75,10 +76,9 @@ export default function UseCases() {
             {USE_CASES.filter((uc) => !uc.large).map((uc, i) => (
               <FadeUp key={uc.title} delay={0.1 + i * 0.08} className="h-full">
                 <div
-                  className="h-full rounded-3xl border p-6 space-y-3"
+                  className="h-full rounded-3xl p-6 space-y-3"
                   style={{
-                    backgroundColor: "var(--color-surface-raised)",
-                    borderColor: "var(--color-border)",
+                    backgroundColor: uc.surface,
                   }}
                 >
                   <h3

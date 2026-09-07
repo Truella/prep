@@ -43,7 +43,7 @@ export default function Dashboard() {
 						className="col-span-3 rounded-2xl border border-dashed p-12 text-center"
 						style={{
 							borderColor: "var(--color-border)",
-							backgroundColor: "var(--color-surface)",
+							backgroundColor: "var(--color-teal-surface)",
 						}}
 					>
 						<h3
@@ -58,8 +58,8 @@ export default function Dashboard() {
 								href="/dashboard/create"
 								className="inline-block px-5 py-2.5 rounded-xl text-sm font-semibold transition"
 								style={{
-									backgroundColor: "var(--color-accent)",
-									color: "#fff",
+									backgroundColor: "var(--color-sage-accent)",
+									color: "var(--color-bg)",
 								}}
 							>
 								Create your first quiz
@@ -124,7 +124,7 @@ export default function Dashboard() {
 						<Link
 							href="/dashboard/my-quizzes"
 							className="text-xs font-medium"
-							style={{ color: "var(--color-accent)" }}
+							style={{ color: "var(--color-sage-accent)" }}
 						>
 							View all →
 						</Link>
@@ -153,7 +153,7 @@ export default function Dashboard() {
 							<Link
 								href="/dashboard/my-quizzes"
 								className="text-xs font-medium"
-								style={{ color: "var(--color-accent)" }}
+								style={{ color: "var(--color-amber-accent)" }}
 							>
 								View all →
 							</Link>
@@ -177,7 +177,7 @@ export default function Dashboard() {
 							No published quizzes yet.{" "}
 							<Link
 								href="/dashboard/create"
-								style={{ color: "var(--color-accent)" }}
+								style={{ color: "var(--color-sage-accent)" }}
 							>
 								Create your first one.
 							</Link>

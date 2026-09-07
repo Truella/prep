@@ -7,7 +7,6 @@ export default function CTASection() {
   return (
     <section
       className="py-24 px-6"
-      style={{ borderColor: "var(--color-border)" }}
     >
       <div className="max-w-2xl mx-auto text-center space-y-6">
         <FadeUp>
@@ -19,7 +18,7 @@ export default function CTASection() {
             }}
           >
             You already have the{" "}
-            <span className="italic text-accent">questions</span>.
+            <span className="italic text-text-primary">questions</span>.
           </h2>
           <p
             className="text-lg mt-3"
@@ -34,8 +33,8 @@ export default function CTASection() {
               href="/auth"
               className="px-8 py-4 rounded-xl font-semibold transition-all hover:opacity-90"
               style={{
-                backgroundColor: "var(--color-accent)",
-                color: "#0A0A0F",
+                backgroundColor: "var(--color-sage-accent)",
+                color: "var(--color-bg)",
               }}
             >
               Create a quiz

@@ -45,8 +45,8 @@ export default function TopBar({
 						href="/dashboard/create"
 						className="px-5 py-2.5 rounded-xl text-sm font-semibold transition"
 						style={{
-							backgroundColor: "var(--color-accent)",
-							color: "#fff",
+							backgroundColor: "var(--color-sage-accent)",
+							color: "var(--color-bg)",
 						}}
 					>
 						Create Quiz

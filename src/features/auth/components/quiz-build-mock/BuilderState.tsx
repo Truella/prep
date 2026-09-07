@@ -48,7 +48,7 @@ export default function BuilderState({ phase }: { phase: number }) {
         <label className="mb-1.5 block text-xs font-medium text-text-secondary">Quiz Title</label>
         <div className="h-10 rounded-lg border border-border bg-surface px-3 py-2.5 text-xs text-text-primary">
           {titleComplete ? QUIZ_BUILD_MOCK.title : <Typewriter text={QUIZ_BUILD_MOCK.title} />}
-          {!titleComplete && <span className="ml-0.5 animate-pulse text-accent">|</span>}
+          {!titleComplete && <span className="ml-0.5 animate-pulse text-sage-accent">|</span>}
         </div>
       </div>
 

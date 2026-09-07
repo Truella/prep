@@ -17,7 +17,7 @@ export default function QuizReview({
 			<div className="flex items-center justify-between">
 				<button
 					onClick={onBack}
-					className="flex items-center gap-2 text-gray-400 hover:text-white transition"
+					className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition"
 				>
 					<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
 						<path
@@ -30,7 +30,7 @@ export default function QuizReview({
 					</svg>
 					Back to Results
 				</button>
-				<h2 className="text-2xl font-bold text-white">Answer Review</h2>
+				<h2 className="text-2xl font-bold text-text-primary">Answer Review</h2>
 			</div>
 
 			{/* Questions Review */}
@@ -47,31 +47,31 @@ export default function QuizReview({
 				return (
 					<div
 						key={index}
-						className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6"
-					>
-						{/* Question Header */}
-						<div className="flex items-start justify-between mb-4">
-							<div className="flex-1">
-								<div className="flex items-center gap-2 mb-2">
-									<span className="text-sm font-semibold text-gray-400">
-										Question {index + 1}
-									</span>
-								<span className="text-xs text-gray-500">
-									({question.points} pts)
+					className="bg-surface border border-border rounded-2xl p-6"
+				>
+					{/* Question Header */}
+					<div className="flex items-start justify-between mb-4">
+						<div className="flex-1">
+							<div className="flex items-center gap-2 mb-2">
+								<span className="text-sm font-semibold text-text-secondary">
+									Question {index + 1}
 								</span>
-								</div>
-								<h3 className="text-lg font-semibold text-white">
+							<span className="text-xs text-text-secondary">
+								({question.points} pts)
+							</span>
+							</div>
+							<h3 className="text-lg font-semibold text-text-primary">
 									{question.questionText}
 								</h3>
 							</div>
 							<div
-								className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-									isCorrect ? "bg-green-500/20" : "bg-red-500/20"
-								}`}
-							>
-								{isCorrect ? (
-									<svg
-										className="w-5 h-5 text-green-400"
+							className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+								isCorrect ? "bg-correct/15" : "bg-incorrect/15"
+							}`}
+						>
+							{isCorrect ? (
+								<svg
+									className="w-5 h-5 text-correct"
 										viewBox="0 0 24 24"
 										fill="none"
 									>
@@ -84,8 +84,8 @@ export default function QuizReview({
 										/>
 									</svg>
 								) : (
-									<svg
-										className="w-5 h-5 text-red-400"
+								<svg
+									className="w-5 h-5 text-incorrect"
 										viewBox="0 0 24 24"
 										fill="none"
 									>
@@ -108,21 +108,21 @@ export default function QuizReview({
 								const isCorrectAnswer = question.correctIndex === optionIndex;
 								const letter = String.fromCharCode(65 + optionIndex);
 
-								let bgColor = "bg-white/5";
-								let borderColor = "border-white/10";
-								let textColor = "text-gray-400";
+							let bgColor = "bg-surface-raised";
+							let borderColor = "border-border";
+							let textColor = "text-text-secondary";
 
-								if (isCorrectAnswer) {
-									bgColor = "bg-green-500/10";
-									borderColor = "border-green-500/30";
-									textColor = "text-green-400";
-								}
+							if (isCorrectAnswer) {
+								bgColor = "bg-correct/10";
+								borderColor = "border-correct/40";
+								textColor = "text-correct";
+							}
 
-								if (isUserAnswer && !isCorrect) {
-									bgColor = "bg-red-500/10";
-									borderColor = "border-red-500/30";
-									textColor = "text-red-400";
-								}
+							if (isUserAnswer && !isCorrect) {
+								bgColor = "bg-incorrect/10";
+								borderColor = "border-incorrect/40";
+								textColor = "text-incorrect";
+							}
 
 								return (
 									<div
@@ -130,30 +130,30 @@ export default function QuizReview({
 										className={`flex items-start gap-3 p-3 rounded-lg border ${bgColor} ${borderColor}`}
 									>
 										<span
-											className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center font-semibold text-sm ${
-												isCorrectAnswer
-													? "bg-green-500/20 text-green-400"
-													: isUserAnswer
-														? "bg-red-500/20 text-red-400"
-														: "bg-white/10 text-gray-500"
-											}`}
+									className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center font-semibold text-sm ${
+											isCorrectAnswer
+												? "bg-correct/15 text-correct"
+												: isUserAnswer
+													? "bg-incorrect/15 text-incorrect"
+													: "bg-surface-raised text-text-secondary"
+										}`}
 										>
 											{letter}
 										</span>
 										<div className="flex-1">
 											<p className={textColor}>{option}</p>
-											{isUserAnswer && !isCorrect && (
-												<p className="text-xs text-red-400 mt-1">Your answer</p>
-											)}
-											{isCorrectAnswer && (
-												<p className="text-xs text-green-400 mt-1">
-													Correct answer
-												</p>
-											)}
+										{isUserAnswer && !isCorrect && (
+											<p className="text-xs text-incorrect mt-1">Your answer</p>
+										)}
+										{isCorrectAnswer && (
+											<p className="text-xs text-correct mt-1">
+												Correct answer
+											</p>
+										)}
 										</div>
 										{isCorrectAnswer && (
-											<svg
-												className="w-5 h-5 text-green-400 shrink-0"
+									<svg
+											className="w-5 h-5 text-correct shrink-0"
 												viewBox="0 0 24 24"
 												fill="none"
 											>

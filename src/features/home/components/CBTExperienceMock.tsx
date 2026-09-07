@@ -42,13 +42,13 @@ function Options({
             key={index}
             className={`flex items-start gap-3 p-3 rounded-xl border transition-colors duration-300 ${
               isSelected
-                ? "border-accent bg-accent-dim"
+                ? "border-coral-accent bg-coral-surface"
                 : "border-border bg-surface"
             }`}
           >
             <span
               className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center font-semibold text-xs ${
-                isSelected ? "bg-accent text-bg" : "bg-surface-raised text-text-secondary"
+                isSelected ? "bg-coral-accent text-bg" : "bg-surface-raised text-text-secondary"
               }`}
             >
               {letter}
@@ -80,7 +80,7 @@ export default function CBTExperienceMock() {
   const ratio = timerSeconds / 300;
 
   return (
-    <div className="w-full max-w-[420px] mx-auto h-[300px] bg-surface-raised border border-border rounded-2xl p-5 overflow-hidden relative shadow-sm flex flex-col">
+    <div className="w-full max-w-[420px] mx-auto h-[300px] bg-surface-raised rounded-2xl p-5 overflow-hidden relative shadow-sm flex flex-col">
       {/* Header: timer + progress */}
       <div className="flex justify-between items-center mb-1">
         <span className="text-xs text-text-secondary font-medium">
@@ -88,7 +88,7 @@ export default function CBTExperienceMock() {
         </span>
         <span
           className={`font-mono text-base font-bold tabular-nums ${
-            ratio > 0.5 ? "text-accent" : ratio > 0.2 ? "text-text-primary" : "text-error"
+            ratio > 0.5 ? "text-coral-accent" : ratio > 0.2 ? "text-text-primary" : "text-error"
           }`}
         >
           {formatTimer(timerSeconds)}
@@ -104,7 +104,7 @@ export default function CBTExperienceMock() {
       </div>
       <div className="w-full h-1.5 bg-border rounded-full overflow-hidden mb-4">
         <motion.div
-          className="h-full bg-accent rounded-full"
+          className="h-full bg-coral-accent rounded-full"
           animate={{ width: `${problemProgress(questionIndex)}%` }}
           transition={{ duration: 0.4 }}
         />
@@ -145,7 +145,7 @@ export default function CBTExperienceMock() {
             initial={{ scale: 0.96 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.3 }}
-            className="px-5 py-2 rounded-lg bg-accent text-bg text-xs font-semibold"
+            className="px-5 py-2 rounded-lg bg-coral-accent text-bg text-xs font-semibold"
           >
             {questionIndex === 1 ? "Submit Quiz" : "Next"}
           </motion.span>

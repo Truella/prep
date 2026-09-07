@@ -24,7 +24,7 @@ export default function AIReviewSection() {
       <div className="mx-auto max-w-6xl">
         <div className="grid items-center gap-14 lg:grid-cols-[0.8fr_1.2fr]">
           <FadeUp>
-            <p className="text-xs font-semibold uppercase tracking-widest text-accent">
+            <p className="text-xs font-semibold uppercase tracking-widest text-sky-accent">
               After every attempt
             </p>
             <h2
@@ -32,7 +32,7 @@ export default function AIReviewSection() {
               style={{ fontFamily: "var(--font-display)" }}
             >
               A score tells you how you did. We help you figure out{" "}
-              <span className="italic text-accent">why</span>.
+              <span className="italic text-sky-accent">why</span>.
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-text-secondary">
               Finishing with 64% doesn&apos;t tell you what to do tomorrow.
@@ -49,10 +49,9 @@ export default function AIReviewSection() {
           {BREAKDOWN_CARDS.map((card, i) => (
             <FadeUp key={card.title} delay={i * 0.08} className="h-full">
               <div
-                className="h-full rounded-2xl border p-7 space-y-3"
+                className="h-full rounded-2xl p-7 space-y-3"
                 style={{
-                  backgroundColor: "var(--color-surface-raised)",
-                  borderColor: "var(--color-border)",
+                  backgroundColor: "var(--color-sky-surface)",
                 }}
               >
                 <h3

@@ -14,7 +14,7 @@ export default function CSVImportSection() {
               className="text-4xl md:text-5xl leading-tight text-text-primary mb-6"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Already have the questions? Don&apos;t <span className="italic text-accent">type</span> them again.
+              Already have the questions? Don&apos;t <span className="italic text-sage-accent">type</span> them again.
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
               Got a spreadsheet full of questions? A past-paper question bank? Notes you&apos;ve already organized? Upload your CSV and Prep turns it into a ready-to-take CBT.

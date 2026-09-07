@@ -82,7 +82,7 @@ export default function ToolbarButton({
         tabIndex={-1}
         className={`w-full rounded-lg px-2 py-2 text-[10px] font-semibold ${
           isPublish
-            ? "bg-accent text-bg"
+            ? "bg-sage-accent text-bg"
             : "border border-border text-text-primary"
         }`}
         style={{ scale: buttonScale }}
@@ -97,7 +97,7 @@ export default function ToolbarButton({
           style={{ x: cursorX, y: cursorY, scale: cursorScale }}
         >
           <motion.span
-            className="absolute -inset-2 rounded-full border border-accent"
+            className="absolute -inset-2 rounded-full border border-sage-accent"
             style={{ opacity: rippleOpacity, scale: rippleScale }}
           />
         </motion.div>

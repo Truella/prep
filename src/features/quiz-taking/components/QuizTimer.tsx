@@ -51,13 +51,7 @@ export default function QuizTimer({
 		onExpireRef.current();
 	}, [secondsRemaining]);
 
-	const ratio = secondsRemaining / timeLimitSeconds;
-	const colorClass =
-		ratio > 0.5
-			? "text-green-400"
-			: ratio > 0.2
-				? "text-yellow-400"
-				: "text-red-400";
+	const colorClass = "text-text-primary";
 
 	const minutes = Math.floor(secondsRemaining / 60);
 	const seconds = secondsRemaining % 60;
