@@ -79,7 +79,7 @@ export default function HeroCard() {
               width: i === index ? "24px" : "6px",
               backgroundColor:
                 i === index
-                  ? "var(--color-text-primary)"
+                  ? "var(--color-coral-accent)"
                   : "var(--color-border)",
             }}
           />
@@ -112,8 +112,8 @@ export default function HeroCard() {
                 <span
                   className="text-xs font-semibold px-2 py-0.5 rounded font-mono"
                   style={{
-                    backgroundColor: "var(--color-surface-raised)",
-                    color: "var(--color-text-secondary)",
+                    backgroundColor: "var(--color-coral-surface)",
+                    color: "var(--color-coral-accent)",
                   }}
                 >
                   {q.category}
@@ -159,10 +159,10 @@ export default function HeroCard() {
                       opacity: 1,
                       y: 0,
                       backgroundColor: isHighlighted
-                        ? "var(--color-surface-raised)"
+                        ? "var(--color-coral-surface)"
                         : "var(--color-surface-raised)",
                       borderColor: isHighlighted
-                        ? "var(--color-text-primary)"
+                        ? "var(--color-coral-accent)"
                         : "var(--color-border)",
                     }}
                     transition={{
@@ -176,7 +176,7 @@ export default function HeroCard() {
                       className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold font-mono"
                       style={{
                         backgroundColor: isHighlighted
-                          ? "var(--color-text-primary)"
+                          ? "var(--color-coral-accent)"
                           : "var(--color-border)",
                         color: isHighlighted
                           ? "var(--color-bg)"
