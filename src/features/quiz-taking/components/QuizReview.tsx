@@ -1,15 +1,18 @@
 import { AppQuestion } from "@/lib/types";
+import ExportResultsButton from "./ExportResultsButton";
 
 interface QuizReviewProps {
 	questions: AppQuestion[];
 	userAnswers: Record<number, number>;
 	onBack: () => void;
+	quizTitle?: string;
 }
 
 export default function QuizReview({
 	questions,
 	userAnswers,
 	onBack,
+	quizTitle = "quiz",
 }: QuizReviewProps) {
 	return (
 		<div className="max-w-3xl mx-auto space-y-6">
@@ -30,7 +33,13 @@ export default function QuizReview({
 					</svg>
 					Back to Results
 				</button>
-				<h2 className="text-2xl font-bold text-text-primary">Answer Review</h2>
+				<h2 className="text-2xl font-bold text-white">Answer Review</h2>
+				<ExportResultsButton
+					quizTitle={quizTitle}
+					questions={questions}
+					userAnswers={userAnswers}
+					variant="compact"
+				/>
 			</div>
 
 			{/* Questions Review */}

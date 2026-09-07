@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import QuizReview from "./QuizReview";
+import ExportResultsButton from "./ExportResultsButton";
 import { AppQuestion } from "@/lib/types";
 import { useAIReview } from "@/features/quiz-taking/hooks/useAIReview";
 import type { AIReviewPayload } from "@/lib/types";
@@ -152,6 +153,7 @@ export default function QuizResults({
 				questions={questions}
 				userAnswers={userAnswers}
 				onBack={() => setShowReview(false)}
+				quizTitle={quizTitle}
 			/>
 		);
 	}
@@ -328,6 +330,11 @@ export default function QuizResults({
 						Retake Quiz
 					</button>
 				</div>
+				<ExportResultsButton
+					quizTitle={quizTitle}
+					questions={questions}
+					userAnswers={userAnswers}
+				/>
 			</div>
 		</div>
 	);
