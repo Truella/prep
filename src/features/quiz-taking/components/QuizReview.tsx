@@ -33,7 +33,7 @@ export default function QuizReview({
 					</svg>
 					Back to Results
 				</button>
-				<h2 className="text-2xl font-bold text-white">Answer Review</h2>
+				<h2 className="text-2xl font-bold text-text-primary">Answer Review</h2>
 				<ExportResultsButton
 					quizTitle={quizTitle}
 					questions={questions}

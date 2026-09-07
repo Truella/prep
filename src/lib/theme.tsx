@@ -59,6 +59,17 @@ function applyTheme(theme: Theme) {
 	document.documentElement.classList.add(theme);
 }
 
+// Class-swap wrapper: commits the new theme with transitions disabled so
+// the flip reads as one instant change instead of staggered per-element fades.
+function applyThemeWithoutTransition(theme: Theme) {
+	const el = document.documentElement;
+	el.classList.add("theme-no-transition");
+	applyTheme(theme);
+	// Force reflow so the swap commits before transitions are re-enabled.
+	el.getBoundingClientRect();
+	requestAnimationFrame(() => el.classList.remove("theme-no-transition"));
+}
+
 function persistTheme(theme: Theme) {
 	try {
 		localStorage.setItem(STORAGE_KEY, theme);
@@ -88,11 +99,11 @@ export function ThemeProvider({
 	const theme = useSyncExternalStore<Theme>(subscribe, snapshot, () => defaultTheme);
 
 	useEffect(() => {
-		applyTheme(theme);
+		applyThemeWithoutTransition(theme);
 	}, [theme]);
 
 	const setTheme = (t: Theme) => {
-		applyTheme(t);
+		applyThemeWithoutTransition(t);
 		persistTheme(t);
 		window.dispatchEvent(new Event("theme-change"));
 	};

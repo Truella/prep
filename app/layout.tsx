@@ -75,7 +75,7 @@ export default function RootLayout({
             `,
           }}
         />
-        <ThemeProvider defaultTheme="system">
+        <ThemeProvider defaultTheme="dark">
           <ReactQueryProvider>
             <AuthProvider>
               <ErrorBoundary>{children}</ErrorBoundary>

@@ -128,6 +128,23 @@
   }
 }
 
+/* Applied around theme swaps so light/dark flips commit instantly
+   instead of smearing across mismatched transition durations. */
+.theme-no-transition,
+.theme-no-transition *,
+.theme-no-transition *::before,
+.theme-no-transition *::after {
+  transition: none !important;
+}
+
+html {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
 body {
   margin: 0;
   padding: 0;

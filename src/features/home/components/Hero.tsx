@@ -41,7 +41,7 @@ export default function Hero() {
             />
             <div className="space-y-2">
               <motion.span
-                className="inline-block text-xs font-mono font-semibold tracking-widest uppercase text-coral-accent bg-coral-surface rounded-full px-3.5 py-1.5"
+                className="inline-block text-xs font-mono font-semibold tracking-widest uppercase text-magenta-accent bg-magenta-surface rounded-full px-3.5 py-1.5"
                 {...entrance(0.05, -16)}
               >
                 CBT & MCQ Exam Practice
@@ -51,7 +51,7 @@ export default function Hero() {
                 style={{ fontFamily: "var(--font-display)" }}
                 {...entrance(0.18, -32)}
               >
-                Turn your questions into CBT <span className="italic text-coral-accent">practice</span>.
+                Turn your questions into CBT <span className="italic text-magenta-accent">practice</span>.
               </motion.h1>
             </div>
 

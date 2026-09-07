@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -29,9 +29,15 @@ export default function ExternalNav() {
   const pathname = usePathname();
   const isDark = resolvedTheme === "dark";
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-border bg-bg/80 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-bg/80 backdrop-blur-md">
       <Link
         href="/"
         className="font-mono text-lg font-bold text-text-primary tracking-tight"
@@ -73,7 +79,7 @@ export default function ExternalNav() {
           aria-label="Toggle theme"
           className="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-text-secondary hover:text-text-primary hover:bg-surface transition"
         >
-          {resolvedTheme ? (
+          {mounted ? (
             <HugeiconsIcon icon={isDark ? Sun01Icon : Moon01Icon} size={16} />
           ) : (
             <span className="w-4" />
@@ -88,7 +94,7 @@ export default function ExternalNav() {
           aria-label="Toggle theme"
           className="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-text-secondary hover:text-text-primary hover:bg-surface transition"
         >
-          {resolvedTheme ? (
+          {mounted ? (
             <HugeiconsIcon icon={isDark ? Sun01Icon : Moon01Icon} size={16} />
           ) : (
             <span className="w-4" />
