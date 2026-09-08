@@ -20,7 +20,7 @@ const BREAKDOWN_CARDS = [
 
 export default function AIReviewSection() {
   return (
-    <section className="border-t border-border px-6 py-24">
+    <section className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <div className="grid items-center gap-14 lg:grid-cols-[0.8fr_1.2fr]">
           <FadeUp>

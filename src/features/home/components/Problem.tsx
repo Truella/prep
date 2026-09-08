@@ -12,7 +12,7 @@ export default function Problem() {
               className="text-4xl md:text-5xl leading-tight text-text-primary mb-6"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              You shouldn&apos;t have to build a whole quiz just to <span className="italic text-text-primary">practice</span>.
+              You shouldn&apos;t have to <span className="italic text-text-primary">build</span> a whole quiz just to practice.
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
               You already have the questions. Maybe they&apos;re in a spreadsheet. Maybe they&apos;re from a past paper. Maybe someone sent you a question bank. But turning those questions into an actual CBT usually means copying and pasting hundreds of questions into a form, or dealing with import tools that put limits on how much you can upload. Prep was built to remove that step.

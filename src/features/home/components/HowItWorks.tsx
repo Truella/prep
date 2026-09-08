@@ -12,7 +12,7 @@ const STEPS = [
     number: "01",
     title: "Bring your questions",
     description:
-      "Already have questions? Upload a CSV or add them manually using the quiz builder. No need to recreate your question bank from scratch.",
+      "Start with whatever you've already got — a spreadsheet, a past paper, a bank someone sent you. This part takes minutes, not the afternoon.",
     Mock: BringQuestionsMock,
     wide: true,
     surface: "var(--color-sage-surface)",
@@ -22,7 +22,7 @@ const STEPS = [
     number: "02",
     title: "Make it a real practice test",
     description:
-      "Set your timer, choose your quiz settings, and get a CBT-style experience designed for actually practicing.",
+      "Decide how real it feels. Set the timer, pick your settings, then sit the test like it's exam day.",
     Mock: TimerSettingsMock,
     wide: false,
     surface: "var(--color-coral-surface)",
@@ -32,7 +32,7 @@ const STEPS = [
     number: "03",
     title: "Share it",
     description:
-      "Send one link to your friends, classmates, or study group. They can start taking the quiz without creating an account.",
+      "The moment it leaves your hands. One link and your friends, classmates, or study group are taking the same test — no accounts, no setup.",
     Mock: ShareQuizMock,
     wide: false,
     surface: "var(--color-amber-surface)",
@@ -42,7 +42,7 @@ const STEPS = [
     number: "04",
     title: "Find out what to study",
     description:
-      "See your score and get an AI-powered review of your attempt. Find your weak areas and go into your next attempt knowing what to focus on.",
+      "Where the score becomes a study plan. Prep reads your attempt and tells you exactly what to revisit next.",
     Mock: AIReviewStepMock,
     wide: true,
     surface: "var(--color-sky-surface)",
@@ -56,20 +56,14 @@ export default function HowItWorks() {
       <div className="max-w-6xl mx-auto">
         <FadeUp>
           <h2
-            className="text-4xl md:text-5xl mb-3"
+            className="text-4xl md:text-5xl mb-12"
             style={{
               fontFamily: "var(--font-display)",
               color: "var(--color-text-primary)",
             }}
           >
-            From question bank to <span className="italic text-coral-accent">practice</span> in minutes.
+            From question bank to practice in <span className="italic text-coral-accent">minutes</span>.
           </h2>
-          <p
-            className="text-sm mb-12"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            From your notes to a full practice test in minutes.
-          </p>
         </FadeUp>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">

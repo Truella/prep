@@ -24,7 +24,7 @@ export default function CTASection() {
             className="text-lg mt-3"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Now turn them into practice. Build your first CBT in minutes.
+            Now turn them into practice. Your first quiz is one upload away.
           </p>
         </FadeUp>
         <FadeUp delay={0.1}>

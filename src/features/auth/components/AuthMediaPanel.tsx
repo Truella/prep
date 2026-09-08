@@ -26,7 +26,7 @@ export default function AuthMediaPanel() {
             className="mt-2 text-3xl text-text-primary xl:text-4xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Build a quiz in minutes.
+            Build a quiz without the busywork.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-text-secondary">
             Add questions manually or upload a CSV, then share a ready-to-take practice test.

@@ -5,6 +5,10 @@ export default function CSVImportSection() {
   return (
     <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
+        <div
+          className="rounded-3xl p-8 md:p-14"
+          style={{ backgroundColor: "var(--color-sage-surface)" }}
+        >
         <div className="grid grid-cols-1 lg:grid-cols-[45%_55%] gap-10 md:gap-14 lg:items-center">
           <FadeUp className="flex justify-center lg:justify-start">
             <CSVImportMock />
@@ -23,6 +27,7 @@ export default function CSVImportSection() {
               Generous upload limits, no restrictive row caps like standard form-builder extensions.
             </p>
           </FadeUp>
+        </div>
         </div>
       </div>
     </section>

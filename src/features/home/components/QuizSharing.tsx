@@ -7,7 +7,7 @@ const CARDS = [
   },
   {
     title: "Class",
-    description: "Give your classmates a practice test without making everyone create an account.",
+    description: "Drop a practice test in the class group chat and compare scores before the real thing.",
   },
   {
     title: "Personal",
