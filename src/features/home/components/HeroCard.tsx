@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import DemoQuizOptions from "./DemoQuizOptions";
 
 const DEMO_QUESTIONS = [
   {
@@ -40,8 +41,6 @@ const DEMO_QUESTIONS = [
     correct: 2,
   },
 ];
-
-const OPTION_LABELS = ["A", "B", "C", "D"];
 
 export default function HeroCard() {
   const [index, setIndex] = useState(0);
@@ -146,57 +145,13 @@ export default function HeroCard() {
             </motion.div>
 
             {/* Options — slide in one by one */}
-            <div className="space-y-2 mt-5">
-              {q.options.map((option, i) => {
-                const isCorrect = i === q.correct;
-                const isHighlighted = highlightedAnswer !== null && isCorrect;
-
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      backgroundColor: isHighlighted
-                        ? "var(--color-magenta-surface)"
-                        : "var(--color-surface-raised)",
-                      borderColor: isHighlighted
-                        ? "var(--color-magenta-accent)"
-                        : "var(--color-border)",
-                    }}
-                    transition={{
-                      duration: staggerDuration,
-                      ease: "easeOut",
-                      delay: 0.24 + i * 0.08,
-                    }}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm"
-                  >
-                    <span
-                      className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold font-mono"
-                      style={{
-                        backgroundColor: isHighlighted
-                          ? "var(--color-magenta-accent)"
-                          : "var(--color-border)",
-                        color: isHighlighted
-                          ? "var(--color-bg)"
-                          : "var(--color-text-secondary)",
-                      }}
-                    >
-                      {OPTION_LABELS[i]}
-                    </span>
-                    <span
-                      style={{
-                        color: isHighlighted
-                          ? "var(--color-text-primary)"
-                          : "var(--color-text-secondary)",
-                      }}
-                    >
-                      {option}
-                    </span>
-                  </motion.div>
-                );
-              })}
+            <div className="mt-5">
+              <DemoQuizOptions
+                options={q.options}
+                highlightedIndex={highlightedAnswer}
+                tone="hero"
+                staggerEntrance
+              />
             </div>
           </motion.div>
         </AnimatePresence>

@@ -139,7 +139,7 @@ export default function QuizReview({
 										className={`flex items-start gap-3 p-3 rounded-lg border ${bgColor} ${borderColor}`}
 									>
 										<span
-									className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center font-semibold text-sm ${
+									className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-semibold text-sm ${
 											isCorrectAnswer
 												? "bg-correct/15 text-correct"
 												: isUserAnswer

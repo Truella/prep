@@ -47,7 +47,7 @@ export default function QuestionCard({
 						>
 							<div className="flex items-start gap-3">
 								<span
-									className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-semibold ${
+									className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
 										isSelected
 											? "bg-text-primary text-bg"
 											: "bg-surface-raised text-text-secondary"

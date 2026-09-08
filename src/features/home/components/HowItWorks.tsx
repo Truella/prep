@@ -56,13 +56,13 @@ export default function HowItWorks() {
       <div className="max-w-6xl mx-auto">
         <FadeUp>
           <h2
-            className="text-3xl md:text-4xl mb-3"
+            className="text-4xl md:text-5xl mb-3"
             style={{
               fontFamily: "var(--font-display)",
               color: "var(--color-text-primary)",
             }}
           >
-            From question bank to <span className="italic text-text-primary">practice</span> in minutes.
+            From question bank to <span className="italic text-coral-accent">practice</span> in minutes.
           </h2>
           <p
             className="text-sm mb-12"
@@ -72,17 +72,19 @@ export default function HowItWorks() {
           </p>
         </FadeUp>
 
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
           {STEPS.map((step, i) => {
             const Mock = step.Mock;
             return (
               <FadeUp
                 key={step.number}
                 delay={i * 0.08}
-                className={`h-full ${step.wide ? "md:col-span-4" : "md:col-span-2"}`}
+                className={`h-full ${step.wide ? "md:col-span-7" : "md:col-span-5"}`}
               >
                 <div
-                  className="h-full rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6"
+                  className={`h-full rounded-3xl p-6 md:p-8 flex gap-6 ${
+                    step.wide ? "flex-col md:flex-row md:items-center" : "flex-col"
+                  }`}
                   style={{
                     backgroundColor: step.surface,
                   }}
