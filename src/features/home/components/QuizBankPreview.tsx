@@ -67,7 +67,7 @@ export default function QuizBankPreview() {
 							className="text-sm"
 							style={{ color: "var(--color-text-secondary)" }}
 						>
-							Browse quizzes shared by other Prep users and find something to practice.
+							Browse quizzes that other Prep users have shared publicly and find something to practice.
 						</p>
 					</div>
 					<Link

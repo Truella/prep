@@ -16,10 +16,10 @@ export default function CBTExperienceSection() {
               className="text-4xl md:text-5xl leading-tight text-text-primary mb-6"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Practice the way you&apos;ll actually be <span className="italic text-coral-accent">tested</span>.
+              Sit down and take the test.
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed max-w-2xl mx-auto">
-              Google Forms is great for collecting responses. Prep is built for practicing exams. Use a countdown timer, move through questions, submit your attempt, and see your results when you&apos;re done.
+              Prep gives you the parts that matter when you&apos;re practicing for a CBT: your questions, a timer, clear answer choices, and a simple way to move through the test and submit it when you&apos;re finished.
             </p>
             <div className="mt-12">
               <CBTExperienceMock />

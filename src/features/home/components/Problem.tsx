@@ -12,11 +12,19 @@ export default function Problem() {
               className="text-4xl md:text-5xl leading-tight text-text-primary mb-6"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              You shouldn&apos;t have to <span className="italic text-text-primary">build</span> a whole quiz just to practice.
+              I already had the questions. Getting them into a CBT was the problem.
             </h2>
-            <p className="text-lg text-text-secondary leading-relaxed">
-              You already have the questions. Maybe they&apos;re in a spreadsheet. Maybe they&apos;re from a past paper. Maybe someone sent you a question bank. But turning those questions into an actual CBT usually means copying and pasting hundreds of questions into a form, or dealing with import tools that put limits on how much you can upload. Prep was built to remove that step.
-            </p>
+            <div className="space-y-4 text-lg text-text-secondary leading-relaxed">
+              <p>
+                I was preparing for CBT exams and already had questions from past papers and question banks. I wanted to practice with them in an actual CBT format, so I tried using Google Forms. The problem was getting hundreds of questions and answers into a usable quiz without typing everything by hand.
+              </p>
+              <p>
+                I found tools that could import questions from CSV, but the free plans came with limits that made them difficult to use for a large question bank.
+              </p>
+              <p className="text-text-primary">
+                So I built Prep.
+              </p>
+            </div>
           </div>
 
           {/* Visual Panel (approx 45%) */}

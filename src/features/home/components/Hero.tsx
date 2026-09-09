@@ -59,7 +59,7 @@ export default function Hero() {
               className="text-lg leading-relaxed max-w-lg text-text-secondary"
               {...entrance(0.34, -24)}
             >
-              Upload your questions, build a quiz, and practice like it&apos;s the real exam. When you&apos;re done, Prep shows you what you know, what you&apos;re missing, and what to study next.
+              Upload your questions, build a quiz, and practice with it like a real CBT. When you&apos;re done, Prep shows you what you got right, where you struggled, and what to study next.
             </motion.p>
 
             <motion.div

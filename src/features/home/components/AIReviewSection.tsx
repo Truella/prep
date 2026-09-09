@@ -10,7 +10,7 @@ const BREAKDOWN_CARDS = [
   },
   {
     title: "Where you're struggling",
-    description: "Identify the topics behind the questions you're getting wrong.",
+    description: "Find the topics behind the questions you're getting wrong.",
   },
   {
     title: "What to study next",
@@ -31,13 +31,13 @@ export default function AIReviewSection() {
               className="mt-3 text-3xl md:text-4xl leading-tight text-text-primary"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              A score tells you how you did. We help you figure out{" "}
-              <span className="italic text-sky-accent">why</span>.
+              A score tells you how you did. The review tells you what to do next.
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-text-secondary">
-              Finishing with 64% doesn&apos;t tell you what to do tomorrow.
-              Prep&apos;s AI review looks at the questions you answered and the
-              answers you selected to identify patterns in your performance.
+              Getting 26 out of 40 tells you how you performed. It doesn&apos;t tell you what to study tomorrow.
+            </p>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-text-secondary">
+              After an attempt, Prep looks at the questions you answered and the answers you selected to identify the areas you&apos;re doing well in and the ones you need to revisit.
             </p>
           </FadeUp>
           <FadeUp delay={0.1} className="flex justify-center lg:justify-end">

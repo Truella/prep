@@ -41,12 +41,12 @@ export default function TimerSettingsMock() {
         <div className="space-y-2 pt-2 border-t border-border">
           <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Visibility</span>
           <div className="flex flex-col gap-2">
-            <div className={`p-2 rounded border flex items-center gap-2 transition-colors duration-300 ${phase < 2 ? 'border-coral-accent bg-coral-surface' : 'border-border bg-surface'}`}>
-              <div className={`w-3 h-3 rounded-full border ${phase < 2 ? 'border-coral-accent bg-coral-accent' : 'border-border'}`} />
+            <div className={`p-2 rounded border flex items-center gap-2 transition-colors duration-300 ${phase < 2 ? 'border-amber-accent bg-amber-surface' : 'border-border bg-surface'}`}>
+              <div className={`w-3 h-3 rounded-full border ${phase < 2 ? 'border-amber-accent bg-amber-accent' : 'border-border'}`} />
               <div className="text-xs font-medium">Private</div>
             </div>
-            <div className={`p-2 rounded border flex items-center gap-2 transition-colors duration-300 ${phase >= 2 ? 'border-coral-accent bg-coral-surface' : 'border-border bg-surface'}`}>
-              <div className={`w-3 h-3 rounded-full border ${phase >= 2 ? 'border-coral-accent bg-coral-accent' : 'border-border'}`} />
+            <div className={`p-2 rounded border flex items-center gap-2 transition-colors duration-300 ${phase >= 2 ? 'border-amber-accent bg-amber-surface' : 'border-border bg-surface'}`}>
+              <div className={`w-3 h-3 rounded-full border ${phase >= 2 ? 'border-amber-accent bg-amber-accent' : 'border-border'}`} />
               <div className="text-xs font-medium">Public</div>
             </div>
           </div>

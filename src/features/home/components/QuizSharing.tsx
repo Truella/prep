@@ -24,13 +24,10 @@ export default function QuizSharing() {
             className="text-3xl md:text-4xl leading-tight text-text-primary mb-4"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            One quiz. One link. Everyone can{" "}
-            <span className="italic text-amber-accent">practice</span>.
+            Made a quiz for your class or study group?
           </h2>
           <p className="text-base text-text-secondary leading-relaxed">
-            Create a quiz once and send it wherever you want. Make it public for
-            anyone to discover, or keep it private and share it with only the
-            people you choose.
+            Share one link and let everyone practice the same questions. Quizzes can be public or private, and people taking a quiz don&apos;t need an account.
           </p>
         </FadeUp>
 

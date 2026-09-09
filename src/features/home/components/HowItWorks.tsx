@@ -4,15 +4,15 @@ import Link from "next/link";
 import FadeUp from "@/shared/components/FadeUp";
 import BringQuestionsMock from "./how-it-works-mocks/BringQuestionsMock";
 import TimerSettingsMock from "./how-it-works-mocks/TimerSettingsMock";
-import ShareQuizMock from "./how-it-works-mocks/ShareQuizMock";
+import TakeQuizStepMock from "./how-it-works-mocks/TakeQuizStepMock";
 import AIReviewStepMock from "./how-it-works-mocks/AIReviewStepMock";
 
 const STEPS = [
   {
     number: "01",
-    title: "Bring your questions",
+    title: "Add your questions",
     description:
-      "Start with whatever you've already got — a spreadsheet, a past paper, a bank someone sent you. This part takes minutes, not the afternoon.",
+      "Upload a CSV question bank or add your questions manually.",
     Mock: BringQuestionsMock,
     wide: true,
     surface: "var(--color-sage-surface)",
@@ -20,29 +20,29 @@ const STEPS = [
   },
   {
     number: "02",
-    title: "Make it a real practice test",
+    title: "Set your test",
     description:
-      "Decide how real it feels. Set the timer, pick your settings, then sit the test like it's exam day.",
+      "Choose how you want to practice. Set a timer, control who can access the quiz, and configure the options before you start.",
     Mock: TimerSettingsMock,
-    wide: false,
-    surface: "var(--color-coral-surface)",
-    accent: "var(--color-coral-accent)",
-  },
-  {
-    number: "03",
-    title: "Share it",
-    description:
-      "The moment it leaves your hands. One link and your friends, classmates, or study group are taking the same test — no accounts, no setup.",
-    Mock: ShareQuizMock,
     wide: false,
     surface: "var(--color-amber-surface)",
     accent: "var(--color-amber-accent)",
   },
   {
-    number: "04",
-    title: "Find out what to study",
+    number: "03",
+    title: "Take the CBT",
     description:
-      "Where the score becomes a study plan. Prep reads your attempt and tells you exactly what to revisit next.",
+      "Work through your questions with a timer and submit when you're done.",
+    Mock: TakeQuizStepMock,
+    wide: false,
+    surface: "var(--color-coral-surface)",
+    accent: "var(--color-coral-accent)",
+  },
+  {
+    number: "04",
+    title: "Review your result",
+    description:
+      "See your score, understand where you struggled, and get areas to revisit before your next attempt.",
     Mock: AIReviewStepMock,
     wide: true,
     surface: "var(--color-sky-surface)",
@@ -62,7 +62,7 @@ export default function HowItWorks() {
               color: "var(--color-text-primary)",
             }}
           >
-            From question bank to practice in <span className="italic text-coral-accent">minutes</span>.
+            Bring your questions. Prep handles the rest.
           </h2>
         </FadeUp>
 

@@ -195,7 +195,7 @@ function ReviewCard({
       <p className="text-xs font-semibold uppercase tracking-widest text-sky-accent">
         Your AI review
       </p>
-      <h3 className="mt-3 text-xl font-semibold text-text-primary">Focus your next session</h3>
+      <h3 className="mt-3 text-xl font-semibold text-text-primary">What to study next</h3>
       <div className="mt-6 space-y-4">
         {dataset.reviewPoints.map((point, index) => (
           <motion.div
