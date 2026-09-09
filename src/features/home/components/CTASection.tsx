@@ -3,13 +3,15 @@
 import Link from "next/link";
 import FadeUp from "@/shared/components/FadeUp";
 import SectionHeading from "./SectionHeading";
+import HeroIconField from "./HeroIconField";
 
 export default function CTASection() {
   return (
     <section
-      className="py-24 px-6"
+      className="relative overflow-hidden py-24 px-6"
     >
-      <div className="max-w-2xl mx-auto text-center space-y-6">
+      <HeroIconField sparse />
+      <div className="relative z-10 max-w-2xl mx-auto text-center space-y-6">
         <FadeUp>
           <SectionHeading accent="sage" className="text-4xl md:text-5xl">
             You already have the <em>questions.</em>

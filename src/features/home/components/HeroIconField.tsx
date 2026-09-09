@@ -49,13 +49,18 @@ const FIELD_ICONS: FieldIcon[] = [
   { label: "Plus", icon: PlusSignIcon, colorClass: "text-teal-accent", size: 38, opacity: 0.2, rotate: "-6deg", position: { bottom: "6%", right: "32%" } },
 ];
 
-export default function HeroIconField() {
+export default function HeroIconField({ sparse = false }: { sparse?: boolean }) {
+  const icons = sparse
+    ? FIELD_ICONS.filter((icon) =>
+        ["Clock", "Question", "Checklist", "Checkmark circle alt", "Timer", "File upload"].includes(icon.label),
+      ).map((icon) => ({ ...icon, opacity: Math.min(icon.opacity, 0.12) }))
+    : FIELD_ICONS;
   return (
     <div
       aria-hidden="true"
       className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
     >
-      {FIELD_ICONS.map(({ label, icon, colorClass, size, opacity, rotate, position }) => (
+      {icons.map(({ label, icon, colorClass, size, opacity, rotate, position }) => (
         <div
           key={label}
           className={`absolute ${colorClass}`}
