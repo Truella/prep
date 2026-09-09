@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "./SectionHeading";
 import BringQuestionsMock from "./how-it-works-mocks/BringQuestionsMock";
 import TimerSettingsMock from "./how-it-works-mocks/TimerSettingsMock";
 import TakeQuizStepMock from "./how-it-works-mocks/TakeQuizStepMock";
@@ -55,15 +56,11 @@ export default function HowItWorks() {
     <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <FadeUp>
-          <h2
-            className="text-4xl md:text-5xl mb-12"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--color-text-primary)",
-            }}
-          >
-            Bring your questions. Prep handles the rest.
-          </h2>
+          <div className="mb-12">
+            <SectionHeading accent="sage" className="text-4xl md:text-5xl leading-tight">
+              Bring your questions. Prep handles the <em>rest.</em>
+            </SectionHeading>
+          </div>
         </FadeUp>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">

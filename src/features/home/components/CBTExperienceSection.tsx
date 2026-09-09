@@ -1,4 +1,5 @@
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "./SectionHeading";
 import CBTExperienceMock from "./CBTExperienceMock";
 
 export default function CBTExperienceSection() {
@@ -12,12 +13,9 @@ export default function CBTExperienceSection() {
               backgroundColor: "var(--color-coral-surface)",
             }}
           >
-            <h2
-              className="text-4xl md:text-5xl leading-tight text-text-primary mb-6"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Sit down and take the test.
-            </h2>
+            <SectionHeading accent="coral" className="text-4xl md:text-5xl leading-tight mb-6">
+              Sit down and take the <em>test.</em>
+            </SectionHeading>
             <p className="text-lg text-text-secondary leading-relaxed max-w-2xl mx-auto">
               Prep gives you the parts that matter when you&apos;re practicing for a CBT: your questions, a timer, clear answer choices, and a simple way to move through the test and submit it when you&apos;re finished.
             </p>

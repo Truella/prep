@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "./SectionHeading";
 
 export default function CTASection() {
   return (
@@ -10,16 +11,9 @@ export default function CTASection() {
     >
       <div className="max-w-2xl mx-auto text-center space-y-6">
         <FadeUp>
-          <h2
-            className="text-4xl md:text-5xl"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--color-text-primary)",
-            }}
-          >
-            You already have the{" "}
-            <span className="italic text-text-primary">questions</span>.
-          </h2>
+          <SectionHeading accent="sage" className="text-4xl md:text-5xl">
+            You already have the <em>questions.</em>
+          </SectionHeading>
           <p
             className="text-lg mt-3"
             style={{ color: "var(--color-text-secondary)" }}

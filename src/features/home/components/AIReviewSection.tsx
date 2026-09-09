@@ -1,6 +1,7 @@
 "use client";
 
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "./SectionHeading";
 import AIReviewMock from "./AIReviewMock";
 
 const BREAKDOWN_CARDS = [
@@ -24,15 +25,13 @@ export default function AIReviewSection() {
       <div className="mx-auto max-w-6xl">
         <div className="grid items-center gap-14 lg:grid-cols-[0.8fr_1.2fr]">
           <FadeUp>
-            <p className="text-xs font-semibold uppercase tracking-widest text-sky-accent">
-              After every attempt
-            </p>
-            <h2
-              className="mt-3 text-3xl md:text-4xl leading-tight text-text-primary"
-              style={{ fontFamily: "var(--font-display)" }}
+            <SectionHeading
+              accent="sky"
+              eyebrow="After every attempt"
+              className="mt-3 text-3xl md:text-4xl leading-tight"
             >
-              A score tells you how you did. The review tells you what to do next.
-            </h2>
+              A score tells you how you did. The review tells you what to do <em>next.</em>
+            </SectionHeading>
             <p className="mt-5 max-w-md text-base leading-relaxed text-text-secondary">
               Getting 26 out of 40 tells you how you performed. It doesn&apos;t tell you what to study tomorrow.
             </p>

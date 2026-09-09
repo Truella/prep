@@ -159,6 +159,12 @@ body {
   font-variation-settings: "SOFT" 0, "WONK" 1;
 }
 
+/* Section headings: <em> marks the single accent word */
+.section-heading em {
+  color: var(--heading-accent, var(--color-text-primary));
+  font-style: italic;
+}
+
 .auth-input:-webkit-autofill,
 .auth-input:-webkit-autofill:hover,
 .auth-input:-webkit-autofill:focus {

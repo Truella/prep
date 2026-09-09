@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useState, useEffect } from "react";
 import { getAttemptCounts } from "@/features/quiz-bank/utils/attempts";
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "@/features/home/components/SectionHeading";
 import QuizBankCard from "@/features/quiz-bank/components/QuizBankCard";
 import type { PublicQuiz } from "@/lib/types";
 
@@ -54,15 +55,9 @@ export default function QuizBankPreview() {
 			<div className="max-w-6xl mx-auto">
 				<FadeUp className="flex items-end justify-between mb-10">
 					<div>
-						<h2
-							className="text-3xl md:text-4xl leading-tight mb-2"
-							style={{
-								fontFamily: "var(--font-display)",
-								color: "var(--color-text-primary)",
-							}}
-						>
-							Don&apos;t have questions yet? Start with someone else&apos;s.
-						</h2>
+						<SectionHeading accent="amber" className="text-3xl md:text-4xl leading-tight mb-2">
+							Don&apos;t have questions yet? Start with someone <em>else&apos;s.</em>
+						</SectionHeading>
 						<p
 							className="text-sm"
 							style={{ color: "var(--color-text-secondary)" }}

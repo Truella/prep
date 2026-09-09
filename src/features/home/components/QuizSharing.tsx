@@ -1,4 +1,5 @@
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "./SectionHeading";
 
 const CARDS = [
   {
@@ -20,12 +21,9 @@ export default function QuizSharing() {
     <section className="py-16 px-6">
       <div className="max-w-6xl mx-auto">
         <FadeUp className="max-w-2xl">
-          <h2
-            className="text-3xl md:text-4xl leading-tight text-text-primary mb-4"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            Made a quiz for your class or study group?
-          </h2>
+          <SectionHeading accent="amber" className="text-3xl md:text-4xl leading-tight mb-4">
+            Made a quiz for your class or study <em>group?</em>
+          </SectionHeading>
           <p className="text-base text-text-secondary leading-relaxed">
             Share one link and let everyone practice the same questions. Quizzes can be public or private, and people taking a quiz don&apos;t need an account.
           </p>

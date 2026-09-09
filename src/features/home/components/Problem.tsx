@@ -1,5 +1,6 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import SectionHeading from "./SectionHeading";
 
 export default function Problem() {
   return (
@@ -8,12 +9,9 @@ export default function Problem() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Text Panel (approx 55%) */}
           <div className="lg:col-span-7 bg-surface rounded-3xl p-8 md:p-12 flex flex-col justify-center">
-            <h2 
-              className="text-4xl md:text-5xl leading-tight text-text-primary mb-6"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              I already had the questions. Getting them into a CBT was the problem.
-            </h2>
+            <SectionHeading accent="neutral" className="text-4xl md:text-5xl leading-tight mb-6">
+              I already had the questions. Getting them into a CBT was the <em>problem.</em>
+            </SectionHeading>
             <div className="space-y-4 text-lg text-text-secondary leading-relaxed">
               <p>
                 I was preparing for CBT exams and already had questions from past papers and question banks. I wanted to practice with them in an actual CBT format, so I tried using Google Forms. The problem was getting hundreds of questions and answers into a usable quiz without typing everything by hand.

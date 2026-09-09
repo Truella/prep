@@ -2,6 +2,7 @@
 
 import Accordion, { type AccordionItem } from "@/shared/components/Accordion";
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "./SectionHeading";
 
 const FAQ_ITEMS: AccordionItem[] = [
   {
@@ -56,12 +57,9 @@ export default function FAQSection() {
     <section className="px-6 py-24">
       <div className="mx-auto max-w-3xl">
         <FadeUp>
-          <h2
-            className="text-3xl text-text-primary"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            Questions, answered.
-          </h2>
+          <SectionHeading accent="teal" className="text-3xl">
+            Questions, <em>answered.</em>
+          </SectionHeading>
           <p className="mb-10 mt-3 text-sm text-text-secondary">
             What to know before creating or taking your first quiz.
           </p>
