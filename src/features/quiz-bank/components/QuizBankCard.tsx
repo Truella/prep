@@ -5,11 +5,9 @@ import type { PublicQuiz } from "@/lib/types";
 import { DIFFICULTY_STYLES } from "@/features/quiz-bank/constants/quizBank";
 
 export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
-  const stars = Math.round(quiz.average_rating ?? 0);
-
   return (
     <div
-      className="group rounded-2xl p-5 space-y-4 flex flex-col transition-all duration-150 hover:scale-[1.02]"
+      className="group rounded-2xl p-5 space-y-4 flex flex-col transition-all duration-150 hover:scale-[1.02] border"
       style={{
         backgroundColor: "var(--color-surface)",
         borderColor: "var(--color-border)",
@@ -57,16 +55,12 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
       </div>
 
       <div
-        className="flex items-center justify-between text-xs pt-2 border-t"
+        className="flex items-center text-xs pt-2 border-t"
         style={{
           borderColor: "var(--color-border)",
           color: "var(--color-text-secondary)",
         }}
       >
-        <span>
-          {"★".repeat(stars)}{"☆".repeat(5 - stars)}{" "}
-          {quiz.average_rating !== null ? quiz.average_rating.toFixed(1) : "—"}
-        </span>
         <span>{quiz.times_taken.toLocaleString("en-US")} taken</span>
       </div>
 

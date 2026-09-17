@@ -3,6 +3,8 @@
 import { SORT_OPTIONS, DIFFICULTY_OPTIONS } from "@/features/quiz-bank/constants/quizBank";
 import type { SortOption } from "@/features/quiz-bank/constants/quizBank";
 import type { QuizCategory, QuizDifficulty } from "@/lib/types";
+import Dropdown from "@/shared/ui/Dropdown";
+import { QUIZ_CATEGORIES } from "@/lib/types";
 
 interface QuizBankFiltersProps {
   category: QuizCategory | null;
@@ -40,70 +42,32 @@ export default function QuizBankFilters({
         }}
       />
 
-      <select
-        aria-label="Filter by category"
+      <Dropdown
+        ariaLabel="Filter by category"
         value={category ?? ""}
-        onChange={(e) =>
-          onCategoryChange((e.target.value as QuizCategory) || null)
-        }
-        className="px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
-        style={{
-          backgroundColor: "var(--color-surface)",
-          border: "1px solid var(--color-border)",
-          color: "var(--color-text-primary)",
-        }}
-      >
-        <option value="">All Categories</option>
-        <option value="General Knowledge">General Knowledge</option>
-        <option value="Science">Science</option>
-        <option value="History">History</option>
-        <option value="Mathematics">Mathematics</option>
-        <option value="Language & Literature">Language & Literature</option>
-        <option value="Technology">Technology</option>
-        <option value="Arts & Culture">Arts & Culture</option>
-        <option value="Geography">Geography</option>
-        <option value="Health & Medicine">Health & Medicine</option>
-        <option value="Business & Economics">Business & Economics</option>
-      </select>
+        onChange={(v) => onCategoryChange((v as QuizCategory) || null)}
+        options={[{ value: "", label: "All Categories" }, ...QUIZ_CATEGORIES.map((c) => ({ value: c, label: c }))]}
+        placeholder="All Categories"
+        className="min-w-[170px]"
+      />
 
-      <select
-        aria-label="Filter by difficulty"
+      <Dropdown
+        ariaLabel="Filter by difficulty"
         value={difficulty ?? ""}
-        onChange={(e) =>
-          onDifficultyChange((e.target.value as QuizDifficulty) || null)
-        }
-        className="flex-1 min-w-[150px] px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
-        style={{
-          backgroundColor: "var(--color-surface)",
-          border: "1px solid var(--color-border)",
-          color: "var(--color-text-primary)",
-        }}
-      >
-        <option value="">All Difficulties</option>
-        {DIFFICULTY_OPTIONS.map((d: QuizDifficulty) => (
-          <option key={d} value={d}>
-            {d}
-          </option>
-        ))}
-      </select>
+        onChange={(v) => onDifficultyChange((v as QuizDifficulty) || null)}
+        options={[{ value: "", label: "All Difficulties" }, ...DIFFICULTY_OPTIONS.map((d) => ({ value: d as string, label: d as string }))]}
+        placeholder="All Difficulties"
+        className="flex-1 min-w-[150px]"
+      />
 
-      <select
-        aria-label="Sort quizzes"
+      <Dropdown
+        ariaLabel="Sort quizzes"
         value={sort}
-        onChange={(e) => onSortChange(e.target.value as SortOption)}
-        className="flex-1 min-w-[150px] px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
-        style={{
-          backgroundColor: "var(--color-surface)",
-          border: "1px solid var(--color-border)",
-          color: "var(--color-text-primary)",
-        }}
-      >
-        {SORT_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        onChange={(v) => onSortChange(v as SortOption)}
+        options={SORT_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
+        placeholder="Sort"
+        className="flex-1 min-w-[150px]"
+      />
     </div>
   );
 }

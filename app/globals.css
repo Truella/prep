@@ -189,6 +189,26 @@ body {
   animation: tooltip-in 0.15s ease-out forwards;
 }
 
+/* Thin themed scrollbar — used by custom Dropdowns */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
 /* Overlay fade */
 @keyframes overlay-in {
   from { opacity: 0; }
