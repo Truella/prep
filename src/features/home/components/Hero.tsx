@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import HeroCard from "./HeroCard";
 import HeroIconField from "./HeroIconField";
+import TakeQuizModal from "./TakeQuizModal";
 
 export default function Hero() {
+  const [takeOpen, setTakeOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const entrance = (delay: number, x = 0, y = 0) => ({
     initial: {
@@ -72,12 +75,13 @@ export default function Hero() {
               >
                 Create a quiz
               </Link>
-              <Link
-                href="/take"
+              <button
+                type="button"
+                onClick={() => setTakeOpen(true)}
                 className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm border border-border text-text-primary transition hover:bg-surface"
               >
                 Take a quiz
-              </Link>
+              </button>
             </motion.div>
 
             <motion.p
@@ -97,6 +101,7 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
+      <TakeQuizModal isOpen={takeOpen} onClose={() => setTakeOpen(false)} />
     </section>
   );
 }

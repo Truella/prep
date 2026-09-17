@@ -25,14 +25,14 @@ export default function QuizBankFilters({
   onSortChange,
   onSearchChange,
 }: QuizBankFiltersProps) {
-  return (
+    return (
     <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
       <input
         type="text"
         placeholder="Search quizzes..."
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="flex-1 sm:w-64 px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
+        className="w-full sm:w-56 sm:flex-none px-4 py-2.5 rounded-xl text-sm focus:outline-none transition shrink-0"
         style={{
           backgroundColor: "var(--color-surface)",
           border: "1px solid var(--color-border)",
@@ -72,7 +72,7 @@ export default function QuizBankFilters({
         onChange={(e) =>
           onDifficultyChange((e.target.value as QuizDifficulty) || null)
         }
-        className="px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
+        className="flex-1 min-w-[150px] px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
         style={{
           backgroundColor: "var(--color-surface)",
           border: "1px solid var(--color-border)",
@@ -91,7 +91,7 @@ export default function QuizBankFilters({
         aria-label="Sort quizzes"
         value={sort}
         onChange={(e) => onSortChange(e.target.value as SortOption)}
-        className="px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
+        className="flex-1 min-w-[150px] px-4 py-2.5 rounded-xl text-sm focus:outline-none transition"
         style={{
           backgroundColor: "var(--color-surface)",
           border: "1px solid var(--color-border)",

@@ -13,7 +13,6 @@ import {
 import { useTheme } from "@/lib/theme";
 
 const NAV_LINKS = [
-  { href: "/take", label: "Take a Quiz" },
   { href: "/quiz-bank", label: "Quiz Bank" },
   { href: "/docs/getting-started", label: "Docs" },
 ];

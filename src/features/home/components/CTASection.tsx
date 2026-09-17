@@ -36,14 +36,14 @@ export default function CTASection() {
               Create a quiz
             </Link>
             <Link
-              href="/take"
+              href="/quiz-bank"
               className="px-8 py-4 rounded-xl font-semibold border transition-all hover:bg-[var(--color-surface)]"
               style={{
                 borderColor: "var(--color-border)",
                 color: "var(--color-text-primary)",
               }}
             >
-              Take a quiz
+              Browse quizzes
             </Link>
           </div>
         </FadeUp>
