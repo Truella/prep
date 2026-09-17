@@ -17,9 +17,11 @@ import {
 function ResultsCard({
   dataset,
   showCursor = false,
+  scale = 1,
 }: {
   dataset: AIReviewMockDataset;
   showCursor?: boolean;
+  scale?: number;
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -39,10 +41,15 @@ function ResultsCard({
 
     const cursorRect = cursor.getBoundingClientRect();
     const buttonRect = button.getBoundingClientRect();
+    // When the mock is rendered inside a CSS `scale(...)` wrapper (e.g. How It Works
+    // step 04 uses `scale-[0.6]` to fit a 512px design into a 320px card), the
+    // rect delta is already scaled, but the motion `x`/`y` transform we animate
+    // is itself inside the scaled container so it gets scaled again visually.
+    // Compensate by dividing the measured delta by the wrapper scale.
     const targetX =
-      buttonRect.left + buttonRect.width / 2 - (cursorRect.left + cursorRect.width / 2);
+      (buttonRect.left + buttonRect.width / 2 - (cursorRect.left + cursorRect.width / 2)) / scale;
     const targetY =
-      buttonRect.top + buttonRect.height / 2 - (cursorRect.top + cursorRect.height / 2);
+      (buttonRect.top + buttonRect.height / 2 - (cursorRect.top + cursorRect.height / 2)) / scale;
 
     const travelX = animate(cursorX, targetX, { duration: 0.65, ease: "easeInOut" });
     const travelY = animate(cursorY, targetY, { duration: 0.65, ease: "easeInOut" });
@@ -90,6 +97,7 @@ function ResultsCard({
     rippleOpacity,
     rippleScale,
     showCursor,
+    scale,
   ]);
 
   return (
@@ -222,7 +230,7 @@ function ReviewCard({
   );
 }
 
-export default function AIReviewMock() {
+export default function AIReviewMock({ scale = 1 }: { scale?: number } = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
   const [phase, setPhase] = useState(0);
@@ -288,8 +296,8 @@ export default function AIReviewMock() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.45 }}
                 >
-                  {phase === 0 && <ResultsCard dataset={dataset} />}
-                  {phase === 1 && <ResultsCard dataset={dataset} showCursor />}
+                  {phase === 0 && <ResultsCard dataset={dataset} scale={scale} />}
+                  {phase === 1 && <ResultsCard dataset={dataset} showCursor scale={scale} />}
                   {phase === 2 && <AnalyzingCard dataset={dataset} />}
                   {phase === 3 && <ReviewCard dataset={dataset} />}
                 </motion.div>

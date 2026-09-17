@@ -33,9 +33,6 @@ export default function AIReviewSection() {
               A score tells you how you did. The review tells you what to do <em>next.</em>
             </SectionHeading>
             <p className="mt-5 max-w-md text-base leading-relaxed text-text-secondary">
-              Getting 26 out of 40 tells you how you performed. It doesn&apos;t tell you what to study tomorrow.
-            </p>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-text-secondary">
               After an attempt, Prep looks at the questions you answered and the answers you selected to identify the areas you&apos;re doing well in and the ones you need to revisit.
             </p>
           </FadeUp>

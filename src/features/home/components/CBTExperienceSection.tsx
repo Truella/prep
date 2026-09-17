@@ -17,7 +17,7 @@ export default function CBTExperienceSection() {
               Sit down and take the <em>test.</em>
             </SectionHeading>
             <p className="text-lg text-text-secondary leading-relaxed max-w-2xl mx-auto">
-              Prep gives you the parts that matter when you&apos;re practicing for a CBT: your questions, a timer, clear answer choices, and a simple way to move through the test and submit it when you&apos;re finished.
+              Once your questions are in Prep, you get a CBT-style environment to take the test. Set a timer, work through your questions, select your answers, and submit when you&apos;re finished.
             </p>
             <div className="mt-12">
               <CBTExperienceMock />
