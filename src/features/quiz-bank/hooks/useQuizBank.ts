@@ -15,7 +15,7 @@ async function fetchPublicQuizzes(filters: Filters): Promise<PublicQuiz[]> {
   let query = supabase
     .from("quizzes")
     .select(
-      "id, title, description, category, difficulty, times_taken, average_rating, created_at"
+      "id, title, description, category, difficulty, times_taken, average_rating, created_at, time_limit"
     )
     .eq("visibility", "public")
     .eq("status", "published");
@@ -40,7 +40,23 @@ async function fetchPublicQuizzes(filters: Filters): Promise<PublicQuiz[]> {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data ?? [];
+  const quizzes = (data ?? []) as PublicQuiz[];
+
+  // Enrich with question counts (live DB doesn't have a stored count column)
+  if (quizzes.length > 0) {
+    const ids = quizzes.map((q) => q.id);
+    const { data: questions } = await supabase
+      .from("questions")
+      .select("quiz_id")
+      .in("quiz_id", ids);
+    const counts: Record<string, number> = {};
+    (questions ?? []).forEach((row: { quiz_id: string }) => {
+      counts[row.quiz_id] = (counts[row.quiz_id] ?? 0) + 1;
+    });
+    return quizzes.map((q) => ({ ...q, question_count: counts[q.id] ?? 0 }));
+  }
+
+  return quizzes;
 }
 
 export function useQuizBank() {
