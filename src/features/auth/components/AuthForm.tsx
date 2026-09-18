@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import toast from "react-hot-toast";
@@ -9,10 +10,22 @@ import { SupabaseError } from "@/lib/types";
 export default function AuthForm() {
   const { signUp, signIn } = useAuth();
   const reducedMotion = useReducedMotion();
-  const [isSignup, setIsSignup] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isSignup, setIsSignup] = useState(() => searchParams.get("mode") === "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setIsSignup(searchParams.get("mode") === "signup");
+  }, [searchParams]);
+
+  const toggleMode = () => {
+    const next = !isSignup;
+    setIsSignup(next);
+    router.push(`/auth?mode=${next ? "signup" : "signin"}`, { scroll: false });
+  };
   const entrance = (delay: number) => ({
     initial: { opacity: 0, x: reducedMotion ? 0 : 20 },
     animate: { opacity: 1, x: 0 },
@@ -172,7 +185,7 @@ export default function AuthForm() {
 
       <motion.button
         type="button"
-        onClick={() => setIsSignup((v) => !v)}
+        onClick={toggleMode}
         className="w-full rounded-xl border border-border bg-surface-raised px-6 py-3.5 text-sm font-medium text-text-primary transition-all"
         {...entrance(0.59)}
       >

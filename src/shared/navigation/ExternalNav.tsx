@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Sun01Icon,
@@ -26,6 +26,10 @@ function isNavLinkActive(pathname: string, href: string) {
 export default function ExternalNav() {
   const { setTheme, resolvedTheme } = useTheme();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isAuth = pathname === "/auth";
+  const isSignupMode = searchParams.get("mode") === "signup";
+  const authCta = isAuth ? (isSignupMode ? { label: "Sign in", href: "/auth?mode=signin" } : { label: "Sign up", href: "/auth?mode=signup" }) : { label: "Sign in", href: "/auth" };
   const isDark = resolvedTheme === "dark";
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -68,10 +72,10 @@ export default function ExternalNav() {
 
       <div className="hidden sm:flex items-center gap-6">
         <Link
-          href="/auth"
+          href={authCta.href}
           className="text-sm px-4 py-1.5 rounded-lg border border-border text-text-primary hover:bg-surface transition"
         >
-          Sign in
+          {authCta.label}
         </Link>
         <button
           onClick={() => setTheme(isDark ? "light" : "dark")}
@@ -137,11 +141,11 @@ export default function ExternalNav() {
             );
           })}
           <Link
-            href="/auth"
+            href={authCta.href}
             onClick={() => setMenuOpen(false)}
             className="text-sm px-4 py-2.5 rounded-lg border border-border text-text-primary hover:bg-surface transition text-center"
           >
-            Sign in
+            {authCta.label}
           </Link>
         </div>
       )}
