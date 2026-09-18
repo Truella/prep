@@ -46,6 +46,7 @@ export default function AuthForm() {
     <form
       onSubmit={handleSubmit}
       className="space-y-6"
+      style={{ fontFamily: "var(--font-ui)" }}
     >
       <motion.div
         className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-2xl"
@@ -76,12 +77,12 @@ export default function AuthForm() {
 
       <motion.div className="text-center" {...entrance(0.14)}>
         <h2
-          className="mb-2 text-3xl font-bold text-text-primary"
-          style={{ fontFamily: "var(--font-display)" }}
+          className="mb-2 text-3xl text-text-primary leading-tight font-display"
+          style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}
         >
           {isSignup ? "Create Account" : "Welcome Back"}
         </h2>
-        <p className="text-sm text-text-secondary">
+        <p className="text-sm text-text-secondary" style={{ fontFamily: "var(--font-ui)" }}>
           {isSignup ? "Sign up to get started" : "Sign in to continue"}
         </p>
       </motion.div>

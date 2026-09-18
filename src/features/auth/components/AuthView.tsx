@@ -18,7 +18,7 @@ export default function AuthView() {
   }, [user, loading, initializing, router]);
 
   return (
-    <div className="min-h-dvh bg-bg">
+    <div className="min-h-dvh bg-bg" style={{ fontFamily: "var(--font-ui)" }}>
       <ExternalNav />
 
       <main className="mx-auto flex min-h-dvh w-full max-w-400 items-center justify-center bg-bg px-6 lg:grid lg:h-dvh lg:min-h-0 lg:grid-cols-[55%_45%] lg:items-stretch lg:px-0">

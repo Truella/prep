@@ -19,16 +19,13 @@ export default function AuthMediaPanel() {
 
       <div className="relative z-10 mx-auto mt-16 w-full max-w-md">
         <FadeUp>
-          <p className="text-xs font-semibold uppercase tracking-widest text-sage-accent">
-            Quiz builder
-          </p>
           <h1
-            className="mt-2 text-3xl text-text-primary xl:text-4xl"
+            className="text-3xl text-text-primary xl:text-4xl leading-tight font-display"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Build a quiz without the busywork.
+            Build a quiz without the <em style={{ color: "var(--color-sage-accent)", fontStyle: "italic" }}>busywork.</em>
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+          <p className="mt-3 text-sm leading-relaxed text-text-secondary" style={{ fontFamily: "var(--font-ui)" }}>
             Add questions manually or upload a CSV, then share a ready-to-take practice test.
           </p>
         </FadeUp>
