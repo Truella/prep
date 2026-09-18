@@ -21,14 +21,14 @@ export function SidebarLink({ label, path, icon, collapsed = false }: SidebarLin
 			ref={linkRef}
 			href={path}
 			className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition ${
-				isActive ? "" : "hover:bg-surface"
-			} ${collapsed ? "relative group lg:justify-center lg:px-3" : ""}`}
+				collapsed ? "relative group lg:justify-center lg:px-3" : ""
+			}`}
 			style={{
-				backgroundColor: isActive ? "var(--color-surface-raised)" : "transparent",
-				color: isActive ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+				backgroundColor: isActive ? "var(--color-accent-dim)" : "transparent",
+				color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
 			}}
-			onMouseEnter={(e) => { if (!isActive) { e.currentTarget.style.color = "var(--color-text-primary)"; } }}
-			onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.color = "var(--color-text-secondary)"; } }}
+			onMouseEnter={(e) => { if (!isActive) { e.currentTarget.style.backgroundColor = "var(--color-accent-dim)"; e.currentTarget.style.color = "var(--color-accent)"; } }}
+			onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "var(--color-text-secondary)"; } }}
 		>
 			<HugeiconsIcon icon={icon} />
 			<SidebarItemLabel label={label} collapsed={collapsed} itemRef={linkRef} />

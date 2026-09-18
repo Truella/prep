@@ -58,7 +58,7 @@ export default function Dashboard() {
 								href="/dashboard/create"
 								className="inline-block px-5 py-2.5 rounded-xl text-sm font-semibold transition"
 								style={{
-									backgroundColor: "var(--color-sage-accent)",
+									backgroundColor: "var(--color-accent)",
 									color: "var(--color-bg)",
 								}}
 							>
@@ -66,44 +66,47 @@ export default function Dashboard() {
 							</Link>
 					</div>
 				) : (
-					<div className="grid grid-cols-3 gap-4">
+					<div className="grid grid-cols-3 gap-3">
 						{[
 							{
 								label: "Quizzes",
 								value: stats.totalQuizzes,
 								icon: TaskEdit01Icon,
 								subtext: `${published.length} published, ${drafts.length} drafts`,
+								accent: "var(--color-sage-accent)",
 							},
 							{
 								label: "Drafts",
 								value: drafts.length,
 								icon: FileEditIcon,
 								subtext: "awaiting review",
+								accent: "var(--color-amber-accent)",
 							},
 							{
 								label: "Attempts",
 								value: stats.totalAttempts,
 								icon: CheckListIcon,
 								subtext: "across all quizzes",
+								accent: "var(--color-sky-accent)",
 							},
 						].map((s) => (
 							<div
 								key={s.label}
-								className="p-5 rounded-2xl border space-y-2"
+								className="p-4 rounded-xl border space-y-1.5"
 								style={{
 									backgroundColor: "var(--color-surface)",
 									borderColor: "var(--color-border)",
 								}}
 							>
-								<div className="flex items-center gap-2">
+								<div className="flex items-center justify-between">
 									<p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
 										{s.label}
 									</p>
-									<HugeiconsIcon icon={s.icon} size={14} style={{ color: "var(--color-text-secondary)" }} />
+									<HugeiconsIcon icon={s.icon} size={20} style={{ color: s.accent }} />
 								</div>
 								<p
-									className="text-3xl font-bold font-mono"
-									style={{ color: "var(--color-text-primary)" }}
+									className="text-4xl font-bold font-mono"
+									style={{ color: s.accent }}
 								>
 									{s.value}
 								</p>
@@ -124,7 +127,7 @@ export default function Dashboard() {
 						<Link
 							href="/dashboard/my-quizzes"
 							className="text-xs font-medium"
-							style={{ color: "var(--color-sage-accent)" }}
+							style={{ color: "var(--color-accent)" }}
 						>
 							View all →
 						</Link>
@@ -153,7 +156,7 @@ export default function Dashboard() {
 							<Link
 								href="/dashboard/my-quizzes"
 								className="text-xs font-medium"
-								style={{ color: "var(--color-amber-accent)" }}
+								style={{ color: "var(--color-accent)" }}
 							>
 								View all →
 							</Link>
@@ -177,7 +180,7 @@ export default function Dashboard() {
 							No published quizzes yet.{" "}
 							<Link
 								href="/dashboard/create"
-								style={{ color: "var(--color-sage-accent)" }}
+								style={{ color: "var(--color-accent)" }}
 							>
 								Create your first one.
 							</Link>

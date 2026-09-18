@@ -1,7 +1,6 @@
 import React from "react";
 import {
-	ArrowLeft01Icon,
-	ArrowRight01Icon,
+	SidebarLeft01Icon,
 	Moon01Icon,
 	Sun01Icon,
 	Logout01Icon,
@@ -59,40 +58,52 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
 		<>
 			<aside
 				className={`
-					fixed bottom-0 left-0 top-0 z-40 h-screen w-64 overflow-hidden ${isCollapsed ? "lg:w-[68px]" : "lg:w-64"} transform border-r backdrop-blur-xl lg:sticky lg:self-start
+					fixed bottom-0 left-0 top-0 z-40 h-screen w-64 overflow-hidden ${isCollapsed ? "lg:w-[68px]" : "lg:w-64"} transform backdrop-blur-xl lg:sticky lg:self-start
 					${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
 				`}
 				style={{
 					backgroundColor: "var(--color-surface)",
-					borderColor: "var(--color-border)",
 					transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
 				}}
 			>
-				<div
-					className="flex h-full flex-col overflow-hidden"
-					style={{
-						transition: "padding 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-						padding: isCollapsed ? "0.5rem" : "1rem",
-					}}
-				>
-					<div className={`mb-4 hidden lg:flex ${isCollapsed ? "justify-center" : "justify-end"}`}>
+				<div className="flex h-full flex-col overflow-hidden">
+					<div className={`hidden lg:flex h-16 shrink-0 items-center ${isCollapsed ? "justify-center" : "justify-end"}`}>
 						<button
 							type="button"
 							onClick={toggleCollapsed}
-							className="inline-flex rounded-lg p-2 hover:bg-surface-raised"
-							style={{ color: "var(--color-text-secondary)" }}
+							className="inline-flex items-center justify-center rounded-lg p-2 transition"
+							style={{
+								backgroundColor: "transparent",
+								color: "var(--color-text-secondary)",
+							}}
+							onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--color-accent-dim)"; e.currentTarget.style.color = "var(--color-accent)"; }}
+							onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "var(--color-text-secondary)"; }}
 							aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
 						>
-							<HugeiconsIcon icon={isCollapsed ? ArrowRight01Icon : ArrowLeft01Icon} size={18} />
+							<HugeiconsIcon
+								icon={SidebarLeft01Icon}
+								size={18}
+								style={{
+									transform: isCollapsed ? "rotate(180deg)" : "none",
+									transition: "transform 0.3s ease",
+								}}
+							/>
 						</button>
 					</div>
-					<nav className="space-y-2 overflow-y-auto">
-						{NAV_ITEMS.map((item) => (
-							<SidebarLink key={item.path} {...item} collapsed={isCollapsed} />
-						))}
-					</nav>
+					<div
+						className="flex flex-1 flex-col overflow-hidden"
+						style={{
+							padding: isCollapsed ? "0 0.5rem 0.5rem" : "0 1rem 1rem",
+							transition: "padding 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+						}}
+					>
+						<nav className="mt-6 space-y-3 overflow-y-auto">
+							{NAV_ITEMS.map((item) => (
+								<SidebarLink key={item.path} {...item} collapsed={isCollapsed} />
+							))}
+						</nav>
 
-					<div className="mt-auto space-y-2">
+						<div className="mt-auto space-y-3">
 						<button
 							ref={themeButtonRef}
 							type="button"
@@ -116,6 +127,7 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
 							<HugeiconsIcon icon={Logout01Icon} />
 							<SidebarItemLabel label="Log out" collapsed={isCollapsed} itemRef={logoutButtonRef} showLabel={false} />
 						</button>
+						</div>
 					</div>
 				</div>
 			</aside>
