@@ -15,6 +15,9 @@ import {
   AiComputerIcon,
   Tick02Icon,
   Share08Icon,
+  CircleQuestionMarkIcon,
+  Clock01Icon,
+  UserGroup02Icon,
 } from "@hugeicons/core-free-icons";
 import { useState } from "react";
 import type { PublicQuiz } from "@/lib/types";
@@ -69,12 +72,10 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
   // Illustration → small icon in compact area, Accuracy/Completion removed, tags kept, stats = questions • time • taken
   return (
     <div
-      className="group relative rounded-2xl p-5 flex flex-col transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg border overflow-hidden w-full max-w-[380px] mx-auto h-[320px] min-h-[320px] will-change-transform"
+      className="group relative rounded-2xl p-5 flex flex-col w-full h-full min-h-[320px] will-change-transform transition-all duration-300 ease-out hover:scale-[1.01] hover:shadow-md border"
       style={{
         backgroundColor: "var(--color-surface)",
-        borderColor: categoryTokens ? `color-mix(in srgb, ${categoryTokens.accent} 18%, var(--color-border))` : "var(--color-border)",
-        borderTopColor: categoryTokens ? `color-mix(in srgb, ${categoryTokens.accent} 35%, transparent)` : undefined,
-        borderTopWidth: categoryTokens ? 2 : undefined,
+        borderColor: "var(--color-border)",
       }}
     >
       {/* Top: icon left, more menu right — mirrors image's header without illustration */}
@@ -94,7 +95,7 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
           onClick={handleShare}
           aria-label={copied ? "Link copied" : "Copy quiz link"}
           title={copied ? "Copied!" : "Copy link"}
-          className="w-9 h-9 rounded-full border flex items-center justify-center transition hover:scale-105 active:scale-95 shrink-0"
+          className="w-9 h-9 rounded-full border flex items-center justify-center transition hover:scale-105 active:scale-95 shrink-0 cursor-pointer"
           style={{
             backgroundColor: copied ? "var(--color-text-primary)" : "var(--color-surface)",
             color: copied ? "var(--color-bg)" : "var(--color-text-secondary)",
@@ -105,15 +106,21 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
         </button>
       </div>
 
-      {/* Title + Description */}
-      <h3 className="font-semibold text-[15px] leading-snug line-clamp-2 mt-4" style={{ color: "var(--color-text-primary)" }}>
-        {quiz.title}
-      </h3>
-      {quiz.description && (
-        <p className="text-xs line-clamp-2 leading-relaxed mt-1.5" style={{ color: "var(--color-text-secondary)" }}>
-          {quiz.description}
-        </p>
-      )}
+      {/* Title + Description — fixed 2 lines each with line-clamp, not clipped mid-line */}
+      <div className="min-h-[3.25rem] mt-4">
+        <h3 className="font-semibold text-[15px] leading-snug line-clamp-2" style={{ color: "var(--color-text-primary)" }}>
+          {quiz.title || "Untitled Quiz"}
+        </h3>
+        {quiz.description ? (
+          <p className="text-xs line-clamp-2 leading-relaxed mt-1.5" style={{ color: "var(--color-text-secondary)" }}>
+            {quiz.description}
+          </p>
+        ) : (
+          <p className="text-xs mt-1.5 invisible" aria-hidden>
+            —
+          </p>
+        )}
+      </div>
 
       {/* Tags — like UI/UX + Not Urgent, but with Technology + Beginner */}
       <div className="flex items-center gap-2 flex-wrap mt-4">
@@ -145,34 +152,30 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
 
       <div className="flex-1" />
 
-      {/* Quiz stats — like 10 Question row, but with 24 questions • 25 min • 412 taken */}
-      <div className="flex items-center gap-2 text-xs pt-4 mt-4 border-t flex-wrap" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}>
-        <span style={{ color: "var(--color-text-primary)", fontWeight: 500 }}>
-          {quiz.question_count != null ? `${quiz.question_count} question${quiz.question_count === 1 ? "" : "s"}` : "— questions"}
+      {/* Quiz stats — with icons, space-between */}
+      <div className="flex items-center justify-between gap-2 text-xs pt-4 mt-4 border-t whitespace-nowrap overflow-hidden" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}>
+        <span className="flex items-center gap-1 shrink-0" style={{ color: "var(--color-text-primary)", fontWeight: 500 }}>
+          <HugeiconsIcon icon={CircleQuestionMarkIcon} size={14} />
+          {quiz.question_count != null ? `${quiz.question_count}` : "—"}
         </span>
-        <span className="opacity-40">•</span>
-        <span>{quiz.time_limit ? `${quiz.time_limit} min` : "No time limit"}</span>
-        <span className="opacity-40">•</span>
-        <span>{quiz.times_taken.toLocaleString("en-US")} taken</span>
+        <span className="flex items-center gap-1 shrink-0">
+          <HugeiconsIcon icon={Clock01Icon} size={14} />
+          {quiz.time_limit ? `${quiz.time_limit}m` : "No time limit"}
+        </span>
+        <span className="flex items-center gap-1 shrink-0">
+          <HugeiconsIcon icon={UserGroup02Icon} size={14} />
+          {quiz.times_taken.toLocaleString("en-US")} taken
+        </span>
       </div>
 
-      {/* Take Quiz — per-category color */}
+      {/* Take Quiz — single neutral-dark button across all cards */}
       <Link
         href={`/quiz/${quiz.id}`}
-        className="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 border mt-3"
-        style={
-          categoryTokens
-            ? {
-                backgroundColor: categoryTokens.surface,
-                color: categoryTokens.accent,
-                borderColor: `color-mix(in srgb, ${categoryTokens.accent} 22%, transparent)`,
-              }
-            : {
-                backgroundColor: "var(--color-text-primary)",
-                color: "var(--color-bg)",
-                borderColor: "transparent",
-              }
-        }
+        className="block w-full text-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 mt-3"
+        style={{
+          backgroundColor: "var(--color-text-primary)",
+          color: "var(--color-bg)",
+        }}
       >
         Take Quiz
       </Link>

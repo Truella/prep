@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { PublicQuiz, QuizCategory, QuizDifficulty } from "@/lib/types";
 
-type SortOption = "popular" | "rated" | "newest" | "alphabetical";
+type SortOption = "popular" | "newest" | "oldest" | "alphabetical";
 
 interface Filters {
   category: QuizCategory | null;
@@ -27,11 +27,11 @@ async function fetchPublicQuizzes(filters: Filters): Promise<PublicQuiz[]> {
     case "popular":
       query = query.order("times_taken", { ascending: false });
       break;
-    case "rated":
-      query = query.order("average_rating", { ascending: false, nullsFirst: false });
-      break;
     case "newest":
       query = query.order("created_at", { ascending: false });
+      break;
+    case "oldest":
+      query = query.order("created_at", { ascending: true });
       break;
     case "alphabetical":
       query = query.order("title", { ascending: true });

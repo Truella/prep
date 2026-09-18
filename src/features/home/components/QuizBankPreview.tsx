@@ -8,7 +8,6 @@ import FadeUp from "@/shared/components/FadeUp";
 import SectionHeading from "@/features/home/components/SectionHeading";
 import QuizBankCard from "@/features/quiz-bank/components/QuizBankCard";
 import { MOCK_QUIZZES } from "@/features/quiz-bank/mocks/mockQuizzes";
-import { CATEGORY_HUE } from "@/features/quiz-bank/constants/quizBank";
 import type { PublicQuiz } from "@/lib/types";
 
 export default function QuizBankPreview() {
@@ -50,13 +49,7 @@ export default function QuizBankPreview() {
 			}));
 			// Dev preview: show mock quizzes so category/difficulty hues are visible live when DB only has 2 Technology quizzes
 			const isDevPreview = process.env.NODE_ENV !== "production";
-			const rawDisplay = isDevPreview && enriched.length < 3 ? [...enriched, ...MOCK_QUIZZES].slice(0, 3) : enriched;
-			const HUE_ORDER: Record<string, number> = { sage: 0, coral: 1, sky: 2, amber: 3, magenta: 4, teal: 5 };
-			const display = [...rawDisplay].sort((a, b) => {
-				const ha = a.category ? CATEGORY_HUE[a.category] ?? "teal" : "teal";
-				const hb = b.category ? CATEGORY_HUE[b.category] ?? "teal" : "teal";
-				return (HUE_ORDER[ha] ?? 99) - (HUE_ORDER[hb] ?? 99);
-			});
+			const display = isDevPreview && enriched.length < 3 ? [...enriched, ...MOCK_QUIZZES].slice(0, 3) : enriched;
 			setPreview(display);
 			setLoading(false);
 		})();

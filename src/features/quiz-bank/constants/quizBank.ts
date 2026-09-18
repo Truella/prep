@@ -49,8 +49,8 @@ export const DIFFICULTY_STYLES: Record<string, string> = {
 
 export const SORT_OPTIONS = [
   { value: "popular", label: "Most Taken" },
-  { value: "rated", label: "Highest Rated" },
   { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
   { value: "alphabetical", label: "Alphabetical" },
 ] as const;
 
