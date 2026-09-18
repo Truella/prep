@@ -45,7 +45,7 @@ export default function CBTExperienceMock() {
   const ratio = timerSeconds / 300;
 
   return (
-    <div className="w-full max-w-[420px] mx-auto min-h-[420px] bg-surface-raised rounded-2xl p-5 overflow-hidden relative shadow-sm flex flex-col">
+    <div aria-hidden="true" className="w-full max-w-[420px] mx-auto min-h-[420px] bg-surface-raised rounded-2xl p-5 overflow-hidden relative shadow-sm flex flex-col">
       {/* Header: timer + progress */}
       <div className="flex justify-between items-center mb-1">
         <span className="text-xs text-text-secondary font-medium">

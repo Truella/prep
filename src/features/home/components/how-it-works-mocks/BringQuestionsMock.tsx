@@ -16,7 +16,7 @@ export default function BringQuestionsMock() {
   }, [reducedMotion]);
 
   return (
-    <div className="w-full max-w-[320px] mx-auto h-[200px] bg-surface-raised rounded-xl p-4 overflow-hidden relative shadow-sm">
+    <div aria-hidden="true" className="w-full max-w-[320px] mx-auto h-[200px] bg-surface-raised rounded-xl p-4 overflow-hidden relative shadow-sm">
       <AnimatePresence mode="wait">
         <motion.div
           key={phase}

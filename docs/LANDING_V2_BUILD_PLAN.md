@@ -4,8 +4,7 @@ This plan maps out the execution of the `PREP_LANDING_V2_PRT.md` specification d
 
 ## Phase 1: Foundation (Theme & Setup)
 1. **[LANDING2-1] Typography & Base Tokens:** Update `app/layout.tsx` to use the `Fraunces` font (normal/italic). Update `app/globals.css` with the new dark and light base palettes.
-2. **[LANDING2-2] Multi-Palette CSS:** Add the 6 data-palette variants (earth, navy, rust, electric, emerald, indigo) in `app/globals.css`.
-3. **[LANDING2-3] Palette Switcher:** Create `PaletteSwitcher.tsx` and integrate it into `ExternalNav.tsx` next to the theme toggle.
+   > **Note:** `LANDING2-2` (Multi-Palette CSS) and `LANDING2-3` (Palette Switcher) are superseded by `PREP_COLOR_SYSTEM.md` — fixed per-concept hues, no switcher. Phase 1 implements only `LANDING2-1`.
 
 ## Phase 2: Hero & Core Problems
 4. **[LANDING2-4] Hero Rework:** Remove `HeroGrid` from `Hero.tsx`. Create `HeroIconField.tsx` using **hugeicons** (instead of lucide-react) for the faint background icons. Update hero copy.

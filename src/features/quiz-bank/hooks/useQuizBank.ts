@@ -42,16 +42,22 @@ async function fetchPublicQuizzes(filters: Filters): Promise<PublicQuiz[]> {
   if (error) throw error;
   const quizzes = (data ?? []) as PublicQuiz[];
 
-  // Enrich with question counts (live DB doesn't have a stored count column)
+  // Enrich with question counts — aggregated in DB via head count to avoid 1,000-row cap
   if (quizzes.length > 0) {
     const ids = quizzes.map((q) => q.id);
-    const { data: questions } = await supabase
-      .from("questions")
-      .select("quiz_id")
-      .in("quiz_id", ids);
     const counts: Record<string, number> = {};
-    (questions ?? []).forEach((row: { quiz_id: string }) => {
-      counts[row.quiz_id] = (counts[row.quiz_id] ?? 0) + 1;
+    const results = await Promise.all(
+      ids.map(async (id) => {
+        const { count, error: countError } = await supabase
+          .from("questions")
+          .select("id", { count: "exact", head: true })
+          .eq("quiz_id", id);
+        if (countError) throw countError;
+        return { id, count: count ?? 0 };
+      })
+    );
+    results.forEach(({ id, count }) => {
+      counts[id] = count;
     });
     return quizzes.map((q) => ({ ...q, question_count: counts[q.id] ?? 0 }));
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 export interface DropdownOption {
@@ -33,6 +33,8 @@ export default function Dropdown({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const reducedMotion = useReducedMotion();
+  const listboxId = useId();
+  const getOptionId = (idx: number) => `${listboxId}-option-${idx}`;
 
   const selected = options.find((o) => o.value === value) ?? null;
 
@@ -102,6 +104,8 @@ export default function Dropdown({
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={listboxId}
+        aria-activedescendant={open && focusedIndex >= 0 ? getOptionId(focusedIndex) : undefined}
         onClick={() => {
           if (open) close();
           else openDropdown();
@@ -132,6 +136,7 @@ export default function Dropdown({
         {open && (
           <motion.ul
             ref={listRef}
+            id={listboxId}
             role="listbox"
             aria-label={ariaLabel}
             initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
@@ -152,6 +157,7 @@ export default function Dropdown({
               return (
                 <li
                   key={opt.value}
+                  id={getOptionId(idx)}
                   data-index={idx}
                   role="option"
                   aria-selected={isSelected}

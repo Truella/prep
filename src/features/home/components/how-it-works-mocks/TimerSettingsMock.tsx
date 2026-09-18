@@ -16,7 +16,7 @@ export default function TimerSettingsMock() {
   }, [reducedMotion]);
 
   return (
-    <div className="w-full max-w-[320px] mx-auto h-[200px] bg-surface-raised rounded-xl p-4 overflow-hidden relative shadow-sm flex flex-col justify-center">
+    <div aria-hidden="true" className="w-full max-w-[320px] mx-auto h-[200px] bg-surface-raised rounded-xl p-4 overflow-hidden relative shadow-sm flex flex-col justify-center">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Time Limit</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -19,6 +19,65 @@ export default function TakeQuizModal({ isOpen, onClose }: Props) {
   const [resolving, setResolving] = useState(false);
   const router = useRouter();
   const reducedMotion = useReducedMotion();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const cancelledRef = useRef(false);
+
+  const handleClose = () => {
+    if (resolving) return;
+    cancelledRef.current = true;
+    onClose();
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement as HTMLElement | null;
+      cancelledRef.current = false;
+      const frame = requestAnimationFrame(() => {
+        const el = modalRef.current?.querySelector<HTMLElement>('input, button, a, [tabindex]:not([tabindex="-1"])');
+        el?.focus();
+      });
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          handleClose();
+          return;
+        }
+        if (e.key === "Tab" && modalRef.current) {
+          const focusable = Array.from(
+            modalRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')
+          ).filter((el) => el.offsetParent !== null);
+          if (focusable.length === 0) {
+            e.preventDefault();
+            return;
+          }
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (e.shiftKey) {
+            if (document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            }
+          } else if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      };
+      document.addEventListener("keydown", onKeyDown);
+      return () => {
+        cancelAnimationFrame(frame);
+        document.removeEventListener("keydown", onKeyDown);
+      };
+    } else {
+      const trigger = triggerRef.current;
+      if (trigger) {
+        trigger.focus();
+        triggerRef.current = null;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,14 +99,18 @@ export default function TakeQuizModal({ isOpen, onClose }: Props) {
       return;
     }
 
-    if (CODE_REGEX.test(quizId)) {
+    const candidateCode = quizId.toUpperCase();
+    if (CODE_REGEX.test(candidateCode)) {
       setResolving(true);
+      cancelledRef.current = false;
       const { data, error } = await supabase
         .from("quizzes")
         .select("id")
-        .eq("code", quizId)
+        .eq("code", candidateCode)
         .maybeSingle();
       setResolving(false);
+
+      if (cancelledRef.current) return;
 
       if (error || !data) {
         toast.error("No quiz found with that code");
@@ -67,7 +130,8 @@ export default function TakeQuizModal({ isOpen, onClose }: Props) {
           {/* Backdrop */}
           <motion.div
             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-            onClick={onClose}
+            onClick={handleClose}
+            aria-hidden="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -77,6 +141,7 @@ export default function TakeQuizModal({ isOpen, onClose }: Props) {
           {/* Modal wrapper — centered on desktop, bottom sheet on mobile */}
           <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4 pointer-events-none">
             <motion.div
+              ref={modalRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="take-quiz-title"
@@ -105,9 +170,6 @@ export default function TakeQuizModal({ isOpen, onClose }: Props) {
                   ? { duration: 0.15 }
                   : { type: "spring", damping: 30, stiffness: 340, opacity: { duration: 0.2 } }
               }
-              // Desktop override: remove bottom-sheet y animation
-              // On sm+ the flex container centers it, motion y is still applied but visually okay.
-              // We keep y for both; on desktop the initial y is damped quickly so it feels like a fade-scale.
             >
               <div className="p-6 sm:p-7 space-y-6">
                 {/* Drag handle — mobile only */}
@@ -117,9 +179,10 @@ export default function TakeQuizModal({ isOpen, onClose }: Props) {
 
                 {/* Close button */}
                 <button
-                  onClick={onClose}
+                  onClick={handleClose}
                   aria-label="Close"
-                  className="absolute right-4 top-4 sm:right-5 sm:top-5 w-8 h-8 flex items-center justify-center rounded-full border border-border text-text-secondary hover:text-text-primary hover:bg-surface-raised transition"
+                  disabled={resolving}
+                  className="absolute right-4 top-4 sm:right-5 sm:top-5 w-8 h-8 flex items-center justify-center rounded-full border border-border text-text-secondary hover:text-text-primary hover:bg-surface-raised transition disabled:opacity-50"
                 >
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
                     <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -179,7 +242,7 @@ export default function TakeQuizModal({ isOpen, onClose }: Props) {
                   </p>
                   <Link
                     href="/quiz-bank"
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="text-sm font-medium"
                     style={{ color: "var(--color-text-primary)" }}
                   >

@@ -9,7 +9,7 @@ export default function Problem() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Text Panel (approx 55%) */}
           <div className="lg:col-span-7 bg-surface rounded-3xl p-8 md:p-12 flex flex-col justify-center">
-            <SectionHeading accent="sage" className="text-4xl md:text-5xl leading-tight mb-6">
+            <SectionHeading accent="neutral" className="text-4xl md:text-5xl leading-tight mb-6">
               You already have the questions. Getting them into a CBT is the <em>problem.</em>
             </SectionHeading>
             <div className="space-y-4 text-lg text-text-secondary leading-relaxed">

@@ -27,12 +27,13 @@ export default function QuizBankTakeInput() {
       toast.error("Invalid quiz link or ID");
       return;
     }
-    if (CODE_REGEX.test(quizId)) {
+    const candidateCode = quizId.toUpperCase();
+    if (CODE_REGEX.test(candidateCode)) {
       setResolving(true);
       const { data, error } = await supabase
         .from("quizzes")
         .select("id")
-        .eq("code", quizId)
+        .eq("code", candidateCode)
         .maybeSingle();
       setResolving(false);
       if (error || !data) {
@@ -52,7 +53,7 @@ export default function QuizBankTakeInput() {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="Paste link or code"
-        className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-text-primary/10 transition"
+        className="w-full px-4 py-3 rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-text-primary/10 transition"
         style={{
           backgroundColor: "var(--color-surface)",
           border: "1px solid var(--color-border)",

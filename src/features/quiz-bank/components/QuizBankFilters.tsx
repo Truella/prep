@@ -34,7 +34,7 @@ export default function QuizBankFilters({
         placeholder="Search quizzes..."
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full sm:w-56 sm:flex-none px-4 py-2.5 rounded-xl text-sm focus:outline-none transition shrink-0"
+        className="w-full sm:w-56 sm:flex-none px-4 py-2.5 rounded-xl text-base sm:text-sm focus:outline-none transition shrink-0"
         style={{
           backgroundColor: "var(--color-surface)",
           border: "1px solid var(--color-border)",

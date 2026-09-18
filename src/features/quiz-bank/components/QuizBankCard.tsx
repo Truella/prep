@@ -61,8 +61,9 @@ export default function QuizBankCard({ quiz }: { quiz: PublicQuiz }) {
       el.value = url;
       document.body.appendChild(el);
       el.select();
-      document.execCommand("copy");
+      const ok = document.execCommand("copy");
       document.body.removeChild(el);
+      if (!ok) return;
       setCopied(true);
       setTimeout(() => setCopied(false), 1400);
     }

@@ -61,9 +61,11 @@ Do not touch component files in this commit, tokens and font only.
 
 ---
 
-## COMMIT LANDING2-2 — Multi-palette CSS variables
+## COMMIT LANDING2-2 — Multi-palette CSS variables — SUPERSEDED
 
-**Commit:** `feat(theme): add data-palette variants for six accent palettes`
+> **Superseded by `PREP_COLOR_SYSTEM.md` — palette-switcher retired, do not implement. See `PREP_COLOR_SYSTEM.md` for fixed per-concept hues.**
+
+**Commit:** `feat(theme): add data-palette variants for six accent palettes` *(not implemented — retired)*
 
 ---PROMPT---
 Read `app/globals.css` in full first, specifically how `.dark` and `.light` currently define token blocks.
@@ -89,9 +91,11 @@ Do not touch component files in this commit, tokens only.
 
 ---
 
-## COMMIT LANDING2-3 — Palette switcher component
+## COMMIT LANDING2-3 — Palette switcher component — SUPERSEDED
 
-**Commit:** `feat(nav): add palette switcher next to theme toggle`
+> **Superseded by `PREP_COLOR_SYSTEM.md` — palette-switcher retired, do not implement.**
+
+**Commit:** `feat(nav): add palette switcher next to theme toggle` *(not implemented — retired)*
 
 ---PROMPT---
 Read `src/shared/navigation/ExternalNav.tsx` in full first, specifically the theme toggle button around line 72 (desktop) and line 87 (mobile), and `src/lib/theme.ts` (or wherever `useTheme` lives) to see how theme state currently persists.
