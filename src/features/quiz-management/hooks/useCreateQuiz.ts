@@ -149,6 +149,14 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 			toast.error("Quiz title is required");
 			return;
 		}
+		if (state.quiz.title.length > 60) {
+			toast.error("Quiz title must be 60 characters or fewer");
+			return;
+		}
+		if (state.quiz.description.length > 120) {
+			toast.error("Description must be 120 characters or fewer");
+			return;
+		}
 		setState((prev) => ({ ...prev, isCreatingQuiz: true }));
 
 		const { data: userData, error: userError } = await supabase.auth.getUser();
