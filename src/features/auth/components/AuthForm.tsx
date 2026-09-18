@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -12,19 +12,13 @@ export default function AuthForm() {
   const reducedMotion = useReducedMotion();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isSignup, setIsSignup] = useState(() => searchParams.get("mode") === "signup");
+  const isSignup = searchParams.get("mode") === "signup";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setIsSignup(searchParams.get("mode") === "signup");
-  }, [searchParams]);
-
   const toggleMode = () => {
-    const next = !isSignup;
-    setIsSignup(next);
-    router.push(`/auth?mode=${next ? "signup" : "signin"}`, { scroll: false });
+    router.push(`/auth?mode=${isSignup ? "signin" : "signup"}`, { scroll: false });
   };
   const entrance = (delay: number) => ({
     initial: { opacity: 0, x: reducedMotion ? 0 : 20 },

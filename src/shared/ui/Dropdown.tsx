@@ -42,11 +42,11 @@ export default function Dropdown({
     buttonRef.current?.focus();
   };
 
-  useEffect(() => {
-    if (!open) return;
+  const openDropdown = () => {
     const idx = options.findIndex((o) => o.value === value);
     setFocusedIndex(idx >= 0 ? idx : 0);
-  }, [open, value, options]);
+    setOpen(true);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -70,7 +70,7 @@ export default function Dropdown({
     if (!open) {
       if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
-        setOpen(true);
+        openDropdown();
       }
       return;
     }
@@ -102,7 +102,10 @@ export default function Dropdown({
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          if (open) close();
+          else openDropdown();
+        }}
         onKeyDown={handleKeyDown}
         className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl text-sm text-left transition focus:outline-none focus:ring-2 focus:ring-text-primary/10 ${buttonClassName}`}
         style={{

@@ -1,6 +1,5 @@
 import ExternalNav from "@/shared/navigation/ExternalNav";
 import Hero from "@/features/home/components/Hero";
-import Problem from "@/features/home/components/Problem";
 import HowItWorks from "@/features/home/components/HowItWorks";
 import CBTExperienceSection from "@/features/home/components/CBTExperienceSection";
 import AIReviewSection from "@/features/home/components/AIReviewSection";
