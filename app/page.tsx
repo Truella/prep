@@ -18,7 +18,7 @@ export default function Home() {
 		>
 			<ExternalNav />
 			<Hero />
-			<Problem />
+			{/* <Problem /> */}
 			<HowItWorks />
 			<CBTExperienceSection />
 			<AIReviewSection />
