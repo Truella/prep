@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -23,13 +23,34 @@ function isNavLinkActive(pathname: string, href: string) {
   return pathname === href || (href.startsWith("/docs") && pathname.startsWith("/docs"));
 }
 
-export default function ExternalNav() {
-  const { setTheme, resolvedTheme } = useTheme();
+function AuthCta({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isAuth = pathname === "/auth";
   const isSignupMode = searchParams.get("mode") === "signup";
-  const authCta = isAuth ? (isSignupMode ? { label: "Sign in", href: "/auth?mode=signin" } : { label: "Sign up", href: "/auth?mode=signup" }) : { label: "Sign in", href: "/auth" };
+  const authCta = isAuth
+    ? isSignupMode
+      ? { label: "Sign in", href: "/auth?mode=signin" }
+      : { label: "Sign up", href: "/auth?mode=signup" }
+    : { label: "Sign in", href: "/auth" };
+  return (
+    <Link
+      href={authCta.href}
+      onClick={onClose}
+      className={
+        onClose
+          ? "text-sm px-4 py-2.5 rounded-lg border border-border text-text-primary hover:bg-surface transition text-center"
+          : "text-sm px-4 py-1.5 rounded-lg border border-border text-text-primary hover:bg-surface transition"
+      }
+    >
+      {authCta.label}
+    </Link>
+  );
+}
+
+export default function ExternalNav() {
+  const { setTheme, resolvedTheme } = useTheme();
+  const pathname = usePathname();
   const isDark = resolvedTheme === "dark";
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -71,12 +92,9 @@ export default function ExternalNav() {
       </div>
 
       <div className="hidden sm:flex items-center gap-6">
-        <Link
-          href={authCta.href}
-          className="text-sm px-4 py-1.5 rounded-lg border border-border text-text-primary hover:bg-surface transition"
-        >
-          {authCta.label}
-        </Link>
+        <Suspense fallback={<Link href="/auth" className="text-sm px-4 py-1.5 rounded-lg border border-border text-text-primary hover:bg-surface transition">Sign in</Link>}>
+          <AuthCta />
+        </Suspense>
         <button
           onClick={() => setTheme(isDark ? "light" : "dark")}
           aria-label="Toggle theme"
@@ -140,13 +158,9 @@ export default function ExternalNav() {
               </Link>
             );
           })}
-          <Link
-            href={authCta.href}
-            onClick={() => setMenuOpen(false)}
-            className="text-sm px-4 py-2.5 rounded-lg border border-border text-text-primary hover:bg-surface transition text-center"
-          >
-            {authCta.label}
-          </Link>
+          <Suspense fallback={<Link href="/auth" onClick={() => setMenuOpen(false)} className="text-sm px-4 py-2.5 rounded-lg border border-border text-text-primary hover:bg-surface transition text-center">Sign in</Link>}>
+            <AuthCta onClose={() => setMenuOpen(false)} />
+          </Suspense>
         </div>
       )}
     </nav>
