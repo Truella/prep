@@ -1,134 +1,112 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "./SectionHeading";
+import BringQuestionsMock from "./how-it-works-mocks/BringQuestionsMock";
+import TimerSettingsMock from "./how-it-works-mocks/TimerSettingsMock";
+import TakeQuizStepMock from "./how-it-works-mocks/TakeQuizStepMock";
+import AIReviewStepMock from "./how-it-works-mocks/AIReviewStepMock";
 
 const STEPS = [
   {
-    label: "Add your questions",
+    number: "01",
+    title: "Add your questions",
     description:
-      "Create questions manually or upload a CSV. Add an optional timer.",
+      "Upload a CSV question bank or add your questions manually.",
+    Mock: BringQuestionsMock,
+    wide: true,
+    surface: "var(--color-sage-surface)",
+    accent: "var(--color-sage-accent)",
   },
   {
-    label: "Share the link",
+    number: "02",
+    title: "Set your test",
     description:
-      "Share a link. Anyone can join instantly, no account required.",
+      "Choose how you want to practice. Set a timer, control who can access the quiz, and configure the options before you start.",
+    Mock: TimerSettingsMock,
+    wide: false,
+    surface: "var(--color-amber-surface)",
+    accent: "var(--color-amber-accent)",
   },
   {
-    label: "Review your results",
+    number: "03",
+    title: "Take the CBT",
     description:
-      "Get your score, breakdown, and AI feedback on what to review.",
+      "Work through your questions with a timer and submit when you're done.",
+    Mock: TakeQuizStepMock,
+    wide: false,
+    surface: "var(--color-coral-surface)",
+    accent: "var(--color-coral-accent)",
+  },
+  {
+    number: "04",
+    title: "Review your result",
+    description:
+      "See your score, understand where you struggled, and get areas to revisit before your next attempt.",
+    Mock: AIReviewStepMock,
+    wide: true,
+    surface: "var(--color-sky-surface)",
+    accent: "var(--color-sky-accent)",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section
-      className="py-24 px-6"
-      style={{ borderColor: "var(--color-border)" }}
-    >
+    <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <FadeUp>
-          <h2
-            className="text-3xl mb-2"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--color-text-primary)",
-            }}
-          >
-            How it works
-          </h2>
-          <p
-            className="text-sm mb-12"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            From your notes to a full practice test in minutes.
-          </p>
+          <div className="mb-12">
+            <SectionHeading accent="sage" className="text-4xl md:text-5xl leading-tight">
+              Bring your questions. Prep handles the <em>rest.</em>
+            </SectionHeading>
+          </div>
         </FadeUp>
 
-        <div className="relative pl-8 md:pl-0">
-          <div
-            className="absolute left-1.5 top-6 bottom-6 w-px md:hidden"
-            style={{ backgroundColor: "var(--color-border)" }}
-          />
-          <svg
-            aria-hidden="true"
-            className="absolute inset-0 hidden h-full w-full md:block"
-            preserveAspectRatio="none"
-            viewBox="0 0 1000 180"
-          >
-            <path
-              d="M 310 90 H 326 V 45 H 337"
-              fill="none"
-              stroke="var(--color-border)"
-              strokeWidth="2"
-              vectorEffect="non-scaling-stroke"
-            />
-            <path
-              d="M 663 135 H 674 V 90 H 690"
-              fill="none"
-              stroke="var(--color-border)"
-              strokeWidth="2"
-              vectorEffect="non-scaling-stroke"
-            />
-            {[
-              [310, 90],
-              [337, 45],
-              [663, 135],
-              [690, 90],
-            ].map(([cx, cy]) => (
-              <circle
-                key={`${cx}-${cy}`}
-                cx={cx}
-                cy={cy}
-                r="4"
-                fill="var(--color-accent)"
-                vectorEffect="non-scaling-stroke"
-              />
-            ))}
-          </svg>
-
-          <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
-            {STEPS.map((step, i) => (
-              <FadeUp key={step.label} delay={i * 0.1} className="relative h-full">
-                <span
-                  className="absolute -left-[1.875rem] top-6 z-10 h-3 w-3 rounded-full md:hidden"
-                  style={{ backgroundColor: "var(--color-accent)" }}
-                />
-                <motion.div
-                  className="h-full rounded-2xl border p-6 space-y-3 cursor-default"
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+          {STEPS.map((step, i) => {
+            const Mock = step.Mock;
+            return (
+              <FadeUp
+                key={step.number}
+                delay={i * 0.08}
+                className={`h-full ${step.wide ? "md:col-span-7" : "md:col-span-5"}`}
+              >
+                <div
+                  className={`h-full rounded-3xl p-6 md:p-8 flex gap-6 ${
+                    step.wide ? "flex-col md:flex-row md:items-center" : "flex-col"
+                  }`}
                   style={{
-                    backgroundColor: "var(--color-surface)",
-                    borderColor: "var(--color-border)",
+                    backgroundColor: step.surface,
                   }}
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                  <motion.span
-                    className="text-xs font-mono font-bold inline-block"
-                    style={{ color: "var(--color-accent)" }}
-                    whileHover={{ scale: 1.15 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                  >
-                    0{i + 1}
-                  </motion.span>
-                  <h3
-                    className="font-semibold text-base"
-                    style={{ color: "var(--color-text-primary)" }}
-                  >
-                    {step.label}
-                  </h3>
-                  <p
-                    className="text-sm leading-relaxed"
-                    style={{ color: "var(--color-text-secondary)" }}
-                  >
-                    {step.description}
-                  </p>
-                </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <span
+                      className="text-xs font-mono font-bold inline-block mb-3"
+                      style={{ color: step.accent }}
+                    >
+                      {step.number}
+                    </span>
+                    <h3
+                      className="font-semibold text-base mb-2"
+                      style={{ color: "var(--color-text-primary)" }}
+                    >
+                      {step.title}
+                    </h3>
+                    <p
+                      className="text-sm leading-relaxed"
+                      style={{ color: "var(--color-text-secondary)" }}
+                    >
+                      {step.description}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 w-full md:w-[320px]">
+                    <Mock />
+                  </div>
+                </div>
               </FadeUp>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
         <FadeUp delay={0.3} className="mt-10 text-center">
@@ -136,7 +114,7 @@ export default function HowItWorks() {
             href="/auth"
             className="inline-block rounded-xl px-7 py-3.5 text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
-              backgroundColor: "var(--color-accent)",
+              backgroundColor: "var(--color-sage-accent)",
               color: "var(--color-bg)",
             }}
           >

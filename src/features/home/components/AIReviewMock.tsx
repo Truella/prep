@@ -17,9 +17,11 @@ import {
 function ResultsCard({
   dataset,
   showCursor = false,
+  scale = 1,
 }: {
   dataset: AIReviewMockDataset;
   showCursor?: boolean;
+  scale?: number;
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -39,10 +41,15 @@ function ResultsCard({
 
     const cursorRect = cursor.getBoundingClientRect();
     const buttonRect = button.getBoundingClientRect();
+    // When the mock is rendered inside a CSS `scale(...)` wrapper (e.g. How It Works
+    // step 04 uses `scale-[0.6]` to fit a 512px design into a 320px card), the
+    // rect delta is already scaled, but the motion `x`/`y` transform we animate
+    // is itself inside the scaled container so it gets scaled again visually.
+    // Compensate by dividing the measured delta by the wrapper scale.
     const targetX =
-      buttonRect.left + buttonRect.width / 2 - (cursorRect.left + cursorRect.width / 2);
+      (buttonRect.left + buttonRect.width / 2 - (cursorRect.left + cursorRect.width / 2)) / scale;
     const targetY =
-      buttonRect.top + buttonRect.height / 2 - (cursorRect.top + cursorRect.height / 2);
+      (buttonRect.top + buttonRect.height / 2 - (cursorRect.top + cursorRect.height / 2)) / scale;
 
     const travelX = animate(cursorX, targetX, { duration: 0.65, ease: "easeInOut" });
     const travelY = animate(cursorY, targetY, { duration: 0.65, ease: "easeInOut" });
@@ -90,6 +97,7 @@ function ResultsCard({
     rippleOpacity,
     rippleScale,
     showCursor,
+    scale,
   ]);
 
   return (
@@ -101,7 +109,7 @@ function ResultsCard({
     >
       <span
         className="rounded px-2 py-0.5 font-mono text-xs font-semibold"
-        style={{ backgroundColor: "var(--color-accent-dim)", color: "var(--color-accent)" }}
+        style={{ backgroundColor: "var(--color-sky-surface)", color: "var(--color-sky-accent)" }}
       >
         {dataset.category}
       </span>
@@ -120,7 +128,7 @@ function ResultsCard({
         tabIndex={-1}
         className="mt-7 rounded-xl px-6 py-3 text-sm font-semibold"
         style={{
-          backgroundColor: "var(--color-accent)",
+          backgroundColor: "var(--color-sky-accent)",
           color: "var(--color-bg)",
           scale: buttonScale,
         }}
@@ -136,14 +144,14 @@ function ResultsCard({
           style={{
             backgroundColor: "var(--color-text-primary)",
             borderColor: "var(--color-bg)",
-            boxShadow: "0 0 0 4px color-mix(in srgb, var(--color-accent) 35%, transparent)",
+            boxShadow: "0 0 0 4px color-mix(in srgb, var(--color-sky-accent) 35%, transparent)",
             x: cursorX,
             y: cursorY,
             scale: cursorScale,
           }}
         >
           <motion.span
-            className="absolute -inset-2 rounded-full border border-accent"
+            className="absolute -inset-2 rounded-full border border-sky-accent"
             style={{ opacity: rippleOpacity, scale: rippleScale }}
           />
         </motion.div>
@@ -168,8 +176,8 @@ function AnalyzingCard({ dataset }: { dataset: AIReviewMockDataset }) {
       <motion.div
         className="absolute inset-x-0 top-0 h-px"
         style={{
-          backgroundColor: "var(--color-accent)",
-          boxShadow: "0 0 18px 4px var(--color-accent-dim)",
+          backgroundColor: "var(--color-sky-accent)",
+          boxShadow: "0 0 18px 4px var(--color-sky-surface)",
         }}
         animate={{ top: ["0%", "100%"] }}
         transition={{ duration: 1.3, repeat: Infinity, ease: "linear" }}
@@ -192,10 +200,10 @@ function ReviewCard({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <p className="text-xs font-semibold uppercase tracking-widest text-accent">
+      <p className="text-xs font-semibold uppercase tracking-widest text-sky-accent">
         Your AI review
       </p>
-      <h3 className="mt-3 text-xl font-semibold text-text-primary">Focus your next session</h3>
+      <h3 className="mt-3 text-xl font-semibold text-text-primary">What to study next</h3>
       <div className="mt-6 space-y-4">
         {dataset.reviewPoints.map((point, index) => (
           <motion.div
@@ -205,7 +213,7 @@ function ReviewCard({
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: shouldAnimate ? 0.2 + index * 0.25 : 0 }}
           >
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-accent" />
             <span>{point}</span>
           </motion.div>
         ))}
@@ -222,7 +230,7 @@ function ReviewCard({
   );
 }
 
-export default function AIReviewMock() {
+export default function AIReviewMock({ scale = 1 }: { scale?: number } = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
   const [phase, setPhase] = useState(0);
@@ -259,10 +267,9 @@ export default function AIReviewMock() {
   return (
     <div ref={containerRef} className="w-full max-w-lg">
       <div
-        className="relative overflow-hidden rounded-2xl border p-7 sm:p-9"
+        className="relative overflow-hidden rounded-2xl p-7 sm:p-9"
         style={{
           backgroundColor: "var(--color-surface-raised)",
-          borderColor: "var(--color-border)",
         }}
       >
         {reducedMotion ? (
@@ -289,8 +296,8 @@ export default function AIReviewMock() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.45 }}
                 >
-                  {phase === 0 && <ResultsCard dataset={dataset} />}
-                  {phase === 1 && <ResultsCard dataset={dataset} showCursor />}
+                  {phase === 0 && <ResultsCard dataset={dataset} scale={scale} />}
+                  {phase === 1 && <ResultsCard dataset={dataset} showCursor scale={scale} />}
                   {phase === 2 && <AnalyzingCard dataset={dataset} />}
                   {phase === 3 && <ReviewCard dataset={dataset} />}
                 </motion.div>
@@ -308,7 +315,7 @@ export default function AIReviewMock() {
               style={{
                 width: phase === index ? 24 : 6,
                 backgroundColor:
-                  phase === index ? "var(--color-accent)" : "var(--color-border)",
+                  phase === index ? "var(--color-sky-accent)" : "var(--color-border)",
               }}
             />
           ))}

@@ -1,121 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
-import { useState, useEffect } from "react";
-import { getAttemptCounts } from "@/features/quiz-bank/utils/attempts";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import FadeUp from "@/shared/components/FadeUp";
-import QuizBankCard from "@/features/quiz-bank/components/QuizBankCard";
-import type { PublicQuiz } from "@/lib/types";
+import SectionHeading from "@/features/home/components/SectionHeading";
 
 export default function QuizBankPreview() {
-	const [preview, setPreview] = useState<PublicQuiz[]>([]);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		(async () => {
-			const { data, error } = await supabase
-				.from("quizzes")
-				.select("id, title, description, category, difficulty, average_rating, created_at")
-				.eq("visibility", "public")
-				.order("times_taken", { ascending: false })
-				.limit(3);
-
-			if (error || !data) {
-				setLoading(false);
-				return;
-			}
-
-			const ids = data.map((q) => q.id);
-			let counts: Record<string, number>;
-			try {
-				counts = await getAttemptCounts(ids);
-			} catch {
-				counts = {};
-			}
-			const enriched = data.map((q) => ({
-				...q,
-				times_taken: counts[q.id] ?? 0,
-			}));
-			setPreview(enriched);
-			setLoading(false);
-		})();
-	}, []);
-	if (!loading && preview.length === 0) {
-		return null;
-	}
 	return (
 		<section
 			className="py-24 px-6"
-			style={{ borderColor: "var(--color-border)" }}
+			style={{
+				backgroundColor: "var(--color-amber-surface)",
+			}}
 		>
-			<div className="max-w-6xl mx-auto">
-				<FadeUp className="flex items-end justify-between mb-10">
-					<div>
-						<h2
-							className="text-3xl mb-2"
-							style={{
-								fontFamily: "var(--font-display)",
-								color: "var(--color-text-primary)",
-							}}
-						>
-							From the Quiz Bank
-						</h2>
-						<p
-							className="text-sm"
-							style={{ color: "var(--color-text-secondary)" }}
-						>
-							Practice with quizzes shared by other students.
-						</p>
-					</div>
-					<Link
-						href="/quiz-bank"
-						className="text-sm font-medium hidden sm:block"
-						style={{ color: "var(--color-accent)" }}
-					>
-						Browse all →
-					</Link>
+			<div className="max-w-6xl mx-auto text-center">
+				<FadeUp>
+					<SectionHeading accent="amber" className="text-3xl md:text-4xl leading-tight mb-3">
+						Don&apos;t have questions yet? Start with someone <em>else&apos;s.</em>
+					</SectionHeading>
+					<p className="text-sm max-w-2xl mx-auto" style={{ color: "var(--color-text-secondary)" }}>
+						Browse quizzes that other Prep users have shared publicly and find something to practice.
+					</p>
 				</FadeUp>
-
-				{loading ? (
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-						{[1, 2, 3].map((i) => (
-							<div
-								key={i}
-								className="p-5 rounded-2xl border animate-pulse"
-								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border)",
-								}}
-							>
-								<div
-									className="h-4 w-3/4 rounded mb-3"
-									style={{ backgroundColor: "var(--color-surface-raised)" }}
-								/>
-								<div
-									className="h-3 w-1/2 rounded"
-									style={{ backgroundColor: "var(--color-surface-raised)" }}
-								/>
-							</div>
-						))}
-					</div>
-				) : (
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-						{preview.map((quiz, i) => (
-							<FadeUp key={quiz.id} delay={i * 0.1}>
-								<QuizBankCard quiz={quiz} />
-							</FadeUp>
-						))}
-					</div>
-				)}
-
-				<FadeUp delay={0.2} className="mt-6 sm:hidden text-center">
+				<FadeUp delay={0.12} className="mt-8">
 					<Link
 						href="/quiz-bank"
-						className="text-sm font-medium"
-						style={{ color: "var(--color-accent)" }}
+						className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
+						style={{
+							backgroundColor: "var(--color-amber-accent)",
+							color: "#0A0A0F",
+						}}
 					>
-						Browse all →
+						Explore Quiz Bank
+						<HugeiconsIcon icon={ArrowRight01Icon} size={16} />
 					</Link>
 				</FadeUp>
 			</div>

@@ -15,7 +15,7 @@ export default function QuizBankHero() {
         >
           Quiz Bank
         </h1>
-        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-sm leading-relaxed max-w-md" style={{ color: "var(--color-text-secondary)" }}>
           Browse and take public quizzes created by the community.
         </p>
       </div>

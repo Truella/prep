@@ -1,11 +1,11 @@
 import ExternalNav from "@/shared/navigation/ExternalNav";
 import Hero from "@/features/home/components/Hero";
 import HowItWorks from "@/features/home/components/HowItWorks";
-import Features from "@/features/home/components/Features";
+import CBTExperienceSection from "@/features/home/components/CBTExperienceSection";
 import AIReviewSection from "@/features/home/components/AIReviewSection";
+import QuizSharing from "@/features/home/components/QuizSharing";
 import QuizBankPreview from "@/features/home/components/QuizBankPreview";
 import FAQSection from "@/features/home/components/FAQSection";
-import WhoItsFor from "@/features/home/components/WhoItsFor";
 import CTASection from "@/features/home/components/CTASection";
 import Footer from "@/features/home/components/Footer";
 
@@ -17,11 +17,12 @@ export default function Home() {
 		>
 			<ExternalNav />
 			<Hero />
+			{/* <Problem /> */}
 			<HowItWorks />
-			<Features />
+			<CBTExperienceSection />
 			<AIReviewSection />
+			<QuizSharing />
 			<QuizBankPreview />
-			<WhoItsFor />
 			<FAQSection />
 			<CTASection />
 			<Footer />

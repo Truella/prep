@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import HeroCard from "./HeroCard";
-import HeroGrid from "./HeroGrid";
+import HeroIconField from "./HeroIconField";
+import TakeQuizModal from "./TakeQuizModal";
 
 export default function Hero() {
+  const [takeOpen, setTakeOpen] = useState(false);
   const reducedMotion = useReducedMotion();
   const entrance = (delay: number, x = 0, y = 0) => ({
     initial: {
@@ -23,7 +26,7 @@ export default function Hero() {
 
   return (
     <section className="relative lg:h-dvh lg:max-h-240 overflow-hidden flex items-center pt-32 pb-24 px-6">
-      <HeroGrid />
+      <HeroIconField />
       <div className="relative z-10 max-w-6xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left — text */}
@@ -41,7 +44,7 @@ export default function Hero() {
             />
             <div className="space-y-2">
               <motion.span
-                className="inline-block text-xs font-mono font-semibold tracking-widest uppercase text-accent"
+                className="inline-block text-xs font-mono font-semibold tracking-widest uppercase text-magenta-accent bg-magenta-surface rounded-full px-3.5 py-1.5"
                 {...entrance(0.05, -16)}
               >
                 CBT & MCQ Exam Practice
@@ -51,7 +54,7 @@ export default function Hero() {
                 style={{ fontFamily: "var(--font-display)" }}
                 {...entrance(0.18, -32)}
               >
-                Practice like it&apos;s real. Know what to fix next.
+                Turn your questions into CBT <span className="italic text-magenta-accent">practice</span>.
               </motion.h1>
             </div>
 
@@ -59,9 +62,7 @@ export default function Hero() {
               className="text-lg leading-relaxed max-w-lg text-text-secondary"
               {...entrance(0.34, -24)}
             >
-              Build CBT practice tests from your own questions. Set a timer,
-              share with your study group, and get AI feedback on exactly
-              where you need to improve.
+              Upload your questions, build a quiz, and practice with it like a real CBT. When you&apos;re done, Prep shows you what you got right, where you struggled, and what to study next.
             </motion.p>
 
             <motion.div
@@ -70,23 +71,24 @@ export default function Hero() {
             >
               <Link
                 href="/auth"
-                className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm transition-all hover:opacity-90 bg-accent text-bg"
+                className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm transition-all hover:opacity-90 bg-text-primary text-bg"
               >
                 Create a quiz
               </Link>
-              <Link
-                href="/take"
+              <button
+                type="button"
+                onClick={() => setTakeOpen(true)}
                 className="px-7 py-3.5 rounded-xl text-center font-semibold text-sm border border-border text-text-primary transition hover:bg-surface"
               >
                 Take a quiz
-              </Link>
+              </button>
             </motion.div>
 
             <motion.p
               className="text-xs text-text-secondary"
               {...entrance(0.62, -10)}
             >
-              Free to use. No card required.
+              Free to use. No account required to take a quiz.
             </motion.p>
           </div>
 
@@ -99,6 +101,7 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
+      <TakeQuizModal isOpen={takeOpen} onClose={() => setTakeOpen(false)} />
     </section>
   );
 }

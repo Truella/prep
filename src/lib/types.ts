@@ -102,6 +102,7 @@ export interface PublicQuiz {
 	created_at: string;
 	code?: string;
 	question_count?: number;
+	time_limit?: number | null;
 }
 
 export interface QuizAttempt {
