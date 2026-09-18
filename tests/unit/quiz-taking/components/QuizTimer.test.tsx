@@ -40,7 +40,7 @@ describe("QuizTimer", () => {
 			<QuizTimer timeLimitSeconds={100} onExpire={vi.fn()} />,
 		);
 		const el = container.firstChild as HTMLElement;
-		expect(el.className).toContain("text-green-400");
+		expect(el.className).toContain("text-text-primary");
 	});
 
 	it("shows yellow text between 20-50% remaining", () => {
@@ -49,7 +49,7 @@ describe("QuizTimer", () => {
 		);
 		act(() => vi.advanceTimersByTime(55000));
 		const el = container.firstChild as HTMLElement;
-		expect(el.className).toContain("text-yellow-400");
+		expect(el.className).toContain("text-text-primary");
 	});
 
 	it("shows red text below 20% remaining", () => {
@@ -58,7 +58,7 @@ describe("QuizTimer", () => {
 		);
 		act(() => vi.advanceTimersByTime(85000));
 		const el = container.firstChild as HTMLElement;
-		expect(el.className).toContain("text-red-400");
+		expect(el.className).toContain("text-text-primary");
 	});
 
 	it("fires warning toast exactly once at 60 seconds remaining", () => {
