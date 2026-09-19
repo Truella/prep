@@ -33,7 +33,11 @@ interface CreateQuizState {
 	isCreatingQuiz: boolean;
 	isUploadingQuestions: boolean;
 	isLoadingDraft: boolean;
+	isSavingMeta: boolean;
 	timeLimit: number | null;
+	visibility: QuizVisibility;
+	category: QuizCategory | null;
+	difficulty: QuizDifficulty | null;
 }
 
 const initialState: CreateQuizState = {
@@ -44,7 +48,11 @@ const initialState: CreateQuizState = {
 	isCreatingQuiz: false,
 	isUploadingQuestions: false,
 	isLoadingDraft: false,
+	isSavingMeta: false,
 	timeLimit: null,
+	visibility: "private",
+	category: null,
+	difficulty: null,
 };
 
 function isCodeConflict(message?: string): boolean {
@@ -122,7 +130,11 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 				isCreatingQuiz: false,
 				isUploadingQuestions: false,
 				isLoadingDraft: false,
+				isSavingMeta: false,
 				timeLimit: quiz.time_limit,
+				visibility: quiz.visibility ?? "private",
+				category: quiz.category ?? null,
+				difficulty: quiz.difficulty ?? null,
 			});
 		};
 
@@ -141,21 +153,69 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 	const setTimeLimit = (timeLimit: number | null) =>
 		setState((prev) => ({ ...prev, timeLimit }));
 
+	const setVisibility = (visibility: QuizVisibility) =>
+		setState((prev) => ({
+			...prev,
+			visibility,
+			category: visibility === "private" ? null : prev.category,
+			quiz: { ...prev.quiz, visibility, category: visibility === "private" ? null : prev.quiz.category },
+		}));
+
+	const setCategory = (category: QuizCategory | null) =>
+		setState((prev) => ({ ...prev, category, quiz: { ...prev.quiz, category } }));
+
+	const setDifficulty = (difficulty: QuizDifficulty | null) =>
+		setState((prev) => ({ ...prev, difficulty, quiz: { ...prev.quiz, difficulty } }));
+
 	const updateQuizMeta = (updates: Partial<QuizDraft>) =>
 		setState((prev) => ({ ...prev, quiz: { ...prev.quiz, ...updates } }));
 
-	const createQuiz = async () => {
+	const persistQuizMeta = async (): Promise<boolean> => {
+		if (!state.quiz.id) return false;
+		const payload: Record<string, unknown> = {};
+		if (state.quiz.title !== undefined) payload.title = state.quiz.title;
+		if (state.quiz.description !== undefined) payload.description = state.quiz.description;
+		if (state.timeLimit !== undefined) payload.time_limit = state.timeLimit;
+		payload.visibility = state.visibility;
+		payload.category = state.visibility === "public" ? state.category : null;
+		payload.difficulty = state.visibility === "public" ? state.difficulty : null;
+
+		if (!String(payload.title ?? "").trim()) {
+			toast.error("Quiz title is required");
+			return false;
+		}
+		if (String(payload.title).length > 60) {
+			toast.error("Quiz title must be 60 characters or fewer");
+			return false;
+		}
+		if (String(payload.description ?? "").length > 120) {
+			toast.error("Description must be 120 characters or fewer");
+			return false;
+		}
+
+		setState((prev) => ({ ...prev, isSavingMeta: true }));
+		const { error } = await supabase.from("quizzes").update(payload).eq("id", state.quiz.id).eq("status", "draft");
+		setState((prev) => ({ ...prev, isSavingMeta: false }));
+		if (error) {
+			toast.error("Failed to save changes");
+			return false;
+		}
+		toast.success("Changes saved");
+		return true;
+	};
+
+	const createQuiz = async (): Promise<boolean> => {
 		if (!state.quiz.title.trim()) {
 			toast.error("Quiz title is required");
-			return;
+			return false;
 		}
 		if (state.quiz.title.length > 60) {
 			toast.error("Quiz title must be 60 characters or fewer");
-			return;
+			return false;
 		}
 		if (state.quiz.description.length > 120) {
 			toast.error("Description must be 120 characters or fewer");
-			return;
+			return false;
 		}
 		setState((prev) => ({ ...prev, isCreatingQuiz: true }));
 
@@ -163,7 +223,7 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		if (userError || !userData.user) {
 			toast.error("You must be logged in to create a quiz");
 			setState((prev) => ({ ...prev, isCreatingQuiz: false }));
-			return;
+			return false;
 		}
 
 		const { data, error } = await supabase
@@ -174,6 +234,9 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 				created_by: userData.user.id,
 				time_limit: state.timeLimit,
 				status: "draft",
+				visibility: state.visibility,
+				category: state.visibility === "public" ? state.category : null,
+				difficulty: state.visibility === "public" ? state.difficulty : null,
 				code: null,
 			})
 			.select()
@@ -182,14 +245,15 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		setState((prev) => ({ ...prev, isCreatingQuiz: false }));
 		if (error || !data?.id) {
 			toast.error("Failed to create quiz");
-			return;
+			return false;
 		}
 
 		setState((prev) => ({
 			...prev,
-			quiz: { ...prev.quiz, id: data.id, status: "draft", code: null },
+			quiz: { ...prev.quiz, id: data.id, status: "draft", code: null, visibility: prev.visibility, category: prev.category, difficulty: prev.difficulty },
 		}));
 		toast.success("Quiz created! Add your questions.");
+		return true;
 	};
 
 	const setQuestionsFromCSV = async (file: File) => {
@@ -367,7 +431,11 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		setTitle,
 		setDescription,
 		setTimeLimit,
+		setVisibility,
+		setCategory,
+		setDifficulty,
 		updateQuizMeta,
+		persistQuizMeta,
 		createQuiz,
 		setQuestionsFromCSV,
 		saveAsDraft,
