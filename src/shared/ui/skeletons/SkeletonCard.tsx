@@ -11,7 +11,8 @@ export default function SkeletonCard({
 }: SkeletonCardProps) {
 	return (
 		<div
-			className={`backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 ${className}`}
+			className={`rounded-2xl p-6 border ${className}`}
+			style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)" }}
 		>
 			{children}
 		</div>

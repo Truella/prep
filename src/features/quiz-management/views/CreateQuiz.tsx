@@ -10,6 +10,7 @@ import ShareableLink from "@/features/quiz-management/components/ShareableLink";
 import CreateQuizTabs from "@/features/quiz-management/components/create/CreateQuizTabs";
 import QuizDetailsStep from "@/features/quiz-management/components/create/QuizDetailsStep";
 import CreateQuizStepper from "@/features/quiz-management/components/create/CreateQuizStepper";
+import CreateQuizSkeleton from "@/features/quiz-management/components/create/CreateQuizSkeleton";
 import type { AppQuestion } from "@/lib/types";
 
 type Tab = "build" | "csv";
@@ -96,11 +97,7 @@ export default function CreateQuizCSV() {
 	};
 
 	if (isLoadingDraft) {
-		return (
-			<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--color-bg)" }}>
-				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading draft...</p>
-			</div>
-		);
+		return <CreateQuizSkeleton />;
 	}
 
 	return (

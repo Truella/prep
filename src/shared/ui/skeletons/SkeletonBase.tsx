@@ -6,10 +6,12 @@ interface SkeletonBaseProps {
 export function SkeletonBox({
 	className = "",
 	variant = "pulse",
-}: SkeletonBaseProps) {
+	style,
+}: SkeletonBaseProps & { style?: React.CSSProperties }) {
 	return (
 		<div
-			className={`bg-white/10 rounded ${variant === "pulse" ? "animate-pulse" : ""} ${className}`}
+			className={`rounded ${variant === "pulse" ? "animate-pulse" : ""} ${className}`}
+			style={{ backgroundColor: "var(--color-border)", opacity: 0.7, ...style }}
 		/>
 	);
 }

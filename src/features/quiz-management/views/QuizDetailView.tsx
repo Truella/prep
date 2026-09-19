@@ -8,6 +8,7 @@ import { useQuizDetail } from "@/features/quiz-management/hooks/useQuizDetail";
 import MetaEditor from "@/features/quiz-management/components/detail/MetaEditor";
 import QuestionEditor from "@/features/quiz-management/components/detail/QuestionEditor";
 import AttemptStats from "@/features/quiz-management/components/detail/AttemptStats";
+import QuizDetailSkeleton from "@/features/quiz-management/components/detail/QuizDetailSkeleton";
 import PublishSettingsModal from "@/features/quiz-management/components/PublishSettingsModal";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Copy01Icon, ArrowLeft01Icon } from "@hugeicons/core-free-icons";
@@ -62,14 +63,7 @@ export default function QuizDetailView({ quizId }: { quizId: string }) {
 	};
 
 	if (loading) {
-		return (
-			<div
-				className="min-h-64 flex items-center justify-center text-sm"
-				style={{ color: "var(--color-text-secondary)" }}
-			>
-				Loading...
-			</div>
-		);
+		return <QuizDetailSkeleton />;
 	}
 
 	if (error || !quiz) {

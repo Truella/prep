@@ -5,6 +5,7 @@ import { useQuizzes } from "@/features/quiz-management/hooks/useQuizzes";
 import { useAnalyticsStats } from "@/features/dashboard/hooks/useStats";
 import QuizRow from "@/features/quiz-management/components/QuizRow";
 import QuizRowSkeleton from "@/features/quiz-management/components/QuizRowSkeleton";
+import DashboardSkeleton from "@/features/dashboard/components/DashboardSkeleton";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
 	TaskEdit01Icon,
@@ -22,10 +23,15 @@ export default function Dashboard() {
 		unpublishQuiz,
 		refetch,
 	} = useQuizzes();
-	const { stats } = useAnalyticsStats();
+	const { stats, loading: statsLoading } = useAnalyticsStats();
 
 	const recentDrafts = drafts.slice(0, 2);
 	const recentQuizzes = published.slice(0, 3);
+	const isInitialLoading = loading || statsLoading;
+
+	if (isInitialLoading) {
+		return <DashboardSkeleton />;
+	}
 
 	return (
 		<div className="space-y-10">			<div>
