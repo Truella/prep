@@ -14,6 +14,9 @@ interface QuizMetadataFormProps {
   createQuiz: () => void;
 }
 
+const TITLE_LIMIT = 60;
+const DESCRIPTION_LIMIT = 120;
+
 export default function QuizMetadataForm({
   title,
   description,
@@ -42,11 +45,17 @@ export default function QuizMetadataForm({
           type="text"
           placeholder="Enter quiz title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value.slice(0, TITLE_LIMIT))}
           disabled={!!quizId}
+          maxLength={TITLE_LIMIT}
           className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
           style={inputBaseStyle}
         />
+        <div className="mt-1.5 flex justify-end">
+          <span className="text-xs" style={{ color: title.length >= TITLE_LIMIT ? "var(--color-incorrect)" : "var(--color-text-secondary)" }}>
+            {title.length}/{TITLE_LIMIT}
+          </span>
+        </div>
       </div>
       <div>
         <label htmlFor="quiz-description" className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-secondary)" }}>
@@ -56,12 +65,18 @@ export default function QuizMetadataForm({
           id="quiz-description"
           placeholder="Enter quiz description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value.slice(0, DESCRIPTION_LIMIT))}
           disabled={!!quizId}
           rows={3}
+          maxLength={DESCRIPTION_LIMIT}
           className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition disabled:opacity-50 disabled:cursor-not-allowed resize-none"
           style={inputBaseStyle}
         />
+        <div className="mt-1.5 flex justify-end">
+          <span className="text-xs" style={{ color: description.length >= DESCRIPTION_LIMIT ? "var(--color-incorrect)" : "var(--color-text-secondary)" }}>
+            {description.length}/{DESCRIPTION_LIMIT}
+          </span>
+        </div>
       </div>
       <TimeLimitInput value={timeLimit} onChange={setTimeLimit} disabled={!!quizId} />
       {!quizId && (

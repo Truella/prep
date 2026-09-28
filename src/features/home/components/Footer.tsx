@@ -7,7 +7,6 @@ export default function Footer() {
     <footer
       className="py-8 px-6"
       style={{
-        borderColor: "var(--color-border)",
         backgroundColor: "var(--color-surface)",
       }}
     >

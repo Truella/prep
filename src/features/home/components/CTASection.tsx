@@ -2,29 +2,25 @@
 
 import Link from "next/link";
 import FadeUp from "@/shared/components/FadeUp";
+import SectionHeading from "./SectionHeading";
+import HeroIconField from "./HeroIconField";
 
 export default function CTASection() {
   return (
     <section
-      className="py-24 px-6"
-      style={{ borderColor: "var(--color-border)" }}
+      className="relative overflow-hidden py-24 px-6"
     >
-      <div className="max-w-2xl mx-auto text-center space-y-6">
+      <HeroIconField sparse />
+      <div className="relative z-10 max-w-2xl mx-auto text-center space-y-6">
         <FadeUp>
-          <h2
-            className="text-4xl md:text-5xl"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--color-text-primary)",
-            }}
-          >
-            Your exam is coming.
-          </h2>
+          <SectionHeading accent="sage" className="text-4xl md:text-5xl">
+            You already have the <em>questions.</em>
+          </SectionHeading>
           <p
             className="text-lg mt-3"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Start practicing today. It&apos;s free.
+            Turn them into a CBT and start practicing.
           </p>
         </FadeUp>
         <FadeUp delay={0.1}>
@@ -33,21 +29,21 @@ export default function CTASection() {
               href="/auth"
               className="px-8 py-4 rounded-xl font-semibold transition-all hover:opacity-90"
               style={{
-                backgroundColor: "var(--color-accent)",
-                color: "#0A0A0F",
+                backgroundColor: "var(--color-sage-accent)",
+                color: "var(--color-bg)",
               }}
             >
-              Create your first quiz
+              Create a quiz
             </Link>
             <Link
-              href="/take"
+              href="/quiz-bank"
               className="px-8 py-4 rounded-xl font-semibold border transition-all hover:bg-[var(--color-surface)]"
               style={{
                 borderColor: "var(--color-border)",
                 color: "var(--color-text-primary)",
               }}
             >
-              Take a quiz
+              Browse quizzes
             </Link>
           </div>
         </FadeUp>

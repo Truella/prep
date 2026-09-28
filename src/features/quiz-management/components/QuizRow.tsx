@@ -165,7 +165,7 @@ export default function QuizRow({ quiz, onCopyLink, onRefetch, onUnpublish, onDe
 		>
 			<span
 				className="h-2 w-2 shrink-0 rounded-full"
-				style={{ backgroundColor: isDraft ? "var(--color-text-secondary)" : "var(--color-accent)" }}
+				style={{ backgroundColor: isDraft ? "var(--color-sage-accent)" : "var(--color-amber-accent)" }}
 				aria-label={isDraft ? "Draft" : "Published"}
 			/>
 			<div className="min-w-0 flex-1">

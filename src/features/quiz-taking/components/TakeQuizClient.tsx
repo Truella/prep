@@ -91,7 +91,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 					<Link
 						href="/quiz-bank"
 						className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold transition"
-						style={{ backgroundColor: "var(--color-accent)", color: "#0A0A0F" }}
+						style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
 					>
 						Browse Quiz Bank
 					</Link>
@@ -103,7 +103,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 	if (showResults) {
 		const { correctCount, earnedPoints, totalPoints } = calculateScore();
 		return (
-			<div className="min-h-screen bg-black flex items-center justify-center px-4 py-8">
+			<div className="min-h-screen bg-bg flex items-center justify-center px-4 py-8">
 				<QuizResults
 					quizTitle={quiz.title}
 					correctCount={correctCount}
@@ -123,13 +123,13 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 	}
 
 	return (
-		<div className="min-h-screen bg-black py-8 px-4">
+		<div className="min-h-screen bg-bg py-8 px-4">
 			{quiz.status === "draft" && (
 				<div
-					className="px-4 py-2 text-center text-xs font-medium mb-6"
+					className="px-4 py-2 text-center text-xs font-medium mb-6 border-b border-border"
 					style={{
-						backgroundColor: "var(--color-accent-dim)",
-						color: "var(--color-accent)",
+						backgroundColor: "var(--color-surface)",
+						color: "var(--color-text-secondary)",
 					}}
 				>
 					Preview mode - this quiz is a draft and not publicly accessible
@@ -140,7 +140,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 				<div className="mb-8">
 					<Link
 						href="/"
-						className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition mb-4"
+						className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition mb-4"
 					>
 						<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
 							<path
@@ -153,9 +153,9 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 						</svg>
 						Back
 					</Link>
-					<h1 className="text-3xl font-bold text-white mb-2">{quiz.title}</h1>
+					<h1 className="text-3xl font-bold text-text-primary mb-2">{quiz.title}</h1>
 					{quiz.description && (
-						<p className="text-gray-400">{quiz.description}</p>
+						<p className="text-text-secondary">{quiz.description}</p>
 					)}
 				</div>
 
@@ -177,7 +177,7 @@ export default function TakeQuizClient({ quizId }: { quizId: string }) {
 							progress={progress}
 						/>
 
-						<p className="text-xs text-gray-500 text-center">
+						<p className="text-xs text-text-secondary text-center">
 							A–D: select answer &middot; Enter: continue &middot; Esc: close
 						</p>
 

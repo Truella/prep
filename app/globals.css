@@ -1,52 +1,148 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0A0A0F;
-  --color-surface: #141418;
-  --color-surface-raised: #1E1E26;
-  --color-border: #2A2A35;
-  --color-text-primary: #F5F0E8;
-  --color-text-secondary: #9999A8;
-  --color-accent: #E8C547;
-  --color-accent-dim: #3D3410;
-  --color-error: #EF4444;
+  --color-bg: #0B0C10;
+  --color-surface: #15161C;
+  --color-surface-raised: #1E2024;
+  --color-border: #262832;
+  --color-text-primary: #F4F2E8;
+  --color-text-secondary: #9C9DAE;
+  --color-accent: #5B8CFF;
+  --color-accent-dim: #16224A;
+  --color-error: #FF5C56;
 
-  --font-display: "DM Serif Display", Georgia, serif;
+  /* Section hues — dark defaults (adaptive semantic tokens flip in .light) */
+  --color-sage-surface: #14231A;
+  --color-sage-accent: #4ADE80;
+  --color-coral-surface: #2A160F;
+  --color-coral-accent: #FF7A50;
+  --color-sky-surface: #131B33;
+  --color-sky-accent: #6E8CFF;
+  --color-amber-surface: #241D0C;
+  --color-amber-accent: #F2C14E;
+  --color-magenta-surface: #26121D;
+  --color-magenta-accent: #F472B6;
+  --color-teal-surface: #0F211F;
+  --color-teal-accent: #3DD9C9;
+
+  /* Functional tokens — dark defaults */
+  --color-correct: #3DDC7A;
+  --color-incorrect: #FF5C56;
+
+  /* Raw doc values (fixed, non-adaptive) */
+  --color-sage-surface-light: #E3F3E1;
+  --color-sage-accent-light: #1F7A3D;
+  --color-sage-surface-dark: #14231A;
+  --color-sage-accent-dark: #4ADE80;
+  --color-coral-surface-light: #FDE6DE;
+  --color-coral-accent-light: #C73E16;
+  --color-coral-surface-dark: #2A160F;
+  --color-coral-accent-dark: #FF7A50;
+  --color-sky-surface-light: #E1EAFB;
+  --color-sky-accent-light: #2952E3;
+  --color-sky-surface-dark: #131B33;
+  --color-sky-accent-dark: #6E8CFF;
+  --color-amber-surface-light: #FBF0D2;
+  --color-amber-accent-light: #8C5A00;
+  --color-amber-surface-dark: #241D0C;
+  --color-amber-accent-dark: #F2C14E;
+  --color-magenta-surface-light: #FBE3F0;
+  --color-magenta-accent-light: #C2298A;
+  --color-magenta-surface-dark: #26121D;
+  --color-magenta-accent-dark: #F472B6;
+  --color-teal-surface-light: #DEF4F1;
+  --color-teal-accent-light: #0E7C74;
+  --color-teal-surface-dark: #0F211F;
+  --color-teal-accent-dark: #3DD9C9;
+  --color-correct-light: #1F7A3D;
+  --color-correct-dark: #3DDC7A;
+  --color-incorrect-light: #D6322A;
+  --color-incorrect-dark: #FF5C56;
+
+  --font-display: "Fraunces", Georgia, serif;
   --font-ui: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
 /* Light theme overrides */
 .light {
-  --color-bg: #F7F5F0;
+  --color-bg: #FCFBF7;
   --color-surface: #FFFFFF;
-  --color-surface-raised: #F0EDE6;
-  --color-border: #E2DDD4;
-  --color-text-primary: #0A0A0F;
-  --color-text-secondary: #6B6870;
-  --color-accent: #B8960A;
-  --color-accent-dim: #FBF3D0;
-  --color-error: #DC2626;
+  --color-surface-raised: #F2F0E8;
+  --color-border: #E7E5DD;
+  --color-text-primary: #14152B;
+  --color-text-secondary: #5B5C72;
+  --color-accent: #2952E3;
+  --color-accent-dim: #E4EAFC;
+  --color-error: #D6322A;
+
+  --color-sage-surface: #E3F3E1;
+  --color-sage-accent: #1F7A3D;
+  --color-coral-surface: #FDE6DE;
+  --color-coral-accent: #C73E16;
+  --color-sky-surface: #E1EAFB;
+  --color-sky-accent: #2952E3;
+  --color-amber-surface: #FBF0D2;
+  --color-amber-accent: #8C5A00;
+  --color-magenta-surface: #FBE3F0;
+  --color-magenta-accent: #C2298A;
+  --color-teal-surface: #DEF4F1;
+  --color-teal-accent: #0E7C74;
+
+  --color-correct: #1F7A3D;
+  --color-incorrect: #D6322A;
 }
 
 @media (prefers-color-scheme: light) {
   :root:not(.dark) {
-    --color-bg: #F7F5F0;
+    --color-bg: #FCFBF7;
     --color-surface: #FFFFFF;
-    --color-surface-raised: #F0EDE6;
-    --color-border: #E2DDD4;
-    --color-text-primary: #0A0A0F;
-    --color-text-secondary: #6B6870;
-    --color-accent: #B8960A;
-    --color-accent-dim: #FBF3D0;
-    --color-error: #DC2626;
+    --color-surface-raised: #F2F0E8;
+    --color-border: #E7E5DD;
+    --color-text-primary: #14152B;
+    --color-text-secondary: #5B5C72;
+    --color-accent: #2952E3;
+    --color-accent-dim: #E4EAFC;
+    --color-error: #D6322A;
+
+    --color-sage-surface: #E3F3E1;
+    --color-sage-accent: #1F7A3D;
+    --color-coral-surface: #FDE6DE;
+    --color-coral-accent: #C73E16;
+    --color-sky-surface: #E1EAFB;
+    --color-sky-accent: #2952E3;
+    --color-amber-surface: #FBF0D2;
+    --color-amber-accent: #8C5A00;
+    --color-magenta-surface: #FBE3F0;
+    --color-magenta-accent: #C2298A;
+    --color-teal-surface: #DEF4F1;
+    --color-teal-accent: #0E7C74;
+
+    --color-correct: #1F7A3D;
+    --color-incorrect: #D6322A;
   }
 }
-
 @media (prefers-reduced-motion: no-preference) {
   * {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease;
   }
+}
+
+/* Applied around theme swaps so light/dark flips commit instantly
+   instead of smearing across mismatched transition durations. */
+.theme-no-transition,
+.theme-no-transition *,
+.theme-no-transition *::before,
+.theme-no-transition *::after {
+  transition: none !important;
+}
+
+html {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
 }
 
 body {
@@ -55,4 +151,70 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   font-family: var(--font-ui);
+}
+
+/* Expressive Fraunces defaults for display type */
+[style*="--font-display"],
+.font-display {
+  font-variation-settings: "SOFT" 0, "WONK" 1;
+}
+
+/* Section headings: <em> marks the single accent word */
+.section-heading em {
+  color: var(--heading-accent, var(--color-text-primary));
+  font-style: italic;
+}
+
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover,
+.auth-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface-raised) inset;
+  -webkit-text-fill-color: var(--color-text-primary);
+  caret-color: var(--color-text-primary);
+}
+
+/* Tooltip animation */
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+    transform: translate(-4px, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
+.sidebar-tooltip {
+  animation: tooltip-in 0.15s ease-out forwards;
+}
+
+/* Thin themed scrollbar — used by custom Dropdowns */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+/* Overlay fade */
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sidebar-overlay {
+  animation: overlay-in 0.2s ease-out forwards;
 }

@@ -113,7 +113,7 @@ describe("useQuizBank", () => {
 		});
 	});
 
-	it("orders by average_rating descending for rated sort", async () => {
+	it("orders by created_at ascending for oldest sort", async () => {
 		const { supabase } = await import("@/lib/supabase");
 		vi.mocked(supabase.from).mockReturnValue(
 			createChain({ data: [], error: null })
@@ -121,14 +121,13 @@ describe("useQuizBank", () => {
 		const { result } = renderHook(() => useQuizBank());
 		await act(async () => {});
 		act(() => {
-			result.current.setFilter("sort", "rated");
+			result.current.setFilter("sort", "oldest");
 		});
 		await act(async () => {});
 		const results = vi.mocked(supabase.from).mock.results;
 		const chain = results[results.length - 1].value;
-		expect(chain.order).toHaveBeenCalledWith("average_rating", {
-			ascending: false,
-			nullsFirst: false,
+		expect(chain.order).toHaveBeenCalledWith("created_at", {
+			ascending: true,
 		});
 	});
 

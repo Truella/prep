@@ -53,7 +53,7 @@ export default function ExportResultsButton({
 				<button
 					type="button"
 					onClick={() => handleDownload("csv")}
-					className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition px-2.5 py-1.5 rounded-lg border border-white/10 hover:bg-white/5"
+					className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition px-2.5 py-1.5 rounded-lg border border-border hover:bg-surface-raised"
 				>
 					<DownloadIcon className="w-3.5 h-3.5" />
 					CSV
@@ -61,7 +61,7 @@ export default function ExportResultsButton({
 				<button
 					type="button"
 					onClick={() => handleDownload("json")}
-					className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition px-2.5 py-1.5 rounded-lg border border-white/10 hover:bg-white/5"
+					className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition px-2.5 py-1.5 rounded-lg border border-border hover:bg-surface-raised"
 				>
 					<DownloadIcon className="w-3.5 h-3.5" />
 					JSON
@@ -76,11 +76,11 @@ export default function ExportResultsButton({
 			role="group"
 			aria-label="Download results"
 		>
-			<span className="text-xs text-gray-500">Download:</span>
+			<span className="text-xs text-text-secondary">Download:</span>
 			<button
 				type="button"
 				onClick={() => handleDownload("csv")}
-				className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-300 hover:text-white transition px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5"
+				className="inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary hover:text-text-primary transition px-3 py-1.5 rounded-lg border border-border hover:bg-surface-raised"
 			>
 				<DownloadIcon className="w-3.5 h-3.5" />
 				CSV
@@ -88,7 +88,7 @@ export default function ExportResultsButton({
 			<button
 				type="button"
 				onClick={() => handleDownload("json")}
-				className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-300 hover:text-white transition px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5"
+				className="inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary hover:text-text-primary transition px-3 py-1.5 rounded-lg border border-border hover:bg-surface-raised"
 			>
 				<DownloadIcon className="w-3.5 h-3.5" />
 				JSON

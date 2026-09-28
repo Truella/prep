@@ -20,10 +20,10 @@ export function RequireAuth({ children }: RequireAuthProps) {
 
 	if (initializing || !user) {
 		return (
-			<div className="min-h-screen bg-black flex items-center justify-center">
+			<div className="min-h-screen bg-bg flex items-center justify-center">
 				<div className="text-center">
-					<div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
-					<p className="text-gray-400">Loading...</p>
+					<div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-text-primary mb-4"></div>
+					<p className="text-text-secondary">Loading...</p>
 				</div>
 			</div>
 		);

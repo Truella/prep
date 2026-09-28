@@ -40,7 +40,7 @@ export function SidebarItemLabel({ label, collapsed, itemRef, showLabel = true }
 			<span className={!showLabel || collapsed ? "lg:sr-only" : ""}>{label}</span>
 			{collapsed && position && createPortal(
 				<span
-					className="pointer-events-none fixed z-50 hidden -translate-y-1/2 whitespace-nowrap rounded-md border px-2 py-1 text-xs shadow-lg lg:block"
+					className="pointer-events-none fixed z-50 hidden -translate-y-1/2 whitespace-nowrap rounded-md border px-2 py-1 text-xs shadow-lg lg:block sidebar-tooltip"
 					style={{
 						left: position.left,
 						top: position.top,

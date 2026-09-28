@@ -10,7 +10,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const {error, signOut, loading } = useAuth();
+	const { error, signOut, loading } = useAuth();
 
 	const handleLogout = async () => {
 		await signOut();
@@ -25,12 +25,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	};
 
 	return (
-		<div className="min-h-screen overflow-x-clip" style={{ backgroundColor: "var(--color-bg)" }}>
-			{/* Top Navigation */}
-			<TopBar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} />
-			<div className="flex min-w-0">
-				{/* Sidebar navigation */}
-				<SideBar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+		<div className="flex h-screen overflow-hidden" style={{ backgroundColor: "var(--color-bg)" }}>
+			{/* Sidebar navigation - full height */}
+			<SideBar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} />
+
+			{/* Content area */}
+			<div className="flex flex-col min-w-0 flex-1 overflow-hidden">
+				{/* Top Navigation - only spans content area */}
+				<TopBar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
 				{/* Main Content Area */}
 				<main className="min-w-0 flex-1 overflow-auto p-4 sm:p-6 lg:p-8">

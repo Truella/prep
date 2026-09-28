@@ -35,7 +35,7 @@ export default function Accordion({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+    <div className="overflow-hidden rounded-2xl bg-surface">
       {items.map((item, index) => {
         const isOpen = openItems.has(index);
         const buttonId = `${idPrefix}-button-${index}`;
@@ -47,14 +47,14 @@ export default function Accordion({
               <button
                 id={buttonId}
                 type="button"
-                className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-accent sm:px-6"
+                className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-teal-accent sm:px-6"
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggleItem(index)}
               >
                 <span>{item.question}</span>
                 <motion.span
-                  className="shrink-0 text-text-secondary"
+                  className={`shrink-0 ${isOpen ? "text-teal-accent" : "text-text-secondary"}`}
                   animate={{ rotate: isOpen ? 45 : 0 }}
                   transition={{ duration: 0.2 }}
                   aria-hidden="true"
