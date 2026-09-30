@@ -15,24 +15,22 @@ interface RequireAuthProps {
 
 function MyQuizzesSkeleton() {
 	return (
-		<div className="space-y-10 animate-pulse">
-			<div className="flex justify-between items-center">
+		<div className="space-y-6 animate-pulse">
+			<div className="flex justify-between items-center gap-4">
 				<div className="space-y-2">
 					<SkeletonBox className="h-8 w-40 rounded" />
 					<SkeletonBox className="h-4 w-56 rounded" />
 				</div>
-				<SkeletonBox className="h-11 w-40 rounded-lg" />
+				<SkeletonBox className="h-11 w-40 rounded-lg hidden sm:block" />
 			</div>
-			<div className="space-y-6">
-				<div>
-					<SkeletonBox className="h-4 w-24 mb-4 rounded" />
-					<QuizListLoading />
-				</div>
-				<div>
-					<SkeletonBox className="h-4 w-28 mb-4 rounded" />
-					<QuizListLoading />
-				</div>
+			<div className="flex gap-2">
+				<SkeletonBox className="h-8 w-16 rounded-full" />
+				<SkeletonBox className="h-8 w-20 rounded-full" />
+				<SkeletonBox className="h-8 w-24 rounded-full" />
+				<div className="flex-1" />
+				<SkeletonBox className="h-10 w-64 rounded-xl" />
 			</div>
+			<QuizListLoading />
 		</div>
 	);
 }
