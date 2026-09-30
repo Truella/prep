@@ -58,7 +58,7 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
 		<>
 			<aside
 				className={`
-					fixed bottom-0 left-0 top-0 z-40 h-screen w-64 overflow-hidden ${isCollapsed ? "lg:w-[68px]" : "lg:w-64"} transform backdrop-blur-xl lg:sticky lg:self-start
+					fixed bottom-0 left-0 top-0 z-[60] h-screen w-64 overflow-hidden ${isCollapsed ? "lg:w-[68px]" : "lg:w-64"} transform backdrop-blur-xl lg:sticky lg:self-start
 					${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
 				`}
 				style={{
@@ -134,7 +134,7 @@ export default function SideBar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
 			{/* Overlay for mobile */}
 			{isSidebarOpen && (
 				<div
-					className="fixed inset-0 backdrop-blur-sm z-30 lg:hidden sidebar-overlay"
+					className="fixed inset-0 backdrop-blur-sm z-[55] lg:hidden sidebar-overlay"
 					style={{ backgroundColor: "color-mix(in srgb, var(--color-bg) 80%, transparent)" }}
 					onClick={() => setIsSidebarOpen(false)}
 				/>
