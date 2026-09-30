@@ -1,5 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { BYPASS_AUTH } from "@/features/auth/context/AuthContext";
+import {
+	deleteLocalQuestion,
+	deleteLocalQuiz,
+	getLocalQuiz,
+	listLocalQuestions,
+	updateLocalQuestion,
+	updateLocalQuiz,
+} from "@/features/quiz-management/utils/localQuizStore";
 import toast from "react-hot-toast";
 import { dbToAppQuestion, appToDBQuestion } from "@/features/quiz-management/utils/transforms";
 import { generateCode } from "@/features/quiz-management/utils/codeGenerator";
@@ -31,6 +40,25 @@ type AttemptRow = Pick<
 >;
 
 async function fetchQuiz(quizId: string): Promise<QuizMeta> {
+  // TEMP (Supabase paused): read from localStorage when bypassing auth.
+  if (BYPASS_AUTH) {
+    const quiz = getLocalQuiz(quizId);
+    if (!quiz) throw new Error("Quiz not found");
+    return {
+      id: quiz.id,
+      title: quiz.title,
+      description: quiz.description,
+      time_limit: quiz.time_limit,
+      visibility: quiz.visibility,
+      category: quiz.category,
+      difficulty: quiz.difficulty,
+      status: quiz.status,
+      code: quiz.code,
+      created_at: quiz.created_at,
+      times_taken: 0,
+      average_rating: null,
+    };
+  }
   const { data, error } = await supabase
     .from("quizzes")
     .select("*")
@@ -41,6 +69,8 @@ async function fetchQuiz(quizId: string): Promise<QuizMeta> {
 }
 
 async function fetchQuestions(quizId: string): Promise<AppQuestion[]> {
+  // TEMP (Supabase paused): read from localStorage when bypassing auth.
+  if (BYPASS_AUTH) return listLocalQuestions(quizId);
   const { data, error } = await supabase
     .from("questions")
     .select("*")
@@ -51,6 +81,11 @@ async function fetchQuestions(quizId: string): Promise<AppQuestion[]> {
 }
 
 async function fetchAttempts(quizId: string): Promise<AttemptRow[]> {
+  // TEMP (Supabase paused): no attempt history locally.
+  if (BYPASS_AUTH) {
+    void quizId;
+    return [];
+  }
   const { data, error } = await supabase
     .from("quiz_attempts")
     .select("id, score, total_points, elapsed_seconds, completed_at")
@@ -92,6 +127,12 @@ export function useQuizDetail(quizId: string) {
         >
       >
     ) => {
+      // TEMP (Supabase paused): update locally when bypassing auth.
+      if (BYPASS_AUTH) {
+        const updated = updateLocalQuiz(quizId, updates);
+        if (!updated) throw new Error("Quiz not found");
+        return;
+      }
       const { error } = await supabase
         .from("quizzes")
         .update(updates)
@@ -108,6 +149,11 @@ export function useQuizDetail(quizId: string) {
 
   const updateQuestionMutation = useMutation({
     mutationFn: async (question: AppQuestion) => {
+      // TEMP (Supabase paused): update locally when bypassing auth.
+      if (BYPASS_AUTH) {
+        updateLocalQuestion(question);
+        return;
+      }
       const payload = appToDBQuestion(question);
       const { error } = await supabase
         .from("questions")
@@ -124,6 +170,11 @@ export function useQuizDetail(quizId: string) {
 
   const deleteQuestionMutation = useMutation({
     mutationFn: async (questionId: string) => {
+      // TEMP (Supabase paused): delete locally when bypassing auth.
+      if (BYPASS_AUTH) {
+        deleteLocalQuestion(questionId);
+        return;
+      }
       const { error } = await supabase
         .from("questions")
         .delete()
@@ -139,6 +190,11 @@ export function useQuizDetail(quizId: string) {
 
   const deleteQuizMutation = useMutation({
     mutationFn: async () => {
+      // TEMP (Supabase paused): delete locally when bypassing auth.
+      if (BYPASS_AUTH) {
+        deleteLocalQuiz(quizId);
+        return;
+      }
       const { error } = await supabase
         .from("quizzes")
         .delete()
@@ -155,6 +211,11 @@ export function useQuizDetail(quizId: string) {
 
   const unpublishMutation = useMutation({
     mutationFn: async () => {
+      // TEMP (Supabase paused): unpublish locally when bypassing auth.
+      if (BYPASS_AUTH) {
+        updateLocalQuiz(quizId, { status: "draft", code: null, visibility: "private" });
+        return;
+      }
       const { error } = await supabase
         .from("quizzes")
         .update({ status: "draft", code: null, visibility: "private" })
@@ -176,6 +237,11 @@ export function useQuizDetail(quizId: string) {
       difficulty: QuizDifficulty | null;
     }) => {
       const code = generateCode();
+      // TEMP (Supabase paused): republish locally when bypassing auth.
+      if (BYPASS_AUTH) {
+        updateLocalQuiz(quizId, { status: "published", code, ...settings });
+        return code;
+      }
       const { error } = await supabase
         .from("quizzes")
         .update({ status: "published", code, ...settings })

@@ -3,6 +3,14 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { supabase } from "@/lib/supabase";
+import { BYPASS_AUTH } from "@/features/auth/context/AuthContext";
+import {
+	createLocalQuiz,
+	getLocalQuiz,
+	insertLocalQuestions as insertLocalQuestionsStore,
+	listLocalQuestions,
+	updateLocalQuiz,
+} from "@/features/quiz-management/utils/localQuizStore";
 import { parseAndValidateCSV } from "@/features/quiz-management/utils/csvParser";
 import { appToDBQuestion, dbToAppQuestion } from "@/features/quiz-management/utils/transforms";
 import { generateCode } from "@/features/quiz-management/utils/codeGenerator";
@@ -73,6 +81,43 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		let cancelled = false;
 		const loadDraft = async () => {
 			setState((prev) => ({ ...prev, isLoadingDraft: true }));
+			// TEMP (Supabase paused): load draft from localStorage when bypassing auth.
+			if (BYPASS_AUTH) {
+				if (cancelled) return;
+				const quiz = getLocalQuiz(resumeQuizId);
+				if (!quiz) {
+					toast.error("Draft not found or you do not have access");
+					setState((prev) => ({ ...prev, isLoadingDraft: false }));
+					return;
+				}
+				const questions = listLocalQuestions(resumeQuizId);
+				if (cancelled) return;
+				setState({
+					quiz: {
+						id: quiz.id,
+						title: quiz.title,
+						description: quiz.description ?? "",
+						time_limit: quiz.time_limit,
+						visibility: quiz.visibility,
+						category: quiz.category,
+						difficulty: quiz.difficulty,
+						status: "draft",
+						code: null,
+					},
+					questions,
+					shareableLink: null,
+					quizCode: null,
+					isCreatingQuiz: false,
+					isUploadingQuestions: false,
+					isLoadingDraft: false,
+					isSavingMeta: false,
+					timeLimit: quiz.time_limit,
+					visibility: quiz.visibility ?? "private",
+					category: quiz.category ?? null,
+					difficulty: quiz.difficulty ?? null,
+				});
+				return;
+			}
 			const { data: userData, error: userError } = await supabase.auth.getUser();
 			if (cancelled) return;
 			if (userError || !userData.user) {
@@ -194,6 +239,17 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		}
 
 		setState((prev) => ({ ...prev, isSavingMeta: true }));
+		// TEMP (Supabase paused): persist metadata locally when bypassing auth.
+		if (BYPASS_AUTH) {
+			const updated = updateLocalQuiz(state.quiz.id, payload as Parameters<typeof updateLocalQuiz>[1]);
+			setState((prev) => ({ ...prev, isSavingMeta: false }));
+			if (!updated) {
+				toast.error("Failed to save changes");
+				return false;
+			}
+			toast.success("Changes saved");
+			return true;
+		}
 		const { error } = await supabase.from("quizzes").update(payload).eq("id", state.quiz.id).eq("status", "draft");
 		setState((prev) => ({ ...prev, isSavingMeta: false }));
 		if (error) {
@@ -219,6 +275,25 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		}
 		setState((prev) => ({ ...prev, isCreatingQuiz: true }));
 
+		// TEMP (Supabase paused): create quiz in localStorage when bypassing auth.
+		if (BYPASS_AUTH) {
+			const local = createLocalQuiz({
+				title: state.quiz.title,
+				description: state.quiz.description,
+				time_limit: state.timeLimit,
+				visibility: state.visibility,
+				category: state.visibility === "public" ? state.category : null,
+				difficulty: state.visibility === "public" ? state.difficulty : null,
+				created_by: "dev-user-id",
+			});
+			setState((prev) => ({
+				...prev,
+				isCreatingQuiz: false,
+				quiz: { ...prev.quiz, id: local.id, status: "draft", code: null, visibility: prev.visibility, category: prev.category, difficulty: prev.difficulty },
+			}));
+			toast.success("Quiz created! Add your questions.");
+			return true;
+		}
 		const { data: userData, error: userError } = await supabase.auth.getUser();
 		if (userError || !userData.user) {
 			toast.error("You must be logged in to create a quiz");
@@ -290,6 +365,15 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		const unsavedQuestions = questions.filter(isUnsavedQuestion);
 		if (unsavedQuestions.length === 0) return questions;
 
+		// TEMP (Supabase paused): save questions to localStorage when bypassing auth.
+		if (BYPASS_AUTH) {
+			try {
+				return insertLocalQuestionsStore(quizId, unsavedQuestions);
+			} catch {
+				toast.error("Failed to save questions");
+				return null;
+			}
+		}
 		const payload = unsavedQuestions.map((question) => ({
 			...appToDBQuestion(question),
 			quiz_id: quizId,
@@ -359,6 +443,39 @@ export function useCreateQuiz(resumeQuizId?: string | null) {
 		}
 
 		let code = generateCode();
+		// TEMP (Supabase paused): publish locally when bypassing auth.
+		if (BYPASS_AUTH) {
+			const updated = updateLocalQuiz(state.quiz.id, { status: "published", code, ...settings });
+			setState((prev) => ({ ...prev, isUploadingQuestions: false }));
+			if (!updated) {
+				toast.error("Failed to publish quiz");
+				return false;
+			}
+			const quizLink = `${window.location.origin}/quiz/${state.quiz.id}`;
+			try {
+				localStorage.removeItem(QUIZ_META_KEY);
+				localStorage.removeItem(BUILDER_DRAFT_KEY);
+			} catch {}
+			setState((prev) => ({
+				...prev,
+				questions: savedQuestions,
+				shareableLink: quizLink,
+				quizCode: updated.code,
+				quiz: {
+					...prev.quiz,
+					...settings,
+					status: "published",
+					code: updated.code,
+				},
+			}));
+			try {
+				await navigator.clipboard.writeText(quizLink);
+				toast.success("Quiz published! Link copied to clipboard.");
+			} catch {
+				toast.success("Quiz published!");
+			}
+			return true;
+		}
 		let result = await supabase
 			.from("quizzes")
 			.update({ status: "published", code, ...settings })

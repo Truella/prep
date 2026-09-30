@@ -1,6 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { BYPASS_AUTH } from "@/features/auth/context/AuthContext";
+import {
+	getLocalQuiz,
+	listLocalQuestions,
+} from "@/features/quiz-management/utils/localQuizStore";
 import toast from "react-hot-toast";
 import { DBQuestion } from "@/lib/types";
 import { dbToAppQuestion } from "@/features/quiz-management/utils/transforms";
@@ -63,6 +68,12 @@ export function useTakeQuiz(quizId: string | undefined) {
 		queryKey: ["quiz-take", quizId],
 		queryFn: async () => {
 			if (!quizId) throw new Error("No quiz ID provided");
+			// TEMP (Supabase paused): read from localStorage when bypassing auth.
+			if (BYPASS_AUTH) {
+				const local = getLocalQuiz(quizId);
+				if (!local) throw new Error("Quiz not found");
+				return local;
+			}
 			const { data, error } = await supabase
 				.from("quizzes")
 				.select("*")
@@ -79,6 +90,12 @@ export function useTakeQuiz(quizId: string | undefined) {
 	const { data: questions = [], isLoading: questionsLoading, error: questionsError } = useQuery({
 		queryKey: ["quiz-take-questions", quizId],
 		queryFn: async () => {
+			// TEMP (Supabase paused): read from localStorage when bypassing auth.
+			if (BYPASS_AUTH) {
+				const localQuestions = listLocalQuestions(quizId!);
+				if (localQuestions.length === 0) throw new Error("This quiz has no questions");
+				return localQuestions;
+			}
 			const { data, error } = await supabase
 				.from("questions")
 				.select("*")
@@ -154,6 +171,8 @@ export function useTakeQuiz(quizId: string | undefined) {
 
 	const saveAttempt = async (elapsed: number, answers?: Record<number, number>): Promise<boolean> => {
 		if (!quiz?.id) return false;
+		// TEMP (Supabase paused): skip DB write, results already persist to localStorage below.
+		if (BYPASS_AUTH) return true;
 		const answersToSubmit = answers ?? selectedAnswers;
 		const { earnedPoints } = calculateScore(answersToSubmit);
 		const totalPts = questions.reduce((sum, q) => sum + q.points, 0);

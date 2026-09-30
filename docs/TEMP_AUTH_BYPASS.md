@@ -23,7 +23,21 @@ When `true`:
 
 When `false` / unset: original Supabase behavior, zero changes.
 
-## Files touched
+## Local quiz creation (no DB writes)
+
+When `BYPASS_AUTH=true`, quiz creation/listing/detail/take also run against
+`localStorage` instead of Supabase, so work survives reloads until you unpause
+and revert.
+
+- Storage keys: `prep.local.quizzes.v1`, `prep.local.questions.v1` (plus the
+  existing `quiz_builder_draft`, `quiz_meta_draft`, `quiz_results_*` keys).
+- Mock owner id: `dev-user-id`. Attempt history is stubbed as empty; take-flow
+  attempts skip the DB insert and still show results via `quiz_results_*`.
+- IDs are generated locally (`quiz-<uuid>`, `q-<uuid>`), so share links look like
+  `/quiz/quiz-...` and work for local preview only. They will NOT exist in
+  Supabase after unpausing — export/recreate anything worth keeping.
+
+## Files touched (local-data mode)
 
 1. `.env.local` (new, gitignored — NOT committed)
    ```ini
@@ -54,9 +68,28 @@ When `false` / unset: original Supabase behavior, zero changes.
    - Guard inside redirect `useEffect`: `if (BYPASS_AUTH) return;`
    - Early render after all hooks: `if (BYPASS_AUTH) return <>{children}</>;`
 
-No other files changed. Data hooks (`useQuizzes`, `useCreateQuiz`, etc.) still
-call Supabase and will return errors/empty lists while paused — routes render,
-but nothing persists.
+4. `src/features/quiz-management/utils/localQuizStore.ts` (new — delete on revert)
+   - `localStorage`-backed `LocalQuiz` + `AppQuestion` store: create/read/update/delete
+     for quizzes and questions. All functions are `BYPASS_AUTH`-only callers.
+
+5. Bypass branches (all gated on `if (BYPASS_AUTH)`, search `TEMP (Supabase paused)`):
+   - `src/features/quiz-management/hooks/useCreateQuiz.ts` — load draft, create quiz,
+     `persistQuizMeta`, `insertQuestions`, `publishQuiz` use the local store.
+   - `src/features/quiz-management/hooks/useQuizzes.ts` — list/unpublish/delete use
+     the local store (with `question_count` from local questions).
+   - `src/features/quiz-management/hooks/useQuizDetail.ts` — fetch quiz/questions
+     (attempts → `[]`) and update/delete/unpublish/republish mutations use the local store.
+   - `src/features/quiz-management/hooks/usePublishQuiz.ts` — visibility update uses
+     the local store.
+   - `src/features/quiz-taking/hooks/useTakeQuiz.ts` — quiz/questions read from the
+     local store; `saveAttempt` returns `true` without a DB write.
+   - `src/features/dashboard/hooks/useStats.ts` — counts computed from the local store
+     (`totalAttempts: 0`).
+
+Quiz Bank / public discovery, ratings, and `/quiz/[quizId]` server reads still hit
+Supabase and will error while paused — local mode covers the dashboard
+creation loop (`/dashboard`, `/dashboard/create`, `/dashboard/my-quizzes`,
+`/dashboard/quiz/[quizId]`, take-flow for local quizzes).
 
 ## Disable without reverting (recommended first step)
 ```ini
@@ -75,11 +108,18 @@ Then restart dev server. Code stays but is inert.
    - the `BYPASS_AUTH` import,
    - `if (BYPASS_AUTH) return;` in `useEffect`,
    - the `if (BYPASS_AUTH) return <>{children}</>;` block.
-4. Delete this file (`docs/TEMP_AUTH_BYPASS.md`).
-5. Verify: `npm run typecheck`, `npm run lint`, then `git diff` should be empty.
+4. Delete `src/features/quiz-management/utils/localQuizStore.ts`.
+5. Remove every `// TEMP (Supabase paused)` branch in: `useCreateQuiz.ts`,
+   `useQuizzes.ts`, `useQuizDetail.ts`, `usePublishQuiz.ts`, `useTakeQuiz.ts`,
+   `useStats.ts` (plus their `BYPASS_AUTH` / `localQuizStore` imports).
+6. Optional: clear dev data in browser DevTools → Application → Local Storage:
+   `prep.local.quizzes.v1`, `prep.local.questions.v1`.
+7. Delete this file (`docs/TEMP_AUTH_BYPASS.md`).
+8. Verify: `npm run typecheck`, `npm run lint`, then `git diff` should be empty.
 
-Equivalent one-liner revert (from repo root, discards ONLY these two files):
+Equivalent one-liner revert (from repo root, discards all TEMP changes):
 ```powershell
-git checkout -- src/features/auth/context/AuthContext.tsx src/features/auth/components/RequireAuth.tsx
+git checkout -- src/features/auth/context/AuthContext.tsx src/features/auth/components/RequireAuth.tsx src/features/quiz-management/hooks/useCreateQuiz.ts src/features/quiz-management/hooks/useQuizzes.ts src/features/quiz-management/hooks/useQuizDetail.ts src/features/quiz-management/hooks/usePublishQuiz.ts src/features/quiz-taking/hooks/useTakeQuiz.ts src/features/dashboard/hooks/useStats.ts
 ```
-Then remove the `.env.local` line.
+Then delete `src/features/quiz-management/utils/localQuizStore.ts`,
+remove the `.env.local` line, and delete this doc.

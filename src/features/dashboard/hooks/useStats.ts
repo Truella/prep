@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { BYPASS_AUTH } from "@/features/auth/context/AuthContext";
+import {
+	countLocalQuestions,
+	listLocalQuizzes,
+} from "@/features/quiz-management/utils/localQuizStore";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 interface Stats {
@@ -9,6 +14,15 @@ interface Stats {
 }
 
 async function fetchStats(userId: string): Promise<Stats> {
+  // TEMP (Supabase paused): compute from localStorage when bypassing auth.
+  if (BYPASS_AUTH) {
+    void userId;
+    return {
+      totalQuizzes: listLocalQuizzes().length,
+      totalQuestions: countLocalQuestions(),
+      totalAttempts: 0,
+    };
+  }
   const [
     { count: quizCount, error: quizError },
     questionResult,
