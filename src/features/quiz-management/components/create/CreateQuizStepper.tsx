@@ -16,8 +16,8 @@ export default function CreateQuizStepper({
 	onStepChange,
 }: CreateQuizStepperProps) {
 	const steps: { id: Step; label: string; desc: string }[] = [
-		{ id: "details", label: "1. Details", desc: "Title, visibility & timing" },
-		{ id: "questions", label: "2. Questions", desc: hasQuiz ? `${questionCount} question${questionCount !== 1 ? "s" : ""}` : "Add content" },
+		{ id: "details", label: "Details", desc: "Title, visibility & timing" },
+		{ id: "questions", label: "Questions", desc: hasQuiz ? `${questionCount} question${questionCount !== 1 ? "s" : ""}` : "Add content" },
 	];
 
 	return (

@@ -109,15 +109,19 @@ export default function CreateQuizCSV() {
 						<Link href="/dashboard/my-quizzes" className="hover:underline" style={{ color: "var(--color-text-secondary)" }}>
 							← My quizzes
 						</Link>
-						<span aria-hidden>·</span>
-						<span>{quiz.id ? (quiz.status === "published" ? "Published" : "Draft") : "New quiz"}</span>
+						{quiz.id && (
+							<>
+								<span aria-hidden>·</span>
+								<span>{quiz.status === "published" ? "Published" : "Draft"}</span>
+							</>
+						)}
 					</div>
 					<h1 className="text-2xl font-bold tracking-tight" style={{ color: "var(--color-text-primary)" }}>
 						{quiz.id ? (step === "details" ? "Edit quiz details" : quiz.title || "Add questions") : "Create a new quiz"}
 					</h1>
 					<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
 						{step === "details"
-							? "Set up the basics before adding questions. All fields can be edited later."
+							? "Set up the basics before adding questions."
 							: "Add questions manually or bulk-upload via CSV. Your quiz saves as a draft until you publish."}
 					</p>
 				</div>

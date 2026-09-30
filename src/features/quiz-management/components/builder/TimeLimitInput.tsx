@@ -65,7 +65,7 @@ export default function TimeLimitInput({
 					Time limit
 				</p>
 				<p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
-					Learners will see a countdown. Leave as no limit for untimed quizzes.
+					Optional countdown for timed quizzes.
 				</p>
 			</div>
 

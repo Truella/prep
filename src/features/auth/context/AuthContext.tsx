@@ -29,6 +29,21 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// TEMPORARY: bypass auth while Supabase project is paused.
+// Set NEXT_PUBLIC_BYPASS_AUTH=true in .env.local to enable.
+// Remove this once Supabase is resumed.
+export const BYPASS_AUTH =
+	process.env.NEXT_PUBLIC_BYPASS_AUTH === "true";
+
+const MOCK_DEV_USER = {
+	id: "dev-user-id",
+	email: "dev@localhost.test",
+	app_metadata: { provider: "email", providers: ["email"] },
+	user_metadata: { email: "dev@localhost.test" },
+	aud: "authenticated",
+	created_at: new Date().toISOString(),
+} as unknown as User;
+
 interface AuthProviderProps {
 	children: ReactNode;
 }
@@ -42,6 +57,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const mountedRef = useRef(true);
 
 	useEffect(() => {
+		if (BYPASS_AUTH) {
+			if (mountedRef.current) {
+				setUser(MOCK_DEV_USER);
+				setInitializing(false);
+			}
+			return;
+		}
 		mountedRef.current = true;
 
 		// Get initial session
@@ -80,6 +102,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	};
 
 	const signUp = async (email: string, password: string) => {
+		if (BYPASS_AUTH) {
+			setUser(MOCK_DEV_USER);
+			router.push("/dashboard");
+			return;
+		}
 		setError(null);
 		setLoading(true);
 
@@ -109,6 +136,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	};
 
 	const signIn = async (email: string, password: string) => {
+		if (BYPASS_AUTH) {
+			setUser(MOCK_DEV_USER);
+			router.push("/dashboard");
+			return;
+		}
 		setError(null);
 		setLoading(true);
 
@@ -139,6 +171,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	};
 
 	const signOut = async () => {
+		if (BYPASS_AUTH) {
+			router.push("/auth");
+			return;
+		}
 		setError(null);
 		setLoading(true);
 

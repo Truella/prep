@@ -66,7 +66,7 @@ export default function QuizDetailsStep({
 						Basics
 					</h3>
 					<p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
-						This is what learners see first. You can edit it later from your dashboard.
+						How your quiz appears to learners.
 					</p>
 				</div>
 
@@ -110,9 +110,6 @@ export default function QuizDetailsStep({
 						className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition resize-none"
 						style={inputBase}
 					/>
-					<p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
-						Keep it short — shown on cards and share previews.
-					</p>
 				</div>
 			</div>
 
@@ -123,7 +120,7 @@ export default function QuizDetailsStep({
 						Discovery
 					</h3>
 					<p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
-						Control how learners find your quiz. You can change this before publishing.
+						Control quiz discovery.
 					</p>
 				</div>
 

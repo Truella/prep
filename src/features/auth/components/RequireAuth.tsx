@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { BYPASS_AUTH } from "@/features/auth/context/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import DashboardSkeleton from "@/features/dashboard/components/DashboardSkeleton";
@@ -48,10 +49,16 @@ export function RequireAuth({ children }: RequireAuthProps) {
 	const pathname = usePathname();
 
 	useEffect(() => {
+		if (BYPASS_AUTH) return;
 		if (!initializing && !user) {
 			router.replace("/auth");
 		}
 	}, [user, initializing, router]);
+
+	// TEMPORARY bypass while Supabase is paused. Remove with BYPASS_AUTH.
+	if (BYPASS_AUTH) {
+		return <>{children}</>;
+	}
 
 	if (initializing) {
 		return (
