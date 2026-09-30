@@ -170,15 +170,6 @@ export default function Quizzes() {
 					))}
 				</div>
 			)}
-
-			<Link
-				href="/dashboard/create"
-				className="sm:hidden flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold"
-				style={{ backgroundColor: "var(--color-text-primary)", color: "var(--color-bg)" }}
-			>
-				<HugeiconsIcon icon={PlusSignIcon} size={18} />
-				Create New Quiz
-			</Link>
 		</div>
 	);
 }
